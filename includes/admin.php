@@ -9,6 +9,29 @@ function tsvd_tools_log($message) {
     @file_put_contents(TSVD_TOOLS_LOG_FILE, $entry, FILE_APPEND);
 }
 
+add_action('init', function() {
+    if (!taxonomy_exists('animal_breed')) {
+        register_taxonomy('animal_breed', 'animals', array(
+            'public'       => true,
+            'show_ui'      => false,
+            'show_in_menu' => false,
+            'hierarchical' => true,
+            'label'        => 'Tierarten/Rassen',
+        ));
+        tsvd_tools_log("FALLBACK: animal_breed taxonomy registered");
+    }
+    if (!taxonomy_exists('animal_color')) {
+        register_taxonomy('animal_color', 'animals', array(
+            'public'       => true,
+            'show_ui'      => false,
+            'show_in_menu' => false,
+            'hierarchical' => false,
+            'label'        => 'Farben',
+        ));
+        tsvd_tools_log("FALLBACK: animal_color taxonomy registered");
+    }
+}, 5);
+
 add_action('admin_menu', 'tsvd_tools_register_admin_page');
 function tsvd_tools_register_admin_page() {
     add_menu_page(
@@ -132,12 +155,14 @@ add_action('rest_api_init', function() {
                 $theme_dir = get_template_directory();
                 tsvd_tools_log("REST: theme_dir=$theme_dir, json=$theme_dir/data/animal-breeds.json, file_exists=" . (file_exists($theme_dir . '/data/animal-breeds.json') ? 'YES' : 'NO'));
                 $results['breeds'] = tsvd_tools_import_breeds(true);
+                update_option('tsvd_tools_breeds_last_sync', date('d.m.Y H:i'));
                 tsvd_tools_log("REST API: breeds sync done");
             }
             if ($type === 'colors' || $type === 'both') {
                 $theme_dir = get_template_directory();
                 tsvd_tools_log("REST: colors json=$theme_dir/data/animal-colors.json, file_exists=" . (file_exists($theme_dir . '/data/animal-colors.json') ? 'YES' : 'NO'));
                 $results['colors'] = tsvd_tools_import_colors(true);
+                update_option('tsvd_tools_colors_last_sync', date('d.m.Y H:i'));
                 tsvd_tools_log("REST API: colors sync done");
             }
 
@@ -254,13 +279,17 @@ function tsvd_tools_import_breeds($force_update = false) {
         $exists = term_exists($sp_slug, 'animal_breed');
         if (!$exists || $exists === 0) {
             $new = wp_insert_term($sp_name, 'animal_breed', array('slug' => $sp_slug));
-            if (!is_wp_error($new)) { $imported++; }
-            $sp_id = $new['term_id'];
+            if (is_wp_error($new)) {
+                tsvd_tools_log("ERROR inserting species $sp_slug: " . $new->get_error_message());
+            } else {
+                $imported++;
+                $sp_id = $new['term_id'];
+            }
         } else {
-            $sp_id = (int) $exists;
+            $sp_id = is_array($exists) ? (int) $exists['term_id'] : (int) $exists;
         }
 
-        if (isset($sp['breeds']) && is_array($sp['breeds'])) {
+        if (isset($sp['breeds']) && is_array($sp['breeds']) && isset($sp_id)) {
             foreach ($sp['breeds'] as $br) {
                 $br_name = $is_german ? $br['name_de'] : $br['name_en'];
                 $br_slug = $br['slug'];
@@ -268,18 +297,24 @@ function tsvd_tools_import_breeds($force_update = false) {
                 $br_exists = term_exists($br_slug, 'animal_breed');
                 if (!$br_exists || $br_exists === 0) {
                     $new = wp_insert_term($br_name, 'animal_breed', array('slug' => $br_slug, 'parent' => $sp_id));
-                    if (!is_wp_error($new)) { $imported++; }
+                    if (is_wp_error($new)) {
+                        tsvd_tools_log("ERROR inserting breed $br_slug: " . $new->get_error_message());
+                    } else {
+                        $imported++;
+                    }
                 } else {
-                    wp_update_term($br_exists, 'animal_breed', array('name' => $br_name, 'parent' => $sp_id));
+                    $br_update_id = is_array($br_exists) ? $br_exists['term_id'] : $br_exists;
+                    wp_update_term($br_update_id, 'animal_breed', array('name' => $br_name, 'parent' => $sp_id));
                     $updated++;
                 }
             }
         }
     }
 
+    clean_term_cache(array(), 'animal_breed', true);
     tsvd_tools_log("BREEDS SYNC DONE: imported=$imported updated=$updated deleted=$deleted");
     return array(
-        'success' => true,
+        'success' => ($imported + $updated + $deleted) > 0,
         'message' => sprintf('Rassen importiert: %d neu, %d aktualisiert, %d gelöscht.', $imported, $updated, $deleted),
         'imported' => $imported, 'updated' => $updated, 'deleted' => $deleted
     );
@@ -331,16 +366,22 @@ function tsvd_tools_import_colors($force_update = false) {
         $exists = term_exists($slug, 'animal_color');
         if (!$exists || $exists === 0) {
             $new = wp_insert_term($name, 'animal_color', array('slug' => $slug));
-            if (!is_wp_error($new)) { $imported++; }
+            if (is_wp_error($new)) {
+                tsvd_tools_log("ERROR inserting color $slug: " . $new->get_error_message());
+            } else {
+                $imported++;
+            }
         } else {
-            wp_update_term($exists, 'animal_color', array('name' => $name));
+            $update_id = is_array($exists) ? $exists['term_id'] : $exists;
+            wp_update_term($update_id, 'animal_color', array('name' => $name));
             $updated++;
         }
     }
 
+    clean_term_cache(array(), 'animal_color', true);
     tsvd_tools_log("COLORS SYNC DONE: imported=$imported updated=$updated deleted=$deleted");
     return array(
-        'success' => true,
+        'success' => ($imported + $updated + $deleted) > 0,
         'message' => sprintf('Farben importiert: %d neu, %d aktualisiert, %d gelöscht.', $imported, $updated, $deleted),
         'imported' => $imported, 'updated' => $updated, 'deleted' => $deleted
     );
