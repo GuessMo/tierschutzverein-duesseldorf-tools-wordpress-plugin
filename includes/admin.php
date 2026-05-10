@@ -71,13 +71,8 @@ function tsvd_tools_render_admin_page() {
     global $wpdb;
     $tax_breed_exists = taxonomy_exists('animal_breed') ? 'JA' : 'NEIN';
     $tax_color_exists = taxonomy_exists('animal_color') ? 'JA' : 'NEIN';
-    $db_breed_count = (int) $wpdb->get_var("SELECT COUNT(*) FROM {$wpdb->term_taxonomy} WHERE taxonomy = 'animal_breed'");
-    $db_color_count = (int) $wpdb->get_var("SELECT COUNT(*) FROM {$wpdb->term_taxonomy} WHERE taxonomy = 'animal_color'");
-
-    $breeds_count = wp_count_terms('animal_breed', array('hide_empty' => false));
-    $colors_count = wp_count_terms('animal_color', array('hide_empty' => false));
-    $breeds_count = is_int($breeds_count) ? $breeds_count : 0;
-    $colors_count = is_int($colors_count) ? $colors_count : 0;
+    $breeds_count = (int) $wpdb->get_var("SELECT COUNT(*) FROM {$wpdb->term_taxonomy} WHERE taxonomy = 'animal_breed'");
+    $colors_count = (int) $wpdb->get_var("SELECT COUNT(*) FROM {$wpdb->term_taxonomy} WHERE taxonomy = 'animal_color'");
     ?>
     <div class="wrap tsvd-tools-wrap">
         <h1>TSV Tools</h1>
@@ -86,10 +81,10 @@ function tsvd_tools_render_admin_page() {
         <p>Synchronisiert Tier-Rassen und Farben aus den JSON-Dateien im Theme-Verzeichnis in die WordPress-Taxonomien.</p>
 
         <div class="tsvd-tools-info" style="margin:15px 0;padding:15px;background:#f8f8f8;border:1px solid #ddd;">
-            <p><strong>Rassen-JSON:</strong> <?php echo $breeds_modified; ?> (<?php echo $breeds_count; ?> Rassen in DB via wp_count_terms) — Letzter Sync: <?php echo esc_html($breeds_last_sync); ?></p>
-            <p><strong>Farben-JSON:</strong> <?php echo $colors_modified; ?> (<?php echo $colors_count; ?> Farben in DB via wp_count_terms) — Letzter Sync: <?php echo esc_html($colors_last_sync); ?></p>
-            <p><strong>Diagnose:</strong> taxonomy_exists('animal_breed') = <strong><?php echo $tax_breed_exists; ?></strong> | DB COUNT: <?php echo $db_breed_count; ?> | wp_count_terms: <?php echo $breeds_count; ?></p>
-            <p><strong>Diagnose:</strong> taxonomy_exists('animal_color') = <strong><?php echo $tax_color_exists; ?></strong> | DB COUNT: <?php echo $db_color_count; ?> | wp_count_terms: <?php echo $colors_count; ?></p>
+            <p><strong>Rassen-JSON:</strong> <?php echo $breeds_modified; ?> (<?php echo $breeds_count; ?> Rassen in DB) — Letzter Sync: <?php echo esc_html($breeds_last_sync); ?></p>
+            <p><strong>Farben-JSON:</strong> <?php echo $colors_modified; ?> (<?php echo $colors_count; ?> Farben in DB) — Letzter Sync: <?php echo esc_html($colors_last_sync); ?></p>
+            <p><strong>Diagnose:</strong> taxonomy_exists('animal_breed') = <strong><?php echo $tax_breed_exists; ?></strong> | DB COUNT: <?php echo $breeds_count; ?></p>
+            <p><strong>Diagnose:</strong> taxonomy_exists('animal_color') = <strong><?php echo $tax_color_exists; ?></strong> | DB COUNT: <?php echo $colors_count; ?></p>
         </div>
 
         <div style="margin:20px 0;">
@@ -140,16 +135,13 @@ function tsvd_tools_ajax_get_status() {
     $db_breed_count = (int) $wpdb->get_var("SELECT COUNT(*) FROM {$wpdb->term_taxonomy} WHERE taxonomy = 'animal_breed'");
     $db_color_count = (int) $wpdb->get_var("SELECT COUNT(*) FROM {$wpdb->term_taxonomy} WHERE taxonomy = 'animal_color'");
 
-    $breeds_count = wp_count_terms('animal_breed', array('hide_empty' => false));
-    $colors_count = wp_count_terms('animal_color', array('hide_empty' => false));
-
     wp_send_json_success(array(
         'breeds_file' => $breeds_modified,
         'colors_file' => $colors_modified,
         'breeds_last_sync' => $breeds_last_sync,
         'colors_last_sync' => $colors_last_sync,
-        'breeds_count' => is_int($breeds_count) ? $breeds_count : 0,
-        'colors_count' => is_int($colors_count) ? $colors_count : 0,
+        'breeds_count' => $db_breed_count,
+        'colors_count' => $db_color_count,
         'db_breed_count' => $db_breed_count,
         'db_color_count' => $db_color_count,
         'tax_breed_exists' => taxonomy_exists('animal_breed'),

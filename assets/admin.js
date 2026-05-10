@@ -29,6 +29,7 @@ document.addEventListener('DOMContentLoaded', function () {
                     if (d.data.imported !== undefined) {
                         log('   Neu: ' + d.data.imported + ' | Aktualisiert: ' + d.data.updated + ' | Gelöscht: ' + d.data.deleted);
                     }
+                    refreshStatus();
                 } else {
                     log('FEHLER: ' + (d.data ? d.data.message : 'Unbekannt'));
                 }
@@ -38,6 +39,27 @@ document.addEventListener('DOMContentLoaded', function () {
                 log('NETZWERKFEHLER: ' + e.message);
                 if (btn) { btn.textContent = origText; btn.disabled = false; }
             });
+    }
+
+    function refreshStatus() {
+        var fd = new FormData();
+        fd.append('action', 'tsvd_tools_get_status');
+        fd.append('nonce', tsvdTools.nonce);
+        fetch(tsvdTools.ajaxUrl, { method: 'POST', body: fd })
+            .then(function(r) { return r.json(); })
+            .then(function(d) {
+                if (d.success && d.data) {
+                    var infoDiv = document.querySelector('.tsvd-tools-info');
+                    if (infoDiv) {
+                        var paragraphs = infoDiv.querySelectorAll('p');
+                        if (paragraphs.length >= 2) {
+                            paragraphs[0].innerHTML = '<strong>Rassen-JSON:</strong> ' + (d.data.breeds_file || '?') + ' (' + d.data.breeds_count + ' Rassen in DB) — Letzter Sync: ' + (d.data.breeds_last_sync || 'nie');
+                            paragraphs[1].innerHTML = '<strong>Farben-JSON:</strong> ' + (d.data.colors_file || '?') + ' (' + d.data.colors_count + ' Farben in DB) — Letzter Sync: ' + (d.data.colors_last_sync || 'nie');
+                        }
+                    }
+                }
+            })
+            .catch(function() {});
     }
 
     if (syncBreedsBtn) {
