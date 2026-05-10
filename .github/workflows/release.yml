@@ -1,0 +1,159 @@
+name: Release and Deploy
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+env:
+  DEPLOY_ARTIFACT_NAME: tsvd-tools-deploy
+  DEPLOY_ARTIFACT_DIR: /tmp/tsvd-tools-deploy
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    outputs:
+      version: ${{ steps.version.outputs.new_version }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          fetch-depth: 0
+
+      - name: Pull latest changes
+        run: git pull --rebase origin main
+
+      - name: Determine bump type
+        id: bump
+        run: |
+          MSG="${{ github.event.head_commit.message }}"
+          echo "Commit: $MSG"
+          if echo "$MSG" | grep -qE '^feat(\(.+\))?:'; then
+            echo "type=minor" >> $GITHUB_OUTPUT
+            echo "→ Bumping minor version"
+          elif echo "$MSG" | grep -qE '^fix(\(.+\))?:'; then
+            echo "type=patch" >> $GITHUB_OUTPUT
+            echo "→ Bumping patch version"
+          elif echo "$MSG" | grep -qE '^chore\(release\)'; then
+            echo "type=released" >> $GITHUB_OUTPUT
+            echo "→ Already released, using current version"
+          else
+            echo "type=none" >> $GITHUB_OUTPUT
+            echo "→ No bump needed"
+          fi
+
+      - name: Get current version
+        id: current
+        run: |
+          git fetch --tags
+          LATEST_TAG=$(git tag -l "v*" --sort=-version:refname | head -1)
+          if [ -z "$LATEST_TAG" ]; then
+            CURRENT=$(grep " * Version:" "tsv-tools.php" | awk '{print $3}')
+          else
+            CURRENT="${LATEST_TAG#v}"
+          fi
+          echo "current=$CURRENT" >> $GITHUB_OUTPUT
+          echo "Using version: $CURRENT"
+
+      - name: Bump version
+        if: steps.bump.outputs.type == 'minor' || steps.bump.outputs.type == 'patch'
+        run: |
+          CURRENT=${{ steps.current.outputs.current }}
+          IFS='.' read -r MAJOR MINOR PATCH <<< "$CURRENT"
+          if [ "${{ steps.bump.outputs.type }}" = "minor" ]; then
+            MINOR=$((MINOR + 1)); PATCH=0
+          else
+            PATCH=$((PATCH + 1))
+          fi
+          NEW="$MAJOR.$MINOR.$PATCH"
+          sed -i "s/ \* Version: $CURRENT/ \* Version: $NEW/" "tsv-tools.php"
+          sed -i "s/define('TSVD_TOOLS_VERSION', '.*');/define('TSVD_TOOLS_VERSION', '$NEW');/" "tsv-tools.php"
+          echo "Version bumped to $NEW"
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add -A
+          git commit -m "chore(release): bump version to $NEW"
+          git tag -d "v$NEW" 2>/dev/null || true
+          git tag "v$NEW"
+          git pull --rebase origin main
+          git push origin main --tags
+
+      - name: Set version for release
+        id: version
+        run: |
+          VERSION=$(grep " * Version:" "tsv-tools.php" | awk '{print $3}')
+          echo "new_version=$VERSION" >> $GITHUB_OUTPUT
+          echo "Deploying version $VERSION"
+
+  build:
+    runs-on: ubuntu-latest
+    needs: release
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Pull latest
+        run: |
+          git pull origin main
+          git fetch --tags origin
+
+      - name: Stage deploy artifact
+        run: |
+          mkdir -p "$DEPLOY_ARTIFACT_DIR"
+          rsync -a \
+            --exclude='.github/' \
+            --exclude='.git/' \
+            --exclude='*.md' \
+            ./ \
+            "$DEPLOY_ARTIFACT_DIR/"
+
+      - name: Upload deploy artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: ${{ env.DEPLOY_ARTIFACT_NAME }}
+          path: ${{ env.DEPLOY_ARTIFACT_DIR }}/
+          if-no-files-found: error
+
+  deploy:
+    runs-on: ubuntu-latest
+    needs: build
+
+    steps:
+      - name: Download deploy artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: ${{ env.DEPLOY_ARTIFACT_NAME }}
+          path: ${{ env.DEPLOY_ARTIFACT_DIR }}
+
+      - name: Prepare SSH key
+        env:
+          HETZNER_HOST: ${{ secrets.HETZNER_HOST }}
+          HETZNER_SSH_KEY: ${{ secrets.HETZNER_SSH_KEY }}
+        run: |
+          test -n "$HETZNER_HOST"
+          test -n "$HETZNER_SSH_KEY"
+          mkdir -p ~/.ssh
+          chmod 700 ~/.ssh
+          printf '%s\n' "$HETZNER_SSH_KEY" | tr -d '\r' > ~/.ssh/id_ed25519
+          chmod 600 ~/.ssh/id_ed25519
+          ssh-keyscan -H "$HETZNER_HOST" >> ~/.ssh/known_hosts
+
+      - name: Deploy plugin to Hetzner
+        env:
+          HETZNER_HOST: ${{ secrets.HETZNER_HOST }}
+          HETZNER_USER: ${{ secrets.HETZNER_USER }}
+          HETZNER_PLUGIN_DIR: ${{ secrets.HETZNER_PLUGIN_DIR }}
+        run: |
+          test -n "$HETZNER_HOST"
+          test -n "$HETZNER_USER"
+          test -n "$HETZNER_PLUGIN_DIR"
+          ssh -i ~/.ssh/id_ed25519 "$HETZNER_USER@$HETZNER_HOST" "mkdir -p '$HETZNER_PLUGIN_DIR'"
+          rsync -az --delete \
+            -e "ssh -i ~/.ssh/id_ed25519" \
+            "$DEPLOY_ARTIFACT_DIR/" \
+            "$HETZNER_USER@$HETZNER_HOST:$HETZNER_PLUGIN_DIR/"
