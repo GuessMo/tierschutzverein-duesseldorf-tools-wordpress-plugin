@@ -215,10 +215,6 @@ function tsvd_tools_import_breeds($force_update = false) {
         return array('success' => false, 'message' => 'Ungültiges JSON-Format.');
     }
 
-    if (!$force_update && get_option('tsvd_tools_breeds_imported')) {
-        return array('success' => false, 'message' => 'Bereits importiert. Nutze Force Sync für erneuten Import.');
-    }
-
     $current_locale = get_locale();
     $is_german = (strpos($current_locale, 'de') === 0);
     $imported = 0;
@@ -277,7 +273,6 @@ function tsvd_tools_import_breeds($force_update = false) {
         }
     }
 
-    update_option('tsvd_tools_breeds_imported', true);
     tsvd_tools_log("BREEDS SYNC DONE: imported=$imported updated=$updated deleted=$deleted");
     return array(
         'success' => true,
@@ -300,10 +295,6 @@ function tsvd_tools_import_colors($force_update = false) {
 
     if (json_last_error() !== JSON_ERROR_NONE || !isset($data['colors'])) {
         return array('success' => false, 'message' => 'Ungültiges JSON-Format.');
-    }
-
-    if (!$force_update && get_option('tsvd_tools_colors_imported')) {
-        return array('success' => false, 'message' => 'Bereits importiert. Nutze Force Sync für erneuten Import.');
     }
 
     $current_locale = get_locale();
@@ -343,7 +334,6 @@ function tsvd_tools_import_colors($force_update = false) {
         }
     }
 
-    update_option('tsvd_tools_colors_imported', true);
     tsvd_tools_log("COLORS SYNC DONE: imported=$imported updated=$updated deleted=$deleted");
     return array(
         'success' => true,
