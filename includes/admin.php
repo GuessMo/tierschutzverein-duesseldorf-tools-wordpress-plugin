@@ -129,10 +129,14 @@ add_action('rest_api_init', function() {
             $results = array();
 
             if ($type === 'breeds' || $type === 'both') {
+                $theme_dir = get_template_directory();
+                tsvd_tools_log("REST: theme_dir=$theme_dir, json=$theme_dir/data/animal-breeds.json, file_exists=" . (file_exists($theme_dir . '/data/animal-breeds.json') ? 'YES' : 'NO'));
                 $results['breeds'] = tsvd_tools_import_breeds(true);
                 tsvd_tools_log("REST API: breeds sync done");
             }
             if ($type === 'colors' || $type === 'both') {
+                $theme_dir = get_template_directory();
+                tsvd_tools_log("REST: colors json=$theme_dir/data/animal-colors.json, file_exists=" . (file_exists($theme_dir . '/data/animal-colors.json') ? 'YES' : 'NO'));
                 $results['colors'] = tsvd_tools_import_colors(true);
                 tsvd_tools_log("REST API: colors sync done");
             }
