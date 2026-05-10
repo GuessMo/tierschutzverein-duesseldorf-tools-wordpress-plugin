@@ -1,6 +1,14 @@
 <?php
 if (!defined('ABSPATH')) exit;
 
+define('TSVD_TOOLS_LOG_FILE', WP_CONTENT_DIR . '/tsvd-tools-sync.log');
+
+function tsvd_tools_log($message) {
+    $timestamp = date('Y-m-d H:i:s');
+    $entry = "[$timestamp] $message\n";
+    @file_put_contents(TSVD_TOOLS_LOG_FILE, $entry, FILE_APPEND);
+}
+
 add_action('admin_menu', 'tsvd_tools_register_admin_page');
 function tsvd_tools_register_admin_page() {
     add_menu_page(
@@ -143,6 +151,8 @@ function tsvd_tools_ajax_sync_colors() {
 }
 
 function tsvd_tools_import_breeds($force_update = false) {
+    tsvd_tools_log('BREEDS SYNC START (force=' . ($force_update ? 'true' : 'false') . ')');
+
     $json_file = get_template_directory() . '/data/animal-breeds.json';
 
     if (!file_exists($json_file)) {
@@ -219,6 +229,7 @@ function tsvd_tools_import_breeds($force_update = false) {
     }
 
     update_option('tsvd_tools_breeds_imported', true);
+    tsvd_tools_log("BREEDS SYNC DONE: imported=$imported updated=$updated deleted=$deleted");
     return array(
         'success' => true,
         'message' => sprintf('Rassen importiert: %d neu, %d aktualisiert, %d gelöscht.', $imported, $updated, $deleted),
@@ -227,6 +238,8 @@ function tsvd_tools_import_breeds($force_update = false) {
 }
 
 function tsvd_tools_import_colors($force_update = false) {
+    tsvd_tools_log('COLORS SYNC START (force=' . ($force_update ? 'true' : 'false') . ')');
+
     $json_file = get_template_directory() . '/data/animal-colors.json';
 
     if (!file_exists($json_file)) {
@@ -282,6 +295,7 @@ function tsvd_tools_import_colors($force_update = false) {
     }
 
     update_option('tsvd_tools_colors_imported', true);
+    tsvd_tools_log("COLORS SYNC DONE: imported=$imported updated=$updated deleted=$deleted");
     return array(
         'success' => true,
         'message' => sprintf('Farben importiert: %d neu, %d aktualisiert, %d gelöscht.', $imported, $updated, $deleted),
