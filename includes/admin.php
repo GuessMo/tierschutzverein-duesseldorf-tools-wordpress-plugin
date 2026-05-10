@@ -68,6 +68,17 @@ function tsvd_tools_render_admin_page() {
             <p><label><input type="checkbox" id="tsvd-tools-force-sync"> <strong>Force Sync</strong> (alle bestehenden Einträge löschen und neu importieren)</label></p>
         </div>
 
+        <div style="margin:20px 0;padding:15px;background:#fffbe6;border:1px solid #ddd;">
+            <h3>Auto-Sync Webhook (für GitHub Actions)</h3>
+            <p>Endpoint: <code id="tsvd-tools-endpoint"><?php echo rest_url('tsvd-tools/v1/sync'); ?></code></p>
+            <p>
+                <label>Sync-Token:</label>
+                <input type="text" id="tsvd-tools-token" value="<?php echo esc_attr(get_option('tsvd_tools_sync_token', '')); ?>" style="width:300px;">
+                <button type="button" id="tsvd-tools-save-token" class="button">Speichern</button>
+            </p>
+            <p class="description">Token wird für REST-API-Authentifizierung benötigt. Er muss in GitHub Actions als Secret hinterlegt werden.</p>
+        </div>
+
         <div style="margin:20px 0;">
             <h3>Log</h3>
             <div id="tsvd-tools-log" style="background:#1e1e1e;color:#00ff00;font-family:monospace;font-size:12px;padding:15px;height:300px;overflow-y:auto;border:1px solid #333;white-space:pre-wrap;"></div>
@@ -103,6 +114,44 @@ function tsvd_tools_ajax_get_status() {
         'colors_count' => is_int($colors_count) ? $colors_count : 0,
     ));
 }
+
+add_action('rest_api_init', function() {
+    register_rest_route('tsvd-tools/v1', '/sync', array(
+        'methods' => 'POST',
+        'callback' => function($request) {
+            $token = $request->get_header('x-sync-token');
+            $expected = get_option('tsvd_tools_sync_token', '');
+            if (empty($expected) || $token !== $expected) {
+                return new WP_Error('unauthorized', 'Invalid or missing sync token', array('status' => 401));
+            }
+
+            $type = $request->get_param('type') ?: 'both';
+            $results = array();
+
+            if ($type === 'breeds' || $type === 'both') {
+                $results['breeds'] = tsvd_tools_import_breeds(true);
+                tsvd_tools_log("REST API: breeds sync done");
+            }
+            if ($type === 'colors' || $type === 'both') {
+                $results['colors'] = tsvd_tools_import_colors(true);
+                tsvd_tools_log("REST API: colors sync done");
+            }
+
+            return new WP_REST_Response($results, 200);
+        },
+        'permission_callback' => '__return_true',
+    ));
+});
+
+add_action('wp_ajax_tsvd_tools_save_token', function() {
+    check_ajax_referer('tsvd_tools_nonce', 'nonce');
+    if (!current_user_can('manage_options')) {
+        wp_send_json_error(array('message' => 'Nicht autorisiert.'));
+    }
+    $token = isset($_POST['token']) ? sanitize_text_field($_POST['token']) : '';
+    update_option('tsvd_tools_sync_token', $token);
+    wp_send_json_success(array('message' => 'Token gespeichert.'));
+});
 
 add_action('wp_ajax_tsvd_tools_sync_breeds', 'tsvd_tools_ajax_sync_breeds');
 function tsvd_tools_ajax_sync_breeds() {

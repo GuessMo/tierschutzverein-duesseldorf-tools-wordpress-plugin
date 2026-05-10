@@ -59,4 +59,30 @@ document.addEventListener('DOMContentLoaded', function () {
             setTimeout(function() { fetchSync('tsvd_tools_sync_colors', syncBothBtn); }, 500);
         });
     }
+
+    var saveTokenBtn = document.getElementById('tsvd-tools-save-token');
+    var tokenInput = document.getElementById('tsvd-tools-token');
+    if (saveTokenBtn) {
+        saveTokenBtn.addEventListener('click', function() {
+            var token = tokenInput.value.trim();
+            var fd = new FormData();
+            fd.append('action', 'tsvd_tools_save_token');
+            fd.append('nonce', tsvdTools.nonce);
+            fd.append('token', token);
+            saveTokenBtn.disabled = true;
+            saveTokenBtn.textContent = 'Speichere...';
+            fetch(tsvdTools.ajaxUrl, { method: 'POST', body: fd })
+                .then(function(r) { return r.json(); })
+                .then(function(d) {
+                    log(d.success ? 'Token gespeichert.' : 'Fehler: ' + (d.data ? d.data.message : '?'));
+                    saveTokenBtn.disabled = false;
+                    saveTokenBtn.textContent = 'Speichern';
+                })
+                .catch(function(e) {
+                    log('FEHLER: ' + e.message);
+                    saveTokenBtn.disabled = false;
+                    saveTokenBtn.textContent = 'Speichern';
+                });
+        });
+    }
 });
