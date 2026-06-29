@@ -135,3 +135,86 @@ function tsvd_tools_ai_update_animal($input) {
 
     return tsvd_tools_ai_format_animal($id);
 }
+
+function tsvd_tools_ai_can_manage_settings() {
+    return current_user_can('manage_options');
+}
+
+function tsvd_tools_ai_missing_form_fields() {
+    return array(
+        array('id' => 'animal_name', 'type' => 'animal_name', 'label' => __('Name des Tieres', 'tsv-tools'), 'required' => true),
+        array('id' => 'animal_breed', 'type' => 'animal_breed', 'label' => __('Tierart / Rasse', 'tsv-tools'), 'required' => true),
+        array('id' => 'animal_missing_last_seen_date', 'type' => 'animal_missing_last_seen_date', 'label' => __('Zuletzt gesehen (Datum)', 'tsv-tools'), 'required' => true),
+        array('id' => 'animal_missing_last_seen_location', 'type' => 'animal_missing_last_seen_location', 'label' => __('Zuletzt gesehen (Ort)', 'tsv-tools'), 'required' => true),
+        array('id' => 'animal_missing_chip_number', 'type' => 'animal_missing_chip_number', 'label' => __('Chipnummer', 'tsv-tools'), 'required' => false),
+        array('id' => 'animal_missing_reward', 'type' => 'animal_missing_reward', 'label' => __('Belohnung', 'tsv-tools'), 'required' => false),
+        array('id' => 'animal_profile_image', 'type' => 'animal_profile_image', 'label' => __('Foto', 'tsv-tools'), 'required' => false),
+        array('id' => 'animal_description', 'type' => 'animal_description', 'label' => __('Beschreibung', 'tsv-tools'), 'required' => false),
+        array('id' => 'melder_vorname', 'type' => 'animal_private_contact_firstname', 'label' => __('Dein Vorname', 'tsv-tools'), 'required' => true),
+        array('id' => 'melder_nachname', 'type' => 'animal_private_contact_lastname', 'label' => __('Dein Nachname', 'tsv-tools'), 'required' => true),
+        array('id' => 'melder_email', 'type' => 'animal_private_contact_email', 'label' => __('Deine E-Mail', 'tsv-tools'), 'required' => true),
+        array('id' => 'melder_anschrift', 'type' => 'animal_private_contact_address', 'label' => __('Deine Anschrift', 'tsv-tools'), 'required' => false),
+    );
+}
+
+function tsvd_tools_ai_create_missing_form($input) {
+    $force = ! empty($input['force']);
+    $existing = (int) get_option('tsvd_missing_animals_form', 0);
+    if ($existing && get_post_type($existing) === 'tsvd_form' && ! $force) {
+        return array(
+            'created'        => false,
+            'form_id'        => $existing,
+            'form_edit_link' => (string) get_edit_post_link($existing, 'raw'),
+            'page_id'        => (int) get_option('tsvd_missing_animals_page', 0),
+            'page_url'       => '',
+            'message'        => __('Formular bereits konfiguriert (force=true zum Neuanlegen).', 'tsv-tools'),
+        );
+    }
+
+    $title = isset($input['title']) && $input['title'] !== '' ? sanitize_text_field($input['title']) : __('Vermisstes Tier melden', 'tsv-tools');
+    $form_id = wp_insert_post(array(
+        'post_type'   => 'tsvd_form',
+        'post_status' => 'publish',
+        'post_title'  => $title,
+    ), true);
+    if (is_wp_error($form_id)) {
+        return $form_id;
+    }
+
+    update_post_meta($form_id, '_tsvd_form_fields', tsvd_tools_ai_missing_form_fields());
+    $recipient = isset($input['recipient_email']) && is_email($input['recipient_email']) ? sanitize_email($input['recipient_email']) : get_option('admin_email');
+    update_post_meta($form_id, '_tsvd_form_recipient', $recipient);
+    update_post_meta($form_id, '_tsvd_form_subject', __('Neue Meldung: Vermisstes Tier', 'tsv-tools'));
+    update_post_meta($form_id, '_tsvd_form_success_message', __('Danke, deine Meldung wurde übermittelt und wird geprüft.', 'tsv-tools'));
+    update_post_meta($form_id, '_tsvd_form_show_title', '1');
+
+    update_option('tsvd_enable_missing_animals', 1);
+    update_option('tsvd_missing_animals_form', $form_id);
+
+    $page_id = (int) get_option('tsvd_missing_animals_page', 0);
+    $create_page = ! isset($input['create_page']) || ! empty($input['create_page']);
+    if ($create_page && (! $page_id || get_post_type($page_id) !== 'page')) {
+        $new_page = wp_insert_post(array(
+            'post_type'    => 'page',
+            'post_status'  => 'publish',
+            'post_title'   => __('Vermisste Tiere', 'tsv-tools'),
+            'post_name'    => 'vermisste-tiere',
+            'post_content' => '[missing_animals]',
+        ), true);
+        if (! is_wp_error($new_page)) {
+            $page_id = (int) $new_page;
+            update_option('tsvd_missing_animals_page', $page_id);
+        }
+    }
+
+    flush_rewrite_rules();
+
+    return array(
+        'created'        => true,
+        'form_id'        => (int) $form_id,
+        'form_edit_link' => (string) get_edit_post_link($form_id, 'raw'),
+        'page_id'        => (int) $page_id,
+        'page_url'       => $page_id ? (string) get_permalink($page_id) : '',
+        'message'        => __('Vermisst-Formular angelegt und in den Einstellungen verknüpft.', 'tsv-tools'),
+    );
+}
