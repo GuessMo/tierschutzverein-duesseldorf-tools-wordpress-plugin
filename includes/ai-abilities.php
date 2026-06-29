@@ -125,4 +125,34 @@ function tsvd_tools_ai_register_abilities() {
         'execute_callback'    => 'tsvd_tools_ai_update_animal',
         'meta'                => array('mcp' => array('public' => true)),
     ));
+
+    wp_register_ability('tsv-tools/create-missing-form', array(
+        'label'               => __('Vermisst-Formular anlegen', 'tsv-tools'),
+        'description'         => __('Legt das Meldeformular für vermisste Tiere (tsvd_form) mit den passenden Feldern an, aktiviert das Feature und verknüpft Formular + Seite in den Einstellungen.', 'tsv-tools'),
+        'category'            => 'tsv-tools-animals',
+        'input_schema'        => array(
+            'type'       => 'object',
+            'properties' => array(
+                'recipient_email' => array('type' => 'string', 'description' => 'E-Mail für Benachrichtigungen (Default: admin_email)'),
+                'create_page'     => array('type' => 'boolean', 'default' => true, 'description' => 'Seite mit [missing_animals] anlegen und verknüpfen'),
+                'force'           => array('type' => 'boolean', 'default' => false, 'description' => 'Neu anlegen, auch wenn bereits ein Formular konfiguriert ist'),
+                'title'           => array('type' => 'string'),
+            ),
+            'additionalProperties' => false,
+        ),
+        'output_schema'       => array(
+            'type'       => 'object',
+            'properties' => array(
+                'created'        => array('type' => 'boolean'),
+                'form_id'        => array('type' => 'integer'),
+                'form_edit_link' => array('type' => 'string'),
+                'page_id'        => array('type' => 'integer'),
+                'page_url'       => array('type' => 'string'),
+                'message'        => array('type' => 'string'),
+            ),
+        ),
+        'permission_callback' => 'tsvd_tools_ai_can_manage_settings',
+        'execute_callback'    => 'tsvd_tools_ai_create_missing_form',
+        'meta'                => array('mcp' => array('public' => true)),
+    ));
 }
