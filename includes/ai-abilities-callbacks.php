@@ -140,8 +140,18 @@ function tsvd_tools_ai_can_manage_settings() {
     return current_user_can('manage_options');
 }
 
-function tsvd_tools_ai_missing_form_fields() {
+function tsvd_tools_ai_missing_form_group_id() {
+    return 'vermisst';
+}
+
+function tsvd_tools_ai_missing_form_groups() {
     return array(
+        array('id' => tsvd_tools_ai_missing_form_group_id(), 'columns' => 1, 'aligns' => array()),
+    );
+}
+
+function tsvd_tools_ai_missing_form_fields() {
+    $fields = array(
         array('id' => 'animal_name', 'type' => 'animal_name', 'label' => __('Name des Tieres', 'tsv-tools'), 'required' => true),
         array('id' => 'animal_breed', 'type' => 'animal_breed', 'label' => __('Tierart / Rasse', 'tsv-tools'), 'required' => true),
         array('id' => 'animal_missing_last_seen_date', 'type' => 'animal_missing_last_seen_date', 'label' => __('Zuletzt gesehen (Datum)', 'tsv-tools'), 'required' => true),
@@ -155,19 +165,36 @@ function tsvd_tools_ai_missing_form_fields() {
         array('id' => 'melder_email', 'type' => 'animal_private_contact_email', 'label' => __('Deine E-Mail', 'tsv-tools'), 'required' => true),
         array('id' => 'melder_anschrift', 'type' => 'animal_private_contact_address', 'label' => __('Deine Anschrift', 'tsv-tools'), 'required' => false),
     );
+
+    $group_id = tsvd_tools_ai_missing_form_group_id();
+    foreach ($fields as &$field) {
+        $field['group_id'] = $group_id;
+        $field['group_column'] = 0;
+    }
+    unset($field);
+
+    return $fields;
+}
+
+function tsvd_tools_ai_write_missing_form_fields($form_id) {
+    update_post_meta($form_id, '_tsvd_form_fields', tsvd_tools_ai_missing_form_fields());
+    update_post_meta($form_id, '_tsvd_form_groups_config', tsvd_tools_ai_missing_form_groups());
 }
 
 function tsvd_tools_ai_create_missing_form($input) {
     $force = ! empty($input['force']);
     $existing = (int) get_option('tsvd_missing_animals_form', 0);
     if ($existing && get_post_type($existing) === 'tsvd_form' && ! $force) {
+        tsvd_tools_ai_write_missing_form_fields($existing);
+        update_option('tsvd_enable_missing_animals', 1);
         return array(
             'created'        => false,
+            'repaired'       => true,
             'form_id'        => $existing,
             'form_edit_link' => (string) get_edit_post_link($existing, 'raw'),
             'page_id'        => (int) get_option('tsvd_missing_animals_page', 0),
             'page_url'       => '',
-            'message'        => __('Formular bereits konfiguriert (force=true zum Neuanlegen).', 'tsv-tools'),
+            'message'        => __('Formular bestand bereits; Felder und Gruppierung wurden neu geschrieben.', 'tsv-tools'),
         );
     }
 
@@ -181,7 +208,7 @@ function tsvd_tools_ai_create_missing_form($input) {
         return $form_id;
     }
 
-    update_post_meta($form_id, '_tsvd_form_fields', tsvd_tools_ai_missing_form_fields());
+    tsvd_tools_ai_write_missing_form_fields($form_id);
     $recipient = isset($input['recipient_email']) && is_email($input['recipient_email']) ? sanitize_email($input['recipient_email']) : get_option('admin_email');
     update_post_meta($form_id, '_tsvd_form_recipient', $recipient);
     update_post_meta($form_id, '_tsvd_form_subject', __('Neue Meldung: Vermisstes Tier', 'tsv-tools'));
