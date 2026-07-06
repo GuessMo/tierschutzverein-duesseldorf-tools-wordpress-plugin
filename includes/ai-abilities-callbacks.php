@@ -245,3 +245,32 @@ function tsvd_tools_ai_create_missing_form($input) {
         'message'        => __('Vermisst-Formular angelegt und in den Einstellungen verknüpft.', 'tsv-tools'),
     );
 }
+
+function tsvd_tools_ai_set_missing_page($input) {
+    $page_id = isset($input['page_id']) ? (int) $input['page_id'] : 0;
+    if (! $page_id || get_post_type($page_id) !== 'page' || get_post_status($page_id) === false) {
+        return new WP_Error('invalid_page', __('Keine gültige Seite (Post-Type page) mit dieser ID gefunden.', 'tsv-tools'));
+    }
+
+    $ensure_content = ! isset($input['ensure_content']) || ! empty($input['ensure_content']);
+    if ($ensure_content && ! has_shortcode((string) get_post_field('post_content', $page_id), 'missing_animals')) {
+        $updated = wp_update_post(array(
+            'ID'           => $page_id,
+            'post_content' => "<!-- wp:shortcode -->[missing_animals]<!-- /wp:shortcode -->",
+        ), true);
+        if (is_wp_error($updated)) {
+            return $updated;
+        }
+    }
+
+    update_option('tsvd_missing_animals_page', $page_id);
+    update_option('tsvd_enable_missing_animals', 1);
+    flush_rewrite_rules();
+
+    return array(
+        'ok'       => true,
+        'page_id'  => $page_id,
+        'page_url' => (string) get_permalink($page_id),
+        'message'  => __('Vermisst-Seite in den Einstellungen verknüpft und Rewrite-Regeln aktualisiert.', 'tsv-tools'),
+    );
+}

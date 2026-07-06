@@ -155,4 +155,31 @@ function tsvd_tools_ai_register_abilities() {
         'execute_callback'    => 'tsvd_tools_ai_create_missing_form',
         'meta'                => array('mcp' => array('public' => true)),
     ));
+
+    wp_register_ability('tsv-tools/set-missing-page', array(
+        'label'               => __('Vermisst-Seite umhängen', 'tsv-tools'),
+        'description'         => __('Setzt die Seite für vermisste Tiere in den Einstellungen auf eine bestehende Seite, stellt den [missing_animals]-Inhalt sicher und aktualisiert die Rewrite-Regeln.', 'tsv-tools'),
+        'category'            => 'tsv-tools-animals',
+        'input_schema'        => array(
+            'type'       => 'object',
+            'properties' => array(
+                'page_id'         => array('type' => 'integer', 'description' => 'ID der bestehenden Seite (Post-Type page)'),
+                'ensure_content'  => array('type' => 'boolean', 'default' => true, 'description' => '[missing_animals] in den Seiteninhalt einfügen, falls nicht vorhanden'),
+            ),
+            'required'             => array('page_id'),
+            'additionalProperties' => false,
+        ),
+        'output_schema'       => array(
+            'type'       => 'object',
+            'properties' => array(
+                'ok'       => array('type' => 'boolean'),
+                'page_id'  => array('type' => 'integer'),
+                'page_url' => array('type' => 'string'),
+                'message'  => array('type' => 'string'),
+            ),
+        ),
+        'permission_callback' => 'tsvd_tools_ai_can_manage_settings',
+        'execute_callback'    => 'tsvd_tools_ai_set_missing_page',
+        'meta'                => array('mcp' => array('public' => true)),
+    ));
 }
