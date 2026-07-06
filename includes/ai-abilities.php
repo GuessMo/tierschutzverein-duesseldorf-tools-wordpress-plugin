@@ -154,6 +154,35 @@ function tsvd_tools_ai_register_abilities() {
         'meta'                => array('mcp' => array('public' => true)),
     ));
 
+    wp_register_ability('tsv-tools/create-animals-bulk', array(
+        'label'               => __('Tiere im Bulk anlegen', 'tsv-tools'),
+        'description'         => __('Legt mehrere Tiere als Entwurf an (Array von Tier-Objekten wie create-animal).', 'tsv-tools'),
+        'category'            => 'tsv-tools-animals',
+        'input_schema'        => array(
+            'type'       => 'object',
+            'properties' => array(
+                'animals' => array(
+                    'type'  => 'array',
+                    'items' => array('type' => 'object'),
+                    'description' => 'Liste von Tier-Objekten (Felder wie bei create-animal).',
+                ),
+            ),
+            'required'   => array('animals'),
+            'additionalProperties' => false,
+        ),
+        'output_schema'       => array(
+            'type'       => 'object',
+            'properties' => array(
+                'count'   => array('type' => 'integer'),
+                'created' => array('type' => 'array'),
+                'errors'  => array('type' => 'array'),
+            ),
+        ),
+        'permission_callback' => 'tsvd_tools_ai_can_manage_animals',
+        'execute_callback'    => 'tsvd_tools_ai_create_animals_bulk',
+        'meta'                => array('mcp' => array('public' => true)),
+    ));
+
     wp_register_ability('tsv-tools/create-missing-form', array(
         'label'               => __('Vermisst-Formular anlegen', 'tsv-tools'),
         'description'         => __('Legt das Meldeformular für vermisste Tiere (tsvd_form) mit den passenden Feldern an, aktiviert das Feature und verknüpft Formular + Seite in den Einstellungen.', 'tsv-tools'),

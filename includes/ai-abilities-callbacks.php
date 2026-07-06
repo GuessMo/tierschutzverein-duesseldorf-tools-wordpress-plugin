@@ -232,6 +232,31 @@ function tsvd_tools_ai_create_animal($input) {
     return tsvd_tools_ai_format_animal($post_id);
 }
 
+function tsvd_tools_ai_create_animals_bulk($input) {
+    $items = isset($input['animals']) && is_array($input['animals']) ? $input['animals'] : array();
+    if (empty($items)) {
+        return new WP_Error('tsvd_tools_ai_no_animals', __('Keine Tiere übergeben.', 'tsv-tools'));
+    }
+    if (count($items) > 200) {
+        return new WP_Error('tsvd_tools_ai_too_many', __('Maximal 200 Tiere pro Aufruf.', 'tsv-tools'));
+    }
+    $created = array();
+    $errors = array();
+    foreach ($items as $i => $item) {
+        if (! is_array($item)) {
+            $errors[] = array('index' => (int) $i, 'message' => 'Ungültiger Eintrag.');
+            continue;
+        }
+        $res = tsvd_tools_ai_create_animal($item);
+        if (is_wp_error($res)) {
+            $errors[] = array('index' => (int) $i, 'name' => isset($item['name']) ? (string) $item['name'] : '', 'message' => $res->get_error_message());
+        } else {
+            $created[] = array('id' => (int) $res['id'], 'name' => (string) $res['name']);
+        }
+    }
+    return array('count' => count($created), 'created' => $created, 'errors' => $errors);
+}
+
 function tsvd_tools_ai_update_animal($input) {
     $id = isset($input['id']) ? (int) $input['id'] : 0;
     if (!$id || get_post_type($id) !== 'animals') {
