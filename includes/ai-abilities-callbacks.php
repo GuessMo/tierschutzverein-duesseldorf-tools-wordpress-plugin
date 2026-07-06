@@ -99,8 +99,77 @@ function tsvd_tools_ai_apply_animal_meta($post_id, $input) {
         }
     }
 
+    if (isset($input['gender'])) {
+        update_post_meta($post_id, 'animal_gender', tsvd_tools_ai_normalize_option($input['gender'], array(
+            'weiblich' => 'female', 'männlich' => 'male', 'maennlich' => 'male', 'unbekannt' => 'unknown',
+        )));
+    }
+    if (isset($input['size'])) {
+        update_post_meta($post_id, 'animal_size_cm', tsvd_tools_ai_normalize_option($input['size'], array(
+            'klein' => 'small', 'mittel' => 'middle', 'groß' => 'large', 'gross' => 'large',
+        )));
+    }
+
+    tsvd_tools_ai_assign_breed($post_id, $input['species'] ?? '', $input['breed'] ?? '');
+    if (isset($input['color']) && $input['color'] !== '') {
+        $color_id = tsvd_tools_ai_ensure_term($input['color'], 'animal_color', 0);
+        if ($color_id) {
+            wp_set_post_terms($post_id, array($color_id), 'animal_color', false);
+        }
+    }
+
     if (isset($input['image_url']) && $input['image_url'] !== '') {
         tsvd_tools_ai_set_animal_image($post_id, $input['image_url']);
+    }
+}
+
+function tsvd_tools_ai_normalize_option($value, array $map) {
+    $value = sanitize_text_field($value);
+    $key = mb_strtolower(trim($value));
+    return isset($map[$key]) ? $map[$key] : $value;
+}
+
+function tsvd_tools_ai_ensure_term($name, $taxonomy, $parent = 0) {
+    $name = sanitize_text_field($name);
+    if ($name === '') {
+        return 0;
+    }
+    $term = get_term_by('name', $name, $taxonomy);
+    if (! $term) {
+        $term = get_term_by('slug', sanitize_title($name), $taxonomy);
+    }
+    if ($term) {
+        return (int) $term->term_id;
+    }
+    $created = wp_insert_term($name, $taxonomy, array('parent' => (int) $parent));
+    if (is_wp_error($created)) {
+        return 0;
+    }
+    return (int) $created['term_id'];
+}
+
+function tsvd_tools_ai_assign_breed($post_id, $species, $breed) {
+    $species = sanitize_text_field($species);
+    $breed = sanitize_text_field($breed);
+    if ($species === '' && $breed === '') {
+        return;
+    }
+    $term_ids = array();
+    $parent_id = 0;
+    if ($species !== '') {
+        $parent_id = tsvd_tools_ai_ensure_term($species, 'animal_breed', 0);
+        if ($parent_id) {
+            $term_ids[] = $parent_id;
+        }
+    }
+    if ($breed !== '') {
+        $breed_id = tsvd_tools_ai_ensure_term($breed, 'animal_breed', $parent_id);
+        if ($breed_id) {
+            $term_ids[] = $breed_id;
+        }
+    }
+    if ($term_ids) {
+        wp_set_post_terms($post_id, $term_ids, 'animal_breed', false);
     }
 }
 
@@ -137,6 +206,10 @@ function tsvd_tools_ai_create_animal($input) {
         $input['adoption_status'] = 'not_for_adoption';
     }
     tsvd_tools_ai_apply_animal_meta($post_id, $input);
+
+    if (function_exists('tsvd_regenerate_animal_title')) {
+        tsvd_regenerate_animal_title($post_id, sanitize_text_field($input['name']));
+    }
 
     return tsvd_tools_ai_format_animal($post_id);
 }
