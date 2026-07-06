@@ -118,6 +118,24 @@ function tsvd_tools_ai_apply_animal_meta($post_id, $input) {
         }
     }
 
+    if (isset($input['description'])) {
+        update_post_meta($post_id, 'animal_description', sanitize_textarea_field($input['description']));
+    }
+
+    $contact_meta = array(
+        'contact_firstname' => 'animal_private_contact_firstname',
+        'contact_lastname'  => 'animal_private_contact_lastname',
+        'contact_address'   => 'animal_private_contact_address',
+    );
+    foreach ($contact_meta as $key => $meta_key) {
+        if (isset($input[$key])) {
+            update_post_meta($post_id, $meta_key, sanitize_text_field($input[$key]));
+        }
+    }
+    if (isset($input['contact_email'])) {
+        update_post_meta($post_id, 'animal_private_contact_email', sanitize_email($input['contact_email']));
+    }
+
     if (isset($input['image_url']) && $input['image_url'] !== '') {
         tsvd_tools_ai_set_animal_image($post_id, $input['image_url']);
     }
