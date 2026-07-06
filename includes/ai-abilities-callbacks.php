@@ -86,6 +86,36 @@ function tsvd_tools_ai_apply_animal_meta($post_id, $input) {
             update_post_meta($post_id, 'animal_missing_status', $missing);
         }
     }
+
+    $missing_meta = array(
+        'last_seen_date'     => 'animal_missing_last_seen_date',
+        'last_seen_location' => 'animal_missing_last_seen_location',
+        'chip_number'        => 'animal_missing_chip_number',
+        'reward'             => 'animal_missing_reward',
+    );
+    foreach ($missing_meta as $key => $meta_key) {
+        if (isset($input[$key])) {
+            update_post_meta($post_id, $meta_key, sanitize_text_field($input[$key]));
+        }
+    }
+
+    if (isset($input['image_url']) && $input['image_url'] !== '') {
+        tsvd_tools_ai_set_animal_image($post_id, $input['image_url']);
+    }
+}
+
+function tsvd_tools_ai_set_animal_image($post_id, $url) {
+    $url = esc_url_raw($url);
+    if (! $url) {
+        return;
+    }
+    require_once ABSPATH . 'wp-admin/includes/file.php';
+    require_once ABSPATH . 'wp-admin/includes/media.php';
+    require_once ABSPATH . 'wp-admin/includes/image.php';
+    $attachment_id = media_sideload_image($url, $post_id, null, 'id');
+    if (! is_wp_error($attachment_id)) {
+        set_post_thumbnail($post_id, (int) $attachment_id);
+    }
 }
 
 function tsvd_tools_ai_create_animal($input) {
