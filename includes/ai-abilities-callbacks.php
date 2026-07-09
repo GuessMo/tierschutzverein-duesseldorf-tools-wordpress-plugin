@@ -577,3 +577,95 @@ function tsvd_tools_ai_add_applicant_fields($input) {
         'form_edit_link' => (string) get_edit_post_link($form_id, 'raw'),
     );
 }
+
+function tsvd_tools_ai_resolve_page($input) {
+    $page_id = isset($input['page_id']) ? (int) $input['page_id'] : 0;
+    if (! $page_id && ! empty($input['slug'])) {
+        $page = get_page_by_path(sanitize_title($input['slug']), OBJECT, 'page');
+        if ($page) {
+            $page_id = (int) $page->ID;
+        }
+    }
+    if ($page_id && get_post_type($page_id) === 'page') {
+        return $page_id;
+    }
+    return 0;
+}
+
+function tsvd_tools_ai_get_page($input) {
+    $page_id = tsvd_tools_ai_resolve_page($input);
+    if (! $page_id) {
+        return new WP_Error('page_not_found', __('Keine Seite (Post-Type page) gefunden (page_id oder slug prüfen).', 'tsv-tools'));
+    }
+    $post = get_post($page_id);
+    return array(
+        'id'        => (int) $post->ID,
+        'title'     => (string) $post->post_title,
+        'slug'      => (string) $post->post_name,
+        'status'    => (string) $post->post_status,
+        'content'   => (string) $post->post_content,
+        'url'       => (string) get_permalink($post),
+        'edit_link' => (string) get_edit_post_link($post->ID, 'raw'),
+    );
+}
+
+function tsvd_tools_ai_update_page($input) {
+    $content = isset($input['content']) ? (string) $input['content'] : '';
+    $mode    = isset($input['mode']) ? sanitize_key($input['mode']) : 'append';
+    $page_id = tsvd_tools_ai_resolve_page($input);
+    $action  = 'updated';
+
+    if (! $page_id) {
+        if (empty($input['create_if_missing'])) {
+            return new WP_Error('page_not_found', __('Seite nicht gefunden. Zum Anlegen create_if_missing=true setzen.', 'tsv-tools'));
+        }
+        $title   = isset($input['title']) && $input['title'] !== '' ? sanitize_text_field($input['title']) : __('Neue Seite', 'tsv-tools');
+        $page_id = wp_insert_post(array(
+            'post_type'    => 'page',
+            'post_status'  => 'publish',
+            'post_title'   => $title,
+            'post_content' => '',
+        ), true);
+        if (is_wp_error($page_id)) {
+            return $page_id;
+        }
+        $page_id = (int) $page_id;
+        $action  = 'created';
+    }
+
+    $existing = (string) get_post_field('post_content', $page_id);
+
+    if ('replace' === $mode) {
+        $new_content = $content;
+    } elseif ('section' === $mode) {
+        $sid   = ! empty($input['section_id']) ? sanitize_key($input['section_id']) : 'tsvd';
+        $start = '<!-- tsvd-section:' . $sid . ' -->';
+        $end   = '<!-- /tsvd-section:' . $sid . ' -->';
+        $block = $start . "\n" . $content . "\n" . $end;
+        $s     = strpos($existing, $start);
+        $e     = strpos($existing, $end);
+        if (false !== $s && false !== $e && $e > $s) {
+            $new_content = substr($existing, 0, $s) . $block . substr($existing, $e + strlen($end));
+            $action      = 'section_replaced';
+        } else {
+            $new_content = '' === trim($existing) ? $block : $existing . "\n\n" . $block;
+            $action      = 'section_added';
+        }
+    } else {
+        $new_content = '' === trim($existing) ? $content : $existing . "\n\n" . $content;
+        $mode        = 'append';
+    }
+
+    $updated = wp_update_post(array('ID' => $page_id, 'post_content' => $new_content), true);
+    if (is_wp_error($updated)) {
+        return $updated;
+    }
+
+    return array(
+        'id'        => $page_id,
+        'url'       => (string) get_permalink($page_id),
+        'edit_link' => (string) get_edit_post_link($page_id, 'raw'),
+        'mode'      => $mode,
+        'action'    => $action,
+    );
+}

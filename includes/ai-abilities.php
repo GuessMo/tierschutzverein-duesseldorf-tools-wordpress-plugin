@@ -301,4 +301,66 @@ function tsvd_tools_ai_register_abilities() {
         'execute_callback'    => 'tsvd_tools_ai_add_applicant_fields',
         'meta'                => array('mcp' => array('public' => true)),
     ));
+
+    wp_register_ability('tsv-tools/get-page', array(
+        'label'               => __('Seite abrufen', 'tsv-tools'),
+        'description'         => __('Gibt eine WordPress-Seite (Post-Type page) mit Inhalt zurück. Auflösung per page_id oder slug.', 'tsv-tools'),
+        'category'            => 'tsv-tools-animals',
+        'input_schema'        => array(
+            'type'       => 'object',
+            'properties' => array(
+                'page_id' => array('type' => 'integer'),
+                'slug'    => array('type' => 'string', 'description' => 'Seiten-Slug (Pfad), alternativ zu page_id'),
+            ),
+            'additionalProperties' => false,
+        ),
+        'output_schema'       => array(
+            'type'       => 'object',
+            'properties' => array(
+                'id'        => array('type' => 'integer'),
+                'title'     => array('type' => 'string'),
+                'slug'      => array('type' => 'string'),
+                'status'    => array('type' => 'string'),
+                'content'   => array('type' => 'string'),
+                'url'       => array('type' => 'string'),
+                'edit_link' => array('type' => 'string'),
+            ),
+        ),
+        'permission_callback' => 'tsvd_tools_ai_can_manage_settings',
+        'execute_callback'    => 'tsvd_tools_ai_get_page',
+        'meta'                => array('mcp' => array('public' => true)),
+    ));
+
+    wp_register_ability('tsv-tools/update-page', array(
+        'label'               => __('Seite bearbeiten', 'tsv-tools'),
+        'description'         => __('Bearbeitet eine WordPress-Seite. mode: append (anhängen), replace (kompletten Inhalt ersetzen), section (idempotenter Block via section_id ersetzen/anlegen). Auflösung per page_id oder slug; optional anlegen.', 'tsv-tools'),
+        'category'            => 'tsv-tools-animals',
+        'input_schema'        => array(
+            'type'       => 'object',
+            'properties' => array(
+                'page_id'           => array('type' => 'integer'),
+                'slug'              => array('type' => 'string'),
+                'content'           => array('type' => 'string', 'description' => 'HTML-Inhalt'),
+                'mode'              => array('type' => 'string', 'description' => 'append | replace | section (Default: append)'),
+                'section_id'        => array('type' => 'string', 'description' => 'Nur mode=section: Kennung des idempotenten Blocks'),
+                'create_if_missing' => array('type' => 'boolean', 'default' => false),
+                'title'             => array('type' => 'string', 'description' => 'Titel für neue Seite (bei create_if_missing)'),
+            ),
+            'required'             => array('content'),
+            'additionalProperties' => false,
+        ),
+        'output_schema'       => array(
+            'type'       => 'object',
+            'properties' => array(
+                'id'        => array('type' => 'integer'),
+                'url'       => array('type' => 'string'),
+                'edit_link' => array('type' => 'string'),
+                'mode'      => array('type' => 'string'),
+                'action'    => array('type' => 'string'),
+            ),
+        ),
+        'permission_callback' => 'tsvd_tools_ai_can_manage_settings',
+        'execute_callback'    => 'tsvd_tools_ai_update_page',
+        'meta'                => array('mcp' => array('public' => true)),
+    ));
 }
