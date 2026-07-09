@@ -669,3 +669,45 @@ function tsvd_tools_ai_update_page($input) {
         'action'    => $action,
     );
 }
+
+function tsvd_tools_ai_rest_request($input) {
+    $allowed_methods = array('GET', 'POST', 'PUT', 'PATCH', 'DELETE');
+    $method = isset($input['method']) ? strtoupper(sanitize_text_field($input['method'])) : 'GET';
+    if (! in_array($method, $allowed_methods, true)) {
+        return new WP_Error('invalid_method', __('Ungültige HTTP-Methode.', 'tsv-tools'));
+    }
+    $route = isset($input['route']) ? '/' . ltrim((string) $input['route'], '/') : '';
+    if ('' === $route || '/' === $route) {
+        return new WP_Error('invalid_route', __('Keine gültige REST-Route angegeben.', 'tsv-tools'));
+    }
+    $params = isset($input['params']) && is_array($input['params']) ? $input['params'] : array();
+
+    $request = new WP_REST_Request($method, $route);
+    foreach ($params as $key => $value) {
+        $request->set_param($key, $value);
+    }
+
+    $server   = rest_get_server();
+    $response = rest_do_request($request);
+    $data     = $server->response_to_data($response, false);
+
+    return array(
+        'status' => (int) $response->get_status(),
+        'body'   => $data,
+    );
+}
+
+function tsvd_tools_ai_rest_list_routes($input) {
+    $contains = isset($input['contains']) ? (string) $input['contains'] : '';
+    $routes   = array_keys(rest_get_server()->get_routes());
+    if ('' !== $contains) {
+        $routes = array_values(array_filter($routes, function ($route) use ($contains) {
+            return false !== strpos($route, $contains);
+        }));
+    }
+    sort($routes);
+    return array(
+        'count'  => count($routes),
+        'routes' => $routes,
+    );
+}
