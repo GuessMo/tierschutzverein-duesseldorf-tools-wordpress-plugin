@@ -412,4 +412,33 @@ function tsvd_tools_ai_register_abilities() {
         'execute_callback'    => 'tsvd_tools_ai_rest_list_routes',
         'meta'                => array('mcp' => array('public' => true)),
     ));
+
+    wp_register_ability('tsv-tools/seed-demo-stats', array(
+        'label'               => __('Demo-Statistik befüllen', 'tsv-tools'),
+        'description'         => __('Befüllt die Formular-Statistik + Interesse-Werte mit einem realistischen Demo-Datensatz (Counter, form_count, species/breed aus echten Tieren, Zeit über 3 Monate). Zum Testen des Dashboards; per "Formular-Statistik zurücksetzen" wieder entfernbar. NICHT für Produktivdaten.', 'tsv-tools'),
+        'category'            => 'tsv-tools-animals',
+        'input_schema'        => array(
+            'type'       => 'object',
+            'properties' => array(
+                'interest'          => array('type' => 'object', 'description' => 'Map animal_id => Anzahl Interesse-Anfragen. Default: eingebauter Satz.'),
+                'private_placement' => array('type' => 'integer', 'description' => 'Anzahl private Vermittlungen (Default 5)'),
+                'missing'           => array('type' => 'integer', 'description' => 'Anzahl Vermisst-Meldungen (Default 4)'),
+                'reset'             => array('type' => 'boolean', 'description' => 'Vorher Counter + form_count leeren (Default true)'),
+            ),
+            'additionalProperties' => false,
+        ),
+        'output_schema'       => array(
+            'type'       => 'object',
+            'properties' => array(
+                'reset'           => array('type' => 'boolean'),
+                'total_interest'  => array('type' => 'integer'),
+                'grand_total'     => array('type' => 'integer'),
+                'animals'         => array('type' => 'array'),
+                'counters'        => array('type' => 'array'),
+            ),
+        ),
+        'permission_callback' => 'tsvd_tools_ai_can_manage_settings',
+        'execute_callback'    => 'tsvd_tools_ai_seed_demo_stats',
+        'meta'                => array('mcp' => array('public' => true)),
+    ));
 }

@@ -748,3 +748,94 @@ function tsvd_tools_ai_rest_list_routes($input) {
         'routes' => $routes,
     );
 }
+
+function tsvd_tools_ai_seed_demo_stats( $input ) {
+    if ( ! function_exists( 'tsvd_stats_table_name' ) ) {
+        return new WP_Error( 'no_stats', __( 'Statistik-Funktionen (Theme) nicht geladen.', 'tsv-tools' ) );
+    }
+    global $wpdb;
+    $table = tsvd_stats_table_name();
+
+    $reset = ! isset( $input['reset'] ) || ! empty( $input['reset'] );
+    if ( $reset ) {
+        $wpdb->query( 'TRUNCATE TABLE ' . $table );
+        if ( function_exists( 'tsvd_interest_reset_form_data' ) ) {
+            tsvd_interest_reset_form_data();
+        }
+    }
+
+    $interest = ( isset( $input['interest'] ) && is_array( $input['interest'] ) && $input['interest'] )
+        ? $input['interest']
+        : array( 3970 => 8, 3972 => 6, 3932 => 5, 3919 => 4, 3936 => 3, 3934 => 2, 3986 => 2, 3978 => 1, 3980 => 1 );
+    $priv = isset( $input['private_placement'] ) ? max( 0, (int) $input['private_placement'] ) : 5;
+    $miss = isset( $input['missing'] ) ? max( 0, (int) $input['missing'] ) : 4;
+
+    $inc = function ( $metric, $bucket, $n ) use ( $wpdb, $table ) {
+        $n = (int) $n;
+        if ( $n <= 0 || null === $bucket || '' === $bucket ) {
+            return;
+        }
+        $wpdb->query( $wpdb->prepare(
+            "INSERT INTO {$table} (metric,bucket,cnt) VALUES (%s,%s,%d) ON DUPLICATE KEY UPDATE cnt = cnt + %d",
+            $metric, (string) $bucket, $n, $n
+        ) );
+    };
+
+    $total_interest = 0;
+    $animals        = array();
+    foreach ( $interest as $aid => $n ) {
+        $aid = (int) $aid;
+        $n   = (int) $n;
+        if ( get_post_type( $aid ) !== 'animals' || get_post_status( $aid ) !== 'publish' ) {
+            $animals[] = array( 'id' => $aid, 'skipped' => 'not_published_animal' );
+            continue;
+        }
+        update_post_meta( $aid, 'animal_interest_form_count', $n );
+        if ( function_exists( 'tsvd_interest_recompute_total' ) ) {
+            tsvd_interest_recompute_total( $aid );
+        }
+        if ( function_exists( 'tsvd_stats_species_breed_terms' ) ) {
+            $terms = tsvd_stats_species_breed_terms( $aid );
+            $inc( 'species', $terms['species'], $n );
+            $inc( 'breed', $terms['breed'], $n );
+        }
+        $inc( 'request_type', 'interest', $n );
+        $total_interest += $n;
+        $animals[] = array( 'id' => $aid, 'interest' => $n );
+    }
+
+    $inc( 'request_type', 'private_placement', $priv );
+    $inc( 'request_type', 'missing', $miss );
+
+    $grand    = $total_interest + $priv + $miss;
+    $with_hou = $total_interest + $priv;
+
+    $inc( 'residence', 'duesseldorf', round( $grand * 0.6 ) );
+    $inc( 'residence', 'outside', $grand - round( $grand * 0.6 ) );
+    $inc( 'housing', 'apartment', round( $with_hou * 0.55 ) );
+    $inc( 'housing', 'house', $with_hou - round( $with_hou * 0.55 ) );
+    $g = round( $with_hou * 0.4 );
+    $b = round( $with_hou * 0.35 );
+    $inc( 'outdoor', 'garden', $g );
+    $inc( 'outdoor', 'balcony', $b );
+    $inc( 'outdoor', 'none', $with_hou - $g - $b );
+
+    $m0 = current_time( 'Y-m' );
+    $m1 = gmdate( 'Y-m', strtotime( $m0 . '-01 -1 month' ) );
+    $m2 = gmdate( 'Y-m', strtotime( $m0 . '-01 -2 month' ) );
+    $p0 = round( $grand * 0.4 );
+    $p1 = round( $grand * 0.35 );
+    $inc( 'period', $m0, $p0 );
+    $inc( 'period', $m1, $p1 );
+    $inc( 'period', $m2, $grand - $p0 - $p1 );
+
+    $counters = $wpdb->get_results( "SELECT metric, bucket, cnt FROM {$table} ORDER BY metric, cnt DESC", ARRAY_A );
+
+    return array(
+        'reset'          => $reset,
+        'total_interest' => $total_interest,
+        'grand_total'    => $grand,
+        'animals'        => $animals,
+        'counters'       => $counters ?: array(),
+    );
+}
