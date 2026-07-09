@@ -196,6 +196,15 @@ function tsvd_tools_ai_set_animal_image($post_id, $url) {
     if (! $url) {
         return;
     }
+    $parts = wp_parse_url($url);
+    if (empty($parts['scheme']) || ! in_array($parts['scheme'], array('http', 'https'), true)) {
+        return;
+    }
+    $host = isset($parts['host']) ? $parts['host'] : '';
+    $ip   = $host ? gethostbyname($host) : '';
+    if (! filter_var($ip, FILTER_VALIDATE_IP, FILTER_FLAG_NO_PRIV_RANGE | FILTER_FLAG_NO_RES_RANGE)) {
+        return;
+    }
     require_once ABSPATH . 'wp-admin/includes/file.php';
     require_once ABSPATH . 'wp-admin/includes/media.php';
     require_once ABSPATH . 'wp-admin/includes/image.php';
@@ -611,6 +620,9 @@ function tsvd_tools_ai_get_page($input) {
 
 function tsvd_tools_ai_update_page($input) {
     $content = isset($input['content']) ? (string) $input['content'] : '';
+    if (! current_user_can('unfiltered_html')) {
+        $content = wp_kses_post($content);
+    }
     $mode    = isset($input['mode']) ? sanitize_key($input['mode']) : 'append';
     $page_id = tsvd_tools_ai_resolve_page($input);
     $action  = 'updated';
@@ -680,6 +692,31 @@ function tsvd_tools_ai_rest_request($input) {
     if ('' === $route || '/' === $route) {
         return new WP_Error('invalid_route', __('Keine gültige REST-Route angegeben.', 'tsv-tools'));
     }
+
+    // Allowlist: only content/config namespaces. Excludes SSRF proxies
+    // (/oembed/1.0/proxy) and plugin/theme management by omission.
+    $allowed_prefixes = apply_filters('tsvd_rest_request_allowed_prefixes', array(
+        '/wp/v2/posts', '/wp/v2/pages', '/wp/v2/media', '/wp/v2/blocks',
+        '/wp/v2/categories', '/wp/v2/tags', '/wp/v2/taxonomies', '/wp/v2/types',
+        '/wp/v2/comments', '/wp/v2/users', '/wp/v2/settings', '/wp/v2/search',
+        '/wp/v2/animals', '/tsv-tools/',
+    ));
+    $route_path = strtok($route, '?');
+    $allowed = false;
+    foreach ($allowed_prefixes as $prefix) {
+        if (0 === strpos($route_path, $prefix)) {
+            $allowed = true;
+            break;
+        }
+    }
+    if (! $allowed) {
+        return new WP_Error(
+            'route_forbidden',
+            __('Route nicht in der Allowlist. Erlaubt: Beiträge, Seiten, Medien, Taxonomien, Kommentare, Nutzer, Einstellungen, tsv-tools.', 'tsv-tools'),
+            array('allowed_prefixes' => $allowed_prefixes)
+        );
+    }
+
     $params = isset($input['params']) && is_array($input['params']) ? $input['params'] : array();
 
     $request = new WP_REST_Request($method, $route);
