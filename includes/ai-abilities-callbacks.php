@@ -535,18 +535,36 @@ function tsvd_tools_ai_add_applicant_fields($input) {
         $added[] = $type;
     }
 
-    // Consent/acceptance field must stay last.
+    // Consent/acceptance must render last. The renderer orders by group (first
+    // appearance of group_id in the field array), so isolate consent in its own
+    // group placed at the very end.
     $consent_types = array('description', 'checkbox');
+    $consent_group = 'zustimmung';
     $head = array();
     $tail = array();
     foreach ($fields as $field) {
         if (isset($field['type']) && in_array($field['type'], $consent_types, true)) {
+            $field['group_id']     = $consent_group;
+            $field['group_column'] = 0;
             $tail[] = $field;
         } else {
             $head[] = $field;
         }
     }
     $fields = array_merge($head, $tail);
+
+    if (! empty($tail)) {
+        $has_consent_group = false;
+        foreach ($groups as $group) {
+            if (isset($group['id']) && $group['id'] === $consent_group) {
+                $has_consent_group = true;
+                break;
+            }
+        }
+        if (! $has_consent_group) {
+            $groups[] = array('id' => $consent_group, 'columns' => 1, 'aligns' => array());
+        }
+    }
 
     update_post_meta($form_id, '_tsvd_form_fields', $fields);
     update_post_meta($form_id, '_tsvd_form_groups_config', $groups);
