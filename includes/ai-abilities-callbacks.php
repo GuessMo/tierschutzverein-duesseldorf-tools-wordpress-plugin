@@ -420,3 +420,119 @@ function tsvd_tools_ai_set_missing_page($input) {
         'message'  => __('Vermisst-Seite in den Einstellungen verknüpft und Rewrite-Regeln aktualisiert.', 'tsv-tools'),
     );
 }
+
+function tsvd_tools_ai_set_animal_interest_seed($input) {
+    $items = isset($input['items']) && is_array($input['items']) ? $input['items'] : array();
+    $results = array();
+    $updated = 0;
+
+    foreach ($items as $item) {
+        $id   = isset($item['id']) ? (int) $item['id'] : 0;
+        $seed = isset($item['seed']) ? max(0, (int) $item['seed']) : 0;
+
+        if (! $id || get_post_type($id) !== 'animals') {
+            $results[] = array('id' => $id, 'ok' => false, 'error' => 'invalid_animal');
+            continue;
+        }
+
+        if (function_exists('tsvd_interest_set_seed')) {
+            $total = tsvd_interest_set_seed($id, $seed);
+        } else {
+            update_post_meta($id, 'animal_interest_seed', $seed);
+            $form  = (int) get_post_meta($id, 'animal_interest_form_count', true);
+            $total = $seed + $form;
+            update_post_meta($id, 'animal_interest_total', $total);
+        }
+
+        $updated++;
+        $results[] = array('id' => $id, 'ok' => true, 'seed' => $seed, 'total' => (int) $total);
+    }
+
+    return array('updated' => $updated, 'results' => $results);
+}
+
+function tsvd_tools_ai_applicant_field_defs($target) {
+    $all = array(
+        'applicant_residence' => array('label' => __('Wohnort', 'tsv-tools'), 'required' => true),
+        'applicant_housing'   => array('label' => __('Unterkunft', 'tsv-tools'), 'required' => false),
+        'applicant_outdoor'   => array('label' => __('Außenbereich', 'tsv-tools'), 'required' => false),
+    );
+    if ('missing' === $target) {
+        return array('applicant_residence' => $all['applicant_residence']);
+    }
+    return $all;
+}
+
+function tsvd_tools_ai_add_applicant_fields($input) {
+    $target = isset($input['target']) ? sanitize_key($input['target']) : '';
+    $map    = array(
+        'interest' => 'tsvd_animal_interest_form',
+        'private'  => 'tsvd_private_adoption_form',
+        'missing'  => 'tsvd_missing_animals_form',
+    );
+
+    $form_id = isset($input['form_id']) ? (int) $input['form_id'] : 0;
+    if (! $form_id && isset($map[$target])) {
+        $form_id = (int) get_option($map[$target], 0);
+    }
+    if (! $form_id || get_post_type($form_id) !== 'tsvd_form') {
+        return new WP_Error('invalid_form', __('Kein gültiges Formular gefunden (target oder form_id prüfen).', 'tsv-tools'));
+    }
+
+    $fields = get_post_meta($form_id, '_tsvd_form_fields', true);
+    if (! is_array($fields)) {
+        $fields = array();
+    }
+    $groups = get_post_meta($form_id, '_tsvd_form_groups_config', true);
+    if (! is_array($groups)) {
+        $groups = array();
+    }
+
+    $group_id  = 'bewerber';
+    $has_group = false;
+    foreach ($groups as $group) {
+        if (isset($group['id']) && $group['id'] === $group_id) {
+            $has_group = true;
+            break;
+        }
+    }
+    if (! $has_group) {
+        $groups[] = array('id' => $group_id, 'columns' => 1, 'aligns' => array());
+    }
+
+    $existing_types = array();
+    foreach ($fields as $field) {
+        if (isset($field['type'])) {
+            $existing_types[$field['type']] = true;
+        }
+    }
+
+    $added = array();
+    foreach (tsvd_tools_ai_applicant_field_defs($target) as $type => $def) {
+        if (isset($existing_types[$type])) {
+            continue;
+        }
+        $fields[] = array(
+            'id'           => $type,
+            'type'         => $type,
+            'label'        => $def['label'],
+            'required'     => (bool) $def['required'],
+            'options'      => array(),
+            'group_id'     => $group_id,
+            'group_column' => 0,
+        );
+        $added[] = $type;
+    }
+
+    update_post_meta($form_id, '_tsvd_form_fields', $fields);
+    update_post_meta($form_id, '_tsvd_form_groups_config', $groups);
+
+    $all_types = array_keys(tsvd_tools_ai_applicant_field_defs($target));
+
+    return array(
+        'form_id'          => $form_id,
+        'added'            => $added,
+        'skipped_existing' => array_values(array_diff($all_types, $added)),
+        'form_edit_link'   => (string) get_edit_post_link($form_id, 'raw'),
+    );
+}
