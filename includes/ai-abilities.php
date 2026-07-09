@@ -239,4 +239,65 @@ function tsvd_tools_ai_register_abilities() {
         'execute_callback'    => 'tsvd_tools_ai_set_missing_page',
         'meta'                => array('mcp' => array('public' => true)),
     ));
+
+    wp_register_ability('tsv-tools/set-animal-interest-seed', array(
+        'label'               => __('Interesse-Basiswert setzen', 'tsv-tools'),
+        'description'         => __('Setzt den redaktionellen Interesse-Basiswert (animal_interest_seed) für ein oder mehrere Tiere und berechnet den Gesamtwert neu.', 'tsv-tools'),
+        'category'            => 'tsv-tools-animals',
+        'input_schema'        => array(
+            'type'       => 'object',
+            'properties' => array(
+                'items' => array(
+                    'type'        => 'array',
+                    'description' => 'Liste von {id, seed}.',
+                    'items'       => array(
+                        'type'       => 'object',
+                        'properties' => array(
+                            'id'   => array('type' => 'integer'),
+                            'seed' => array('type' => 'integer'),
+                        ),
+                        'required'   => array('id', 'seed'),
+                    ),
+                ),
+            ),
+            'required'             => array('items'),
+            'additionalProperties' => false,
+        ),
+        'output_schema'       => array(
+            'type'       => 'object',
+            'properties' => array(
+                'updated' => array('type' => 'integer'),
+                'results' => array('type' => 'array'),
+            ),
+        ),
+        'permission_callback' => 'tsvd_tools_ai_can_manage_animals',
+        'execute_callback'    => 'tsvd_tools_ai_set_animal_interest_seed',
+        'meta'                => array('mcp' => array('public' => true)),
+    ));
+
+    wp_register_ability('tsv-tools/add-applicant-fields-to-form', array(
+        'label'               => __('Bewerber-Felder zum Formular hinzufügen', 'tsv-tools'),
+        'description'         => __('Fügt die Bewerber-Felder (Wohnort/Unterkunft/Außenbereich) gruppen-sicher in ein Formular ein. target: interest|private|missing (missing = nur Wohnort). Idempotent.', 'tsv-tools'),
+        'category'            => 'tsv-tools-animals',
+        'input_schema'        => array(
+            'type'       => 'object',
+            'properties' => array(
+                'target'  => array('type' => 'string', 'description' => 'interest | private | missing'),
+                'form_id' => array('type' => 'integer', 'description' => 'Alternativ zur target-Auflösung: direkte tsvd_form-ID'),
+            ),
+            'additionalProperties' => false,
+        ),
+        'output_schema'       => array(
+            'type'       => 'object',
+            'properties' => array(
+                'form_id'          => array('type' => 'integer'),
+                'added'            => array('type' => 'array'),
+                'skipped_existing' => array('type' => 'array'),
+                'form_edit_link'   => array('type' => 'string'),
+            ),
+        ),
+        'permission_callback' => 'tsvd_tools_ai_can_manage_settings',
+        'execute_callback'    => 'tsvd_tools_ai_add_applicant_fields',
+        'meta'                => array('mcp' => array('public' => true)),
+    ));
 }
