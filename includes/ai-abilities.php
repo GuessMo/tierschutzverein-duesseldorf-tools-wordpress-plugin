@@ -290,10 +290,11 @@ function tsvd_tools_ai_register_abilities() {
         'output_schema'       => array(
             'type'       => 'object',
             'properties' => array(
-                'form_id'          => array('type' => 'integer'),
-                'added'            => array('type' => 'array'),
-                'skipped_existing' => array('type' => 'array'),
-                'form_edit_link'   => array('type' => 'string'),
+                'form_id'        => array('type' => 'integer'),
+                'added'          => array('type' => 'array'),
+                'updated'        => array('type' => 'array'),
+                'order'          => array('type' => 'array'),
+                'form_edit_link' => array('type' => 'string'),
             ),
         ),
         'permission_callback' => 'tsvd_tools_ai_can_manage_settings',

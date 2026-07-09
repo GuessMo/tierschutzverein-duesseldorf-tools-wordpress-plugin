@@ -454,8 +454,8 @@ function tsvd_tools_ai_set_animal_interest_seed($input) {
 function tsvd_tools_ai_applicant_field_defs($target) {
     $all = array(
         'applicant_residence' => array('label' => __('Wohnort', 'tsv-tools'), 'required' => true),
-        'applicant_housing'   => array('label' => __('Unterkunft', 'tsv-tools'), 'required' => false),
-        'applicant_outdoor'   => array('label' => __('Außenbereich', 'tsv-tools'), 'required' => false),
+        'applicant_housing'   => array('label' => __('Unterkunft', 'tsv-tools'), 'required' => true),
+        'applicant_outdoor'   => array('label' => __('Außenbereich', 'tsv-tools'), 'required' => true),
     );
     if ('missing' === $target) {
         return array('applicant_residence' => $all['applicant_residence']);
@@ -500,16 +500,27 @@ function tsvd_tools_ai_add_applicant_fields($input) {
         $groups[] = array('id' => $group_id, 'columns' => 1, 'aligns' => array());
     }
 
-    $existing_types = array();
-    foreach ($fields as $field) {
+    $index_by_type = array();
+    foreach ($fields as $i => $field) {
         if (isset($field['type'])) {
-            $existing_types[$field['type']] = true;
+            $index_by_type[$field['type']] = $i;
         }
     }
 
-    $added = array();
+    $added   = array();
+    $updated = array();
     foreach (tsvd_tools_ai_applicant_field_defs($target) as $type => $def) {
-        if (isset($existing_types[$type])) {
+        if (isset($index_by_type[$type])) {
+            $i = $index_by_type[$type];
+            $fields[$i]['label']    = $def['label'];
+            $fields[$i]['required'] = (bool) $def['required'];
+            if (empty($fields[$i]['group_id'])) {
+                $fields[$i]['group_id'] = $group_id;
+            }
+            if (! isset($fields[$i]['group_column'])) {
+                $fields[$i]['group_column'] = 0;
+            }
+            $updated[] = $type;
             continue;
         }
         $fields[] = array(
@@ -524,15 +535,27 @@ function tsvd_tools_ai_add_applicant_fields($input) {
         $added[] = $type;
     }
 
+    // Consent/acceptance field must stay last.
+    $consent_types = array('description', 'checkbox');
+    $head = array();
+    $tail = array();
+    foreach ($fields as $field) {
+        if (isset($field['type']) && in_array($field['type'], $consent_types, true)) {
+            $tail[] = $field;
+        } else {
+            $head[] = $field;
+        }
+    }
+    $fields = array_merge($head, $tail);
+
     update_post_meta($form_id, '_tsvd_form_fields', $fields);
     update_post_meta($form_id, '_tsvd_form_groups_config', $groups);
 
-    $all_types = array_keys(tsvd_tools_ai_applicant_field_defs($target));
-
     return array(
-        'form_id'          => $form_id,
-        'added'            => $added,
-        'skipped_existing' => array_values(array_diff($all_types, $added)),
-        'form_edit_link'   => (string) get_edit_post_link($form_id, 'raw'),
+        'form_id'        => $form_id,
+        'added'          => $added,
+        'updated'        => $updated,
+        'order'          => array_values(wp_list_pluck($fields, 'type')),
+        'form_edit_link' => (string) get_edit_post_link($form_id, 'raw'),
     );
 }
