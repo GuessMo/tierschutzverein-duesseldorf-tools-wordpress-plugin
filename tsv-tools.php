@@ -2,7 +2,7 @@
 /**
  * Plugin Name: TSV Tools
  * Description: Werkzeuge für das Tierschutzverein Düsseldorf WordPress-Projekt: JSON-Tierdaten-Sync, Theme-Datenbank-Migration und mehr.
- * Version: 0.13.2
+ * Version: 0.14.0
  * Update URI: false
  * Author: Hersteller.io
  * Text Domain: tsv-tools
@@ -10,7 +10,7 @@
 
 if (!defined('ABSPATH')) exit;
 
-define('TSVD_TOOLS_VERSION', '0.13.2');
+define('TSVD_TOOLS_VERSION', '0.14.0');
 define('TSVD_TOOLS_DIR', plugin_dir_path(__FILE__));
 define('TSVD_TOOLS_URL', plugin_dir_url(__FILE__));
 
