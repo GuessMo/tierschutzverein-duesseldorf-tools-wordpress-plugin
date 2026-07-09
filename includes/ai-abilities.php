@@ -363,4 +363,53 @@ function tsvd_tools_ai_register_abilities() {
         'execute_callback'    => 'tsvd_tools_ai_update_page',
         'meta'                => array('mcp' => array('public' => true)),
     ));
+
+    wp_register_ability('tsv-tools/rest-request', array(
+        'label'               => __('REST-API-Aufruf', 'tsv-tools'),
+        'description'         => __('Führt einen beliebigen WordPress-REST-API-Aufruf aus (CRUD auf Beiträge, Seiten, Taxonomien, Medien, Nutzer, Kommentare, Einstellungen). method=GET|POST|PUT|PATCH|DELETE, route=z.B. /wp/v2/posts oder /wp/v2/settings, params=Objekt. Läuft mit den Rechten des angemeldeten Nutzers (Endpoint-Permissions greifen).', 'tsv-tools'),
+        'category'            => 'tsv-tools-animals',
+        'input_schema'        => array(
+            'type'       => 'object',
+            'properties' => array(
+                'method' => array('type' => 'string', 'description' => 'GET|POST|PUT|PATCH|DELETE (Default GET)'),
+                'route'  => array('type' => 'string', 'description' => 'REST-Route, z.B. /wp/v2/posts/123'),
+                'params' => array('type' => 'object', 'description' => 'Query- bzw. Body-Parameter'),
+            ),
+            'required'             => array('route'),
+            'additionalProperties' => false,
+        ),
+        'output_schema'       => array(
+            'type'       => 'object',
+            'properties' => array(
+                'status' => array('type' => 'integer'),
+                'body'   => array('type' => array('object', 'array', 'string', 'null')),
+            ),
+        ),
+        'permission_callback' => 'tsvd_tools_ai_can_manage_settings',
+        'execute_callback'    => 'tsvd_tools_ai_rest_request',
+        'meta'                => array('mcp' => array('public' => true)),
+    ));
+
+    wp_register_ability('tsv-tools/rest-list-routes', array(
+        'label'               => __('REST-Routen auflisten', 'tsv-tools'),
+        'description'         => __('Listet registrierte REST-API-Routen (optional gefiltert per contains), zur Entdeckung verfügbarer Endpoints.', 'tsv-tools'),
+        'category'            => 'tsv-tools-animals',
+        'input_schema'        => array(
+            'type'       => 'object',
+            'properties' => array(
+                'contains' => array('type' => 'string', 'description' => 'Nur Routen, die diesen Teilstring enthalten'),
+            ),
+            'additionalProperties' => false,
+        ),
+        'output_schema'       => array(
+            'type'       => 'object',
+            'properties' => array(
+                'count'  => array('type' => 'integer'),
+                'routes' => array('type' => 'array'),
+            ),
+        ),
+        'permission_callback' => 'tsvd_tools_ai_can_manage_settings',
+        'execute_callback'    => 'tsvd_tools_ai_rest_list_routes',
+        'meta'                => array('mcp' => array('public' => true)),
+    ));
 }
