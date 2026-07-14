@@ -1,17 +1,4 @@
 ( function () {
-    function byId( id ) { return document.getElementById( id ); }
-
-    function fillForm( d ) {
-        byId( 'r301-id' ).value = d.id || '';
-        byId( 'r301-domain' ).value = d.domain || 'tierheim-duesseldorf.de';
-        byId( 'r301-source' ).value = d.source || '';
-        byId( 'r301-target' ).value = d.target || '';
-        byId( 'r301-status' ).value = d.status || '301';
-        byId( 'r301-enabled' ).checked = d.enabled === '1' || d.enabled === true;
-        var title = byId( 'r301-form-title' );
-        if ( title ) { title.scrollIntoView( { behavior: 'smooth' } ); }
-    }
-
     function sortTable( th ) {
         var table = th.closest( 'table' );
         var tbody = table.tBodies[ 0 ];
@@ -42,17 +29,6 @@
     }
 
     document.addEventListener( 'click', function ( e ) {
-        var edit = e.target.closest( '.r301-edit' );
-        if ( edit ) { e.preventDefault(); fillForm( edit.dataset ); return; }
-
-        var reset = e.target.closest( '.r301-reset' );
-        if ( reset ) {
-            e.preventDefault();
-            fillForm( { status: '301', enabled: true } );
-            byId( 'r301-id' ).value = '';
-            return;
-        }
-
         var th = e.target.closest( 'th.r301-sortable' );
         if ( th ) { sortTable( th ); }
     } );
