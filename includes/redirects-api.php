@@ -47,11 +47,16 @@ function tsvd_r301_get_not_found( $limit = 200 ) {
     return is_array( $r['data'] ) ? $r['data'] : array();
 }
 
+function tsvd_r301_norm_host( $host ) {
+    return preg_replace( '/^www\./i', '', strtolower( (string) $host ) );
+}
+
 function tsvd_r301_find_match( $host, $path, $redirects ) {
     $path = (string) $path;
     $norm = rtrim( $path, '/' );
+    $h    = tsvd_r301_norm_host( $host );
     foreach ( $redirects as $r ) {
-        if ( (string) ( $r['domain'] ?? '' ) !== (string) $host ) {
+        if ( tsvd_r301_norm_host( $r['domain'] ?? '' ) !== $h ) {
             continue;
         }
         if ( ! empty( $r['isRegex'] ) ) {
