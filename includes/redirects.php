@@ -68,9 +68,21 @@ function tsvd_r301_render_page() {
     tsvd_r301_form();
 
     $redirects = tsvd_r301_get_redirects();
+    $n301 = $n410 = $nReach = $nMiss = 0;
+    foreach ( $redirects as $r ) {
+        if ( 410 === (int) $r['statusCode'] ) {
+            $n410++;
+        } else {
+            $n301++;
+            'yes' === tsvd_r301_target_reachable( $r['statusCode'], $r['target'] ) ? $nReach++ : $nMiss++;
+        }
+    }
     echo '<h2>Redirects (' . count( $redirects ) . ')</h2>';
+    echo '<p class="description">Nur Domain <code>tierheim-duesseldorf.de</code>. '
+        . '301: ' . $n301 . ' (Ziel erreichbar: ' . $nReach . ', fehlt: ' . $nMiss . ') &middot; 410: ' . $n410 . '. '
+        . '„Erreichbar" prüft, ob das Ziel auf der neuen Seite existiert (funktioniert auch im Wartungsmodus).</p>';
     echo '<table class="wp-list-table widefat fixed striped"><thead><tr>'
-        . '<th>Domain</th><th>Quelle</th><th>Ziel</th><th>Status</th><th>Aktiv</th><th>Hits</th><th>Aktion</th>'
+        . '<th>Quelle</th><th>Ziel</th><th>Status</th><th>Aktiv</th><th>Erreichbar</th><th>Hits</th><th>Aktion</th>'
         . '</tr></thead><tbody>';
     foreach ( $redirects as $r ) {
         $del = '<form method="post" action="' . esc_url( admin_url( 'admin-post.php' ) ) . '" style="display:inline" onsubmit="return confirm(\'Redirect loeschen?\')">'
@@ -86,11 +98,21 @@ function tsvd_r301_render_page() {
             'statusCode' => (int) $r['statusCode'],
             'enabled'    => (bool) $r['enabled'],
         ) ) . '\')>Bearbeiten</button> ';
-        echo '<tr><td>' . esc_html( $r['domain'] ) . '</td>'
-            . '<td><code>' . esc_html( $r['sourcePath'] ) . '</code></td>'
+        $reach = tsvd_r301_target_reachable( $r['statusCode'], $r['target'] );
+        if ( 'yes' === $reach ) {
+            $reachCell = '<span style="color:#227122">&#10003;</span>';
+        } elseif ( 'no' === $reach ) {
+            $reachCell = '<span style="color:#b32d2e" title="Ziel nicht auf der neuen Seite gefunden">&#10007;</span>';
+        } elseif ( 'gone' === $reach ) {
+            $reachCell = '<span class="description">&ndash; (410)</span>';
+        } else {
+            $reachCell = '?';
+        }
+        echo '<tr><td><code>' . esc_html( $r['sourcePath'] ) . '</code></td>'
             . '<td><code>' . esc_html( $r['target'] ) . '</code></td>'
             . '<td>' . (int) $r['statusCode'] . '</td>'
             . '<td>' . ( ! empty( $r['enabled'] ) ? '&#10003;' : '&ndash;' ) . '</td>'
+            . '<td>' . $reachCell . '</td>'
             . '<td>' . (int) $r['hitCount'] . '</td>'
             . '<td>' . $edit . $del . '</td></tr>';
     }

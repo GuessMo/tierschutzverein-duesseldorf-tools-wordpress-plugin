@@ -37,9 +37,20 @@ function tsvd_r301_request( $method, $path, $body = null ) {
     return array( 'code' => $code, 'data' => $data, 'error' => ( $code >= 400 ? 'HTTP ' . $code : '' ) );
 }
 
-function tsvd_r301_get_redirects() {
-    $r = tsvd_r301_request( 'GET', '/api/redirects' );
+function tsvd_r301_get_redirects( $domain = 'tierheim-duesseldorf.de' ) {
+    $path = '/api/redirects' . ( $domain ? '?domain=' . rawurlencode( $domain ) : '' );
+    $r    = tsvd_r301_request( 'GET', $path );
     return is_array( $r['data'] ) ? $r['data'] : array();
+}
+
+function tsvd_r301_target_reachable( $statusCode, $target ) {
+    if ( 410 === (int) $statusCode ) {
+        return 'gone';
+    }
+    if ( '' === (string) $target ) {
+        return 'unknown';
+    }
+    return url_to_postid( $target ) > 0 ? 'yes' : 'no';
 }
 
 function tsvd_r301_get_not_found( $limit = 200 ) {
