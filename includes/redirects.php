@@ -20,6 +20,15 @@ function tsvd_r301_register_page() {
     );
 }
 
+add_action( 'admin_enqueue_scripts', 'tsvd_r301_enqueue' );
+function tsvd_r301_enqueue( $hook ) {
+    if ( false === strpos( (string) $hook, 'tsvd-tools-redirects' ) ) {
+        return;
+    }
+    wp_enqueue_script( 'tsvd-r301', TSVD_TOOLS_URL . 'assets/redirects.js', array(), TSVD_TOOLS_VERSION, true );
+    wp_add_inline_style( 'wp-admin', 'th.r301-sortable{cursor:pointer;white-space:nowrap} th.r301-sortable.sorted.asc::after{content:" \\2191"} th.r301-sortable.sorted.desc::after{content:" \\2193"}' );
+}
+
 function tsvd_r301_open_url( $path ) {
     return esc_url( rtrim( ROUTE301_API_URL, '/' ) . $path );
 }
@@ -48,7 +57,7 @@ function tsvd_r301_form() {
         . '<tr><th>Aktiv</th><td><label><input type="checkbox" name="enabled" id="r301-enabled" value="1" checked> aktiviert</label></td></tr>'
         . '</tbody></table>'
         . '<p><button type="submit" class="button button-primary">Speichern</button> '
-        . '<button type="button" class="button" onclick="r301Reset()">Zuruecksetzen</button></p>'
+        . '<button type="button" class="button r301-reset">Zuruecksetzen</button></p>'
         . '</form>';
 }
 
@@ -82,7 +91,9 @@ function tsvd_r301_render_page() {
         . '301: ' . $n301 . ' (Ziel erreichbar: ' . $nReach . ', fehlt: ' . $nMiss . ') &middot; 410: ' . $n410 . '. '
         . '„Erreichbar" prüft, ob das Ziel auf der neuen Seite existiert (funktioniert auch im Wartungsmodus).</p>';
     echo '<table class="wp-list-table widefat fixed striped"><thead><tr>'
-        . '<th>Quelle</th><th>Ziel</th><th>Status</th><th>Aktiv</th><th>Erreichbar</th><th>Hits</th><th>Aktion</th>'
+        . '<th class="r301-sortable">Quelle</th><th class="r301-sortable">Ziel</th>'
+        . '<th class="r301-sortable" data-sort="num">Status</th><th class="r301-sortable">Aktiv</th>'
+        . '<th class="r301-sortable">Erreichbar</th><th class="r301-sortable" data-sort="num">Hits</th><th>Aktion</th>'
         . '</tr></thead><tbody>';
     foreach ( $redirects as $r ) {
         $del = '<form method="post" action="' . esc_url( admin_url( 'admin-post.php' ) ) . '" style="display:inline" onsubmit="return confirm(\'Redirect loeschen?\')">'
@@ -90,14 +101,13 @@ function tsvd_r301_render_page() {
             . wp_nonce_field( 'tsvd_r301_delete', '_wpnonce', true, false )
             . '<input type="hidden" name="id" value="' . (int) $r['id'] . '">'
             . '<button class="button-link delete" style="color:#b32d2e">Loeschen</button></form>';
-        $edit = '<button type="button" class="button button-small" onclick=\'r301Edit(' . wp_json_encode( array(
-            'id'         => (int) $r['id'],
-            'domain'     => $r['domain'],
-            'sourcePath' => $r['sourcePath'],
-            'target'     => $r['target'],
-            'statusCode' => (int) $r['statusCode'],
-            'enabled'    => (bool) $r['enabled'],
-        ) ) . '\')>Bearbeiten</button> ';
+        $edit = '<button type="button" class="button button-small r301-edit"'
+            . ' data-id="' . (int) $r['id'] . '"'
+            . ' data-domain="' . esc_attr( $r['domain'] ) . '"'
+            . ' data-source="' . esc_attr( $r['sourcePath'] ) . '"'
+            . ' data-target="' . esc_attr( $r['target'] ) . '"'
+            . ' data-status="' . (int) $r['statusCode'] . '"'
+            . ' data-enabled="' . ( ! empty( $r['enabled'] ) ? '1' : '0' ) . '">Bearbeiten</button> ';
         $reach = tsvd_r301_target_reachable( $r['statusCode'], $r['target'] );
         if ( 'yes' === $reach ) {
             $reachCell = '<span style="color:#227122">&#10003;</span>';
@@ -133,24 +143,20 @@ function tsvd_r301_render_page() {
         if ( $m ) {
             $badge  = ! empty( $m['enabled'] ) ? '' : ' <span style="color:#b32d2e">(inaktiv)</span>';
             $status = '&#8594; <code>' . esc_html( $m['target'] ) . '</code> (' . (int) $m['statusCode'] . ')' . $badge;
-            $action = '<button type="button" class="button button-small" onclick=\'r301Edit(' . wp_json_encode( array(
-                'id'         => (int) $m['id'],
-                'domain'     => $m['domain'],
-                'sourcePath' => $m['sourcePath'],
-                'target'     => $m['target'],
-                'statusCode' => (int) $m['statusCode'],
-                'enabled'    => (bool) $m['enabled'],
-            ) ) . '\')>Bearbeiten</button>';
+            $action = '<button type="button" class="button button-small r301-edit"'
+                . ' data-id="' . (int) $m['id'] . '"'
+                . ' data-domain="' . esc_attr( $m['domain'] ) . '"'
+                . ' data-source="' . esc_attr( $m['sourcePath'] ) . '"'
+                . ' data-target="' . esc_attr( $m['target'] ) . '"'
+                . ' data-status="' . (int) $m['statusCode'] . '"'
+                . ' data-enabled="' . ( ! empty( $m['enabled'] ) ? '1' : '0' ) . '">Bearbeiten</button>';
         } else {
             $status = '<span style="color:#b32d2e">offen</span>';
-            $action = '<button type="button" class="button button-small button-primary" onclick=\'r301Edit(' . wp_json_encode( array(
-                'id'         => 0,
-                'domain'     => $l['host'],
-                'sourcePath' => $l['path'],
-                'target'     => '',
-                'statusCode' => 301,
-                'enabled'    => true,
-            ) ) . '\')>Redirect anlegen</button>';
+            $action = '<button type="button" class="button button-small button-primary r301-edit"'
+                . ' data-id="0"'
+                . ' data-domain="' . esc_attr( $l['host'] ) . '"'
+                . ' data-source="' . esc_attr( $l['path'] ) . '"'
+                . ' data-target="" data-status="301" data-enabled="1">Redirect anlegen</button>';
         }
         echo '<tr><td>' . esc_html( $l['host'] ) . '</td>'
             . '<td><code>' . esc_html( $l['path'] ) . '</code></td>'
@@ -161,14 +167,5 @@ function tsvd_r301_render_page() {
     }
     echo '</tbody></table>';
 
-    echo '<script>
-function r301Edit(d){document.getElementById("r301-id").value=d.id||"";
-document.getElementById("r301-domain").value=d.domain||"";
-document.getElementById("r301-source").value=d.sourcePath||"";
-document.getElementById("r301-target").value=d.target||"";
-document.getElementById("r301-status").value=d.statusCode||301;
-document.getElementById("r301-enabled").checked=!!d.enabled;
-document.getElementById("r301-form-title").scrollIntoView({behavior:"smooth"});}
-function r301Reset(){r301Edit({statusCode:301,enabled:true});document.getElementById("r301-id").value="";}
-</script></div>';
+    echo '</div>';
 }
