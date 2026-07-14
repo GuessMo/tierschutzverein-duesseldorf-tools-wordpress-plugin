@@ -47,6 +47,24 @@ function tsvd_r301_get_not_found( $limit = 200 ) {
     return is_array( $r['data'] ) ? $r['data'] : array();
 }
 
+function tsvd_r301_find_match( $host, $path, $redirects ) {
+    $path = (string) $path;
+    $norm = rtrim( $path, '/' );
+    foreach ( $redirects as $r ) {
+        if ( (string) ( $r['domain'] ?? '' ) !== (string) $host ) {
+            continue;
+        }
+        if ( ! empty( $r['isRegex'] ) ) {
+            continue; // Regex-Semantik von route301 nicht raten -> nicht auto-matchen
+        }
+        $src = (string) ( $r['sourcePath'] ?? '' );
+        if ( $src === $path || rtrim( $src, '/' ) === $norm ) {
+            return $r;
+        }
+    }
+    return null;
+}
+
 function tsvd_r301_redirect_back( $ok, $msg ) {
     $url = add_query_arg(
         array( 'r301' => $ok ? 'ok' : 'err', 'r301msg' => rawurlencode( $msg ) ),

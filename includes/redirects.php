@@ -96,24 +96,46 @@ function tsvd_r301_render_page() {
     }
     echo '</tbody></table>';
 
-    $nf = tsvd_r301_get_not_found();
-    echo '<h2>404-Log (' . count( $nf ) . ')</h2>';
-    echo '<table class="wp-list-table widefat fixed striped"><thead><tr>'
-        . '<th>Host</th><th>Pfad</th><th>Hits</th><th>Zuletzt</th><th>Aktion</th></tr></thead><tbody>';
+    $nf   = tsvd_r301_get_not_found();
+    $open = 0;
     foreach ( $nf as $l ) {
-        $mk = '<button type="button" class="button button-small" onclick=\'r301Edit(' . wp_json_encode( array(
-            'id'         => 0,
-            'domain'     => $l['host'],
-            'sourcePath' => $l['path'],
-            'target'     => '',
-            'statusCode' => 301,
-            'enabled'    => true,
-        ) ) . '\')>Redirect anlegen</button>';
+        if ( null === tsvd_r301_find_match( $l['host'], $l['path'], $redirects ) ) {
+            $open++;
+        }
+    }
+    echo '<h2>404-Log (' . count( $nf ) . ', davon ' . $open . ' ohne Redirect)</h2>';
+    echo '<table class="wp-list-table widefat fixed striped"><thead><tr>'
+        . '<th>Host</th><th>Pfad</th><th>Hits</th><th>Zuletzt</th><th>Redirect</th><th>Aktion</th></tr></thead><tbody>';
+    foreach ( $nf as $l ) {
+        $m = tsvd_r301_find_match( $l['host'], $l['path'], $redirects );
+        if ( $m ) {
+            $badge  = ! empty( $m['enabled'] ) ? '' : ' <span style="color:#b32d2e">(inaktiv)</span>';
+            $status = '&#8594; <code>' . esc_html( $m['target'] ) . '</code> (' . (int) $m['statusCode'] . ')' . $badge;
+            $action = '<button type="button" class="button button-small" onclick=\'r301Edit(' . wp_json_encode( array(
+                'id'         => (int) $m['id'],
+                'domain'     => $m['domain'],
+                'sourcePath' => $m['sourcePath'],
+                'target'     => $m['target'],
+                'statusCode' => (int) $m['statusCode'],
+                'enabled'    => (bool) $m['enabled'],
+            ) ) . '\')>Bearbeiten</button>';
+        } else {
+            $status = '<span style="color:#b32d2e">offen</span>';
+            $action = '<button type="button" class="button button-small button-primary" onclick=\'r301Edit(' . wp_json_encode( array(
+                'id'         => 0,
+                'domain'     => $l['host'],
+                'sourcePath' => $l['path'],
+                'target'     => '',
+                'statusCode' => 301,
+                'enabled'    => true,
+            ) ) . '\')>Redirect anlegen</button>';
+        }
         echo '<tr><td>' . esc_html( $l['host'] ) . '</td>'
             . '<td><code>' . esc_html( $l['path'] ) . '</code></td>'
             . '<td>' . (int) $l['hitCount'] . '</td>'
             . '<td>' . esc_html( isset( $l['lastHitAt'] ) ? substr( (string) $l['lastHitAt'], 0, 16 ) : '' ) . '</td>'
-            . '<td>' . $mk . '</td></tr>';
+            . '<td>' . $status . '</td>'
+            . '<td>' . $action . '</td></tr>';
     }
     echo '</tbody></table>';
 
