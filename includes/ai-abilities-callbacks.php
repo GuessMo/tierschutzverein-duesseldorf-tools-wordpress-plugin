@@ -93,7 +93,6 @@ function tsvd_tools_ai_debug_meta_duplicates($input) {
         'duplicates'         => $rows,
         'filtered_total'     => is_array($filtered) ? count($filtered) : null,
         'filtered_dupes'     => $counts,
-        'filtered_ids'       => is_array($filtered) ? array_slice($filtered, 0, 12) : null,
     );
 }
 
