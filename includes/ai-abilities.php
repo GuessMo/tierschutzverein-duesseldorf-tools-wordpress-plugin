@@ -7,6 +7,19 @@ if (!defined('ABSPATH')) exit;
 
 require_once TSVD_TOOLS_DIR . 'includes/ai-abilities-callbacks.php';
 
+// Default server capability gate is 'read' (any logged-in user). Tighten to the
+// broadest capability our abilities actually need — individual permission_callbacks
+// remain the real per-ability gate (tsvd_tools_ai_can_manage_animals/_settings).
+add_filter('mcp_adapter_discover_abilities_capability', function () {
+    return 'edit_posts';
+});
+add_filter('mcp_adapter_get_ability_info_capability', function () {
+    return 'edit_posts';
+});
+add_filter('mcp_adapter_execute_ability_capability', function () {
+    return 'edit_posts';
+});
+
 add_action('wp_abilities_api_categories_init', 'tsvd_tools_ai_register_category');
 function tsvd_tools_ai_register_category() {
     if (!function_exists('wp_register_ability_category')) {
@@ -62,7 +75,10 @@ function tsvd_tools_ai_register_abilities() {
         ),
         'permission_callback' => 'tsvd_tools_ai_can_manage_animals',
         'execute_callback'    => 'tsvd_tools_ai_list_animals',
-        'meta'                => array('mcp' => array('public' => true)),
+        'meta'                => array(
+            'mcp'         => array('public' => true),
+            'annotations' => array('readonly' => true, 'destructive' => false, 'idempotent' => true),
+        ),
     ));
 
     wp_register_ability('tsv-tools/get-animal', array(
@@ -78,7 +94,10 @@ function tsvd_tools_ai_register_abilities() {
         'output_schema'       => $animal_object,
         'permission_callback' => 'tsvd_tools_ai_can_manage_animals',
         'execute_callback'    => 'tsvd_tools_ai_get_animal',
-        'meta'                => array('mcp' => array('public' => true)),
+        'meta'                => array(
+            'mcp'         => array('public' => true),
+            'annotations' => array('readonly' => true, 'destructive' => false, 'idempotent' => true),
+        ),
     ));
 
     wp_register_ability('tsv-tools/create-animal', array(
@@ -114,7 +133,10 @@ function tsvd_tools_ai_register_abilities() {
         'output_schema'       => $animal_object,
         'permission_callback' => 'tsvd_tools_ai_can_manage_animals',
         'execute_callback'    => 'tsvd_tools_ai_create_animal',
-        'meta'                => array('mcp' => array('public' => true)),
+        'meta'                => array(
+            'mcp'         => array('public' => true),
+            'annotations' => array('readonly' => false, 'destructive' => false, 'idempotent' => false),
+        ),
     ));
 
     wp_register_ability('tsv-tools/update-animal', array(
@@ -151,7 +173,10 @@ function tsvd_tools_ai_register_abilities() {
         'output_schema'       => $animal_object,
         'permission_callback' => 'tsvd_tools_ai_can_manage_animals',
         'execute_callback'    => 'tsvd_tools_ai_update_animal',
-        'meta'                => array('mcp' => array('public' => true)),
+        'meta'                => array(
+            'mcp'         => array('public' => true),
+            'annotations' => array('readonly' => false, 'destructive' => false, 'idempotent' => true),
+        ),
     ));
 
     wp_register_ability('tsv-tools/create-animals-bulk', array(
@@ -180,7 +205,10 @@ function tsvd_tools_ai_register_abilities() {
         ),
         'permission_callback' => 'tsvd_tools_ai_can_manage_animals',
         'execute_callback'    => 'tsvd_tools_ai_create_animals_bulk',
-        'meta'                => array('mcp' => array('public' => true)),
+        'meta'                => array(
+            'mcp'         => array('public' => true),
+            'annotations' => array('readonly' => false, 'destructive' => false, 'idempotent' => false),
+        ),
     ));
 
     wp_register_ability('tsv-tools/create-missing-form', array(
@@ -210,7 +238,10 @@ function tsvd_tools_ai_register_abilities() {
         ),
         'permission_callback' => 'tsvd_tools_ai_can_manage_settings',
         'execute_callback'    => 'tsvd_tools_ai_create_missing_form',
-        'meta'                => array('mcp' => array('public' => true)),
+        'meta'                => array(
+            'mcp'         => array('public' => true),
+            'annotations' => array('readonly' => false, 'destructive' => false, 'idempotent' => true),
+        ),
     ));
 
     wp_register_ability('tsv-tools/set-missing-page', array(
@@ -237,7 +268,10 @@ function tsvd_tools_ai_register_abilities() {
         ),
         'permission_callback' => 'tsvd_tools_ai_can_manage_settings',
         'execute_callback'    => 'tsvd_tools_ai_set_missing_page',
-        'meta'                => array('mcp' => array('public' => true)),
+        'meta'                => array(
+            'mcp'         => array('public' => true),
+            'annotations' => array('readonly' => false, 'destructive' => false, 'idempotent' => true),
+        ),
     ));
 
     wp_register_ability('tsv-tools/set-animal-interest-seed', array(
@@ -272,7 +306,10 @@ function tsvd_tools_ai_register_abilities() {
         ),
         'permission_callback' => 'tsvd_tools_ai_can_manage_animals',
         'execute_callback'    => 'tsvd_tools_ai_set_animal_interest_seed',
-        'meta'                => array('mcp' => array('public' => true)),
+        'meta'                => array(
+            'mcp'         => array('public' => true),
+            'annotations' => array('readonly' => false, 'destructive' => false, 'idempotent' => true),
+        ),
     ));
 
     wp_register_ability('tsv-tools/add-applicant-fields-to-form', array(
@@ -299,7 +336,10 @@ function tsvd_tools_ai_register_abilities() {
         ),
         'permission_callback' => 'tsvd_tools_ai_can_manage_settings',
         'execute_callback'    => 'tsvd_tools_ai_add_applicant_fields',
-        'meta'                => array('mcp' => array('public' => true)),
+        'meta'                => array(
+            'mcp'         => array('public' => true),
+            'annotations' => array('readonly' => false, 'destructive' => false, 'idempotent' => true),
+        ),
     ));
 
     wp_register_ability('tsv-tools/get-page', array(
@@ -328,7 +368,10 @@ function tsvd_tools_ai_register_abilities() {
         ),
         'permission_callback' => 'tsvd_tools_ai_can_manage_settings',
         'execute_callback'    => 'tsvd_tools_ai_get_page',
-        'meta'                => array('mcp' => array('public' => true)),
+        'meta'                => array(
+            'mcp'         => array('public' => true),
+            'annotations' => array('readonly' => true, 'destructive' => false, 'idempotent' => true),
+        ),
     ));
 
     wp_register_ability('tsv-tools/update-page', array(
@@ -361,7 +404,10 @@ function tsvd_tools_ai_register_abilities() {
         ),
         'permission_callback' => 'tsvd_tools_ai_can_manage_settings',
         'execute_callback'    => 'tsvd_tools_ai_update_page',
-        'meta'                => array('mcp' => array('public' => true)),
+        'meta'                => array(
+            'mcp'         => array('public' => true),
+            'annotations' => array('readonly' => false, 'destructive' => true, 'idempotent' => false),
+        ),
     ));
 
     wp_register_ability('tsv-tools/rest-request', array(
@@ -387,7 +433,10 @@ function tsvd_tools_ai_register_abilities() {
         ),
         'permission_callback' => 'tsvd_tools_ai_can_manage_settings',
         'execute_callback'    => 'tsvd_tools_ai_rest_request',
-        'meta'                => array('mcp' => array('public' => true)),
+        'meta'                => array(
+            'mcp'         => array('public' => true),
+            'annotations' => array('readonly' => false, 'destructive' => true, 'idempotent' => false),
+        ),
     ));
 
     wp_register_ability('tsv-tools/rest-list-routes', array(
@@ -410,7 +459,10 @@ function tsvd_tools_ai_register_abilities() {
         ),
         'permission_callback' => 'tsvd_tools_ai_can_manage_settings',
         'execute_callback'    => 'tsvd_tools_ai_rest_list_routes',
-        'meta'                => array('mcp' => array('public' => true)),
+        'meta'                => array(
+            'mcp'         => array('public' => true),
+            'annotations' => array('readonly' => true, 'destructive' => false, 'idempotent' => true),
+        ),
     ));
 
     wp_register_ability('tsv-tools/seed-demo-stats', array(
@@ -439,6 +491,9 @@ function tsvd_tools_ai_register_abilities() {
         ),
         'permission_callback' => 'tsvd_tools_ai_can_manage_settings',
         'execute_callback'    => 'tsvd_tools_ai_seed_demo_stats',
-        'meta'                => array('mcp' => array('public' => true)),
+        'meta'                => array(
+            'mcp'         => array('public' => true),
+            'annotations' => array('readonly' => false, 'destructive' => true, 'idempotent' => true),
+        ),
     ));
 }
