@@ -70,6 +70,22 @@ function tsvd_tools_ai_get_animal($input) {
     return tsvd_tools_ai_format_animal($id);
 }
 
+function tsvd_tools_ai_debug_meta_duplicates($input) {
+    $id = isset($input['id']) ? (int) $input['id'] : 0;
+    if (!$id) {
+        return new WP_Error('tsvd_tools_ai_invalid_id', __('Ungültige ID.', 'tsv-tools'));
+    }
+    global $wpdb;
+    $rows = $wpdb->get_results(
+        $wpdb->prepare(
+            "SELECT meta_key, COUNT(*) AS c FROM {$wpdb->postmeta} WHERE post_id = %d GROUP BY meta_key HAVING c > 1",
+            $id
+        ),
+        ARRAY_A
+    );
+    return array('duplicates' => $rows);
+}
+
 function tsvd_tools_ai_apply_animal_meta($post_id, $input) {
     if (isset($input['name'])) {
         update_post_meta($post_id, 'animal_name', sanitize_text_field($input['name']));
