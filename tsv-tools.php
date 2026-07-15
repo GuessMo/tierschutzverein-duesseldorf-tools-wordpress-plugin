@@ -36,6 +36,7 @@ require_once TSVD_TOOLS_DIR . 'includes/admin.php';
 require_once TSVD_TOOLS_DIR . 'includes/password-reset.php';
 require_once TSVD_TOOLS_DIR . 'includes/ai-abilities.php';
 require_once TSVD_TOOLS_DIR . 'includes/ai-admin.php';
+require_once TSVD_TOOLS_DIR . 'includes/ai-admin-abilities.php';
 require_once TSVD_TOOLS_DIR . 'includes/backups.php';
 require_once TSVD_TOOLS_DIR . 'includes/redirects-api.php';
 require_once TSVD_TOOLS_DIR . 'includes/redirects.php';

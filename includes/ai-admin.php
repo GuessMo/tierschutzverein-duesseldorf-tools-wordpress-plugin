@@ -42,12 +42,9 @@ function tsvd_tools_ai_render_admin_page() {
     $abilities_api = function_exists('wp_register_ability');
     $mcp_routes = tsvd_tools_ai_has_mcp_routes();
     $endpoint = esc_url(rest_url('mcp/mcp-adapter-default-server'));
-    $ability_ids = array(
-        'tsv-tools/list-animals',
-        'tsv-tools/get-animal',
-        'tsv-tools/create-animal',
-        'tsv-tools/update-animal',
-    );
+    $total_abilities = count(tsvd_tools_ai_get_ability_definitions());
+    $disabled_count = count(tsvd_tools_ai_disabled_abilities());
+    $abilities_page = esc_url(admin_url('admin.php?page=tsvd-tools-ai-abilities'));
     ?>
     <div class="wrap">
         <h1><?php esc_html_e('AI / MCP', 'tsv-tools'); ?></h1>
@@ -68,11 +65,17 @@ function tsvd_tools_ai_render_admin_page() {
         </ul>
 
         <h2><?php esc_html_e('Registrierte Abilities', 'tsv-tools'); ?></h2>
-        <ul>
-            <?php foreach ($ability_ids as $id) : ?>
-                <li><code><?php echo esc_html($id); ?></code></li>
-            <?php endforeach; ?>
-        </ul>
+        <p>
+            <?php
+            printf(
+                /* translators: 1: total ability count, 2: disabled ability count */
+                esc_html__('%1$d Abilities insgesamt, %2$d davon deaktiviert.', 'tsv-tools'),
+                (int) $total_abilities,
+                (int) $disabled_count
+            );
+            ?>
+            <a href="<?php echo $abilities_page; ?>"><?php esc_html_e('Einzeln aktivieren/deaktivieren →', 'tsv-tools'); ?></a>
+        </p>
 
         <h2><?php esc_html_e('MCP-Endpoint', 'tsv-tools'); ?></h2>
         <p><code><?php echo $endpoint; ?></code></p>
