@@ -81,25 +81,6 @@ function tsvd_tools_ai_register_abilities() {
         'meta'                => array('mcp' => array('public' => true)),
     ));
 
-    wp_register_ability('tsv-tools/debug-meta-duplicates', array(
-        'label'               => __('Debug: doppelte Meta-Keys', 'tsv-tools'),
-        'description'         => __('TEMPORÄR (Diagnose Anzeige-Duplikat-Bug): zeigt Meta-Keys mit mehr als einer Zeile für einen Post. Nur Key + Anzahl, keine Werte.', 'tsv-tools'),
-        'category'            => 'tsv-tools-animals',
-        'input_schema'        => array(
-            'type'       => 'object',
-            'properties' => array('id' => array('type' => 'integer')),
-            'required'   => array('id'),
-            'additionalProperties' => false,
-        ),
-        'output_schema'       => array(
-            'type'       => 'object',
-            'properties' => array('duplicates' => array('type' => 'array')),
-        ),
-        'permission_callback' => 'tsvd_tools_ai_can_manage_animals',
-        'execute_callback'    => 'tsvd_tools_ai_debug_meta_duplicates',
-        'meta'                => array('mcp' => array('public' => true)),
-    ));
-
     wp_register_ability('tsv-tools/create-animal', array(
         'label'               => __('Tier anlegen', 'tsv-tools'),
         'description'         => __('Legt ein neues Tier als Entwurf an.', 'tsv-tools'),
