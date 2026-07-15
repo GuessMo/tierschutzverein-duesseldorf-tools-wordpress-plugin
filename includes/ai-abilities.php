@@ -93,11 +93,7 @@ function tsvd_tools_ai_register_abilities() {
         ),
         'output_schema'       => array(
             'type'       => 'object',
-            'properties' => array(
-                'duplicates'     => array('type' => 'array'),
-                'filtered_total' => array('type' => array('integer', 'null')),
-                'filtered_dupes' => array('type' => array('object', 'null')),
-            ),
+            'properties' => array('duplicates' => array('type' => 'array')),
         ),
         'permission_callback' => 'tsvd_tools_ai_can_manage_animals',
         'execute_callback'    => 'tsvd_tools_ai_debug_meta_duplicates',

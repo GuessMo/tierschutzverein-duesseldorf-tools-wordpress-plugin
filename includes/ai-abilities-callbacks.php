@@ -83,17 +83,7 @@ function tsvd_tools_ai_debug_meta_duplicates($input) {
         ),
         ARRAY_A
     );
-    $filtered = function_exists('tsvd_filter_animals') ? tsvd_filter_animals() : null;
-    $counts = null;
-    if (is_array($filtered)) {
-        $counts = array_count_values(array_map('strval', $filtered));
-        $counts = array_filter($counts, function ($c) { return $c > 1; });
-    }
-    return array(
-        'duplicates'         => $rows,
-        'filtered_total'     => is_array($filtered) ? count($filtered) : null,
-        'filtered_dupes'     => $counts,
-    );
+    return array('duplicates' => $rows);
 }
 
 function tsvd_tools_ai_apply_animal_meta($post_id, $input) {
