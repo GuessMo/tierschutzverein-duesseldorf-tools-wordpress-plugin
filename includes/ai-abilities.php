@@ -8,7 +8,16 @@
 if (!defined('ABSPATH')) exit;
 
 require_once TSVD_TOOLS_DIR . 'includes/ai-abilities-callbacks.php';
+require_once TSVD_TOOLS_DIR . 'includes/ai-abilities-callbacks-extra.php';
 require_once TSVD_TOOLS_DIR . 'includes/ai-abilities-definitions.php';
+require_once TSVD_TOOLS_DIR . 'includes/ai-abilities-definitions-extra.php';
+
+function tsvd_tools_ai_get_all_ability_definitions() {
+    return array_merge(
+        tsvd_tools_ai_get_ability_definitions(),
+        tsvd_tools_ai_get_ability_definitions_extra()
+    );
+}
 
 const TSVD_TOOLS_AI_DISABLED_OPTION = 'tsvd_tools_ai_disabled_abilities';
 
@@ -49,7 +58,7 @@ function tsvd_tools_ai_register_abilities() {
     if (!function_exists('wp_register_ability')) {
         return;
     }
-    foreach (tsvd_tools_ai_get_ability_definitions() as $name => $args) {
+    foreach (tsvd_tools_ai_get_all_ability_definitions() as $name => $args) {
         if (tsvd_tools_ai_is_ability_enabled($name)) {
             wp_register_ability($name, $args);
         }

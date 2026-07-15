@@ -42,7 +42,7 @@ function tsvd_tools_ai_render_admin_page() {
     $abilities_api = function_exists('wp_register_ability');
     $mcp_routes = tsvd_tools_ai_has_mcp_routes();
     $endpoint = esc_url(rest_url('mcp/mcp-adapter-default-server'));
-    $total_abilities = count(tsvd_tools_ai_get_ability_definitions());
+    $total_abilities = count(tsvd_tools_ai_get_all_ability_definitions());
     $disabled_count = count(tsvd_tools_ai_disabled_abilities());
     $abilities_page = esc_url(admin_url('admin.php?page=tsvd-tools-ai-abilities'));
     ?>

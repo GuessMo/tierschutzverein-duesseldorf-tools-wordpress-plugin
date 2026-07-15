@@ -28,7 +28,7 @@ function tsvd_tools_ai_abilities_register_setting() {
 }
 
 function tsvd_tools_ai_sanitize_disabled_abilities($input) {
-    $known = array_keys(tsvd_tools_ai_get_ability_definitions());
+    $known = array_keys(tsvd_tools_ai_get_all_ability_definitions());
     $submitted = is_array($input) ? array_map('sanitize_text_field', $input) : array();
     return array_values(array_intersect($known, $submitted));
 }
@@ -56,7 +56,7 @@ function tsvd_tools_ai_abilities_render_page() {
                     </tr>
                 </thead>
                 <tbody>
-                    <?php foreach (tsvd_tools_ai_get_ability_definitions() as $name => $def) : ?>
+                    <?php foreach (tsvd_tools_ai_get_all_ability_definitions() as $name => $def) : ?>
                         <tr>
                             <td>
                                 <label>
