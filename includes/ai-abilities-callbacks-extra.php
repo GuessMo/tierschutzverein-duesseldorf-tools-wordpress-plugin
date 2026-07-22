@@ -125,6 +125,9 @@ function tsvd_tools_ai_get_form_stats($input) {
         case 'adoption_status':
             $rows = function_exists('tsvd_stats_count_by_adoption_status') ? tsvd_stats_count_by_adoption_status() : array();
             break;
+        case 'adoption_source':
+            $rows = function_exists('tsvd_stats_count_by_adoption_source') ? tsvd_stats_count_by_adoption_source() : array();
+            break;
         case 'adoption_status_by_month':
             $limit = isset($input['limit']) ? max(1, min(60, (int) $input['limit'])) : 12;
             $rows = function_exists('tsvd_stats_adopted_by_month') ? tsvd_stats_adopted_by_month($limit) : array();
