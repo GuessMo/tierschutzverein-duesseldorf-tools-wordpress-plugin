@@ -29,16 +29,17 @@ jobs:
 
       - name: Determine bump type
         id: bump
+        env:
+          COMMIT_MSG: ${{ github.event.head_commit.message }}
         run: |
-          MSG="${{ github.event.head_commit.message }}"
-          echo "Commit: $MSG"
-          if echo "$MSG" | grep -qE '^feat(\(.+\))?:'; then
+          echo "Commit: $COMMIT_MSG"
+          if echo "$COMMIT_MSG" | grep -qE '^feat(\(.+\))?:'; then
             echo "type=minor" >> $GITHUB_OUTPUT
             echo "→ Bumping minor version"
-          elif echo "$MSG" | grep -qE '^fix(\(.+\))?:'; then
+          elif echo "$COMMIT_MSG" | grep -qE '^fix(\(.+\))?:'; then
             echo "type=patch" >> $GITHUB_OUTPUT
             echo "→ Bumping patch version"
-          elif echo "$MSG" | grep -qE '^chore\(release\)'; then
+          elif echo "$COMMIT_MSG" | grep -qE '^chore\(release\)'; then
             echo "type=released" >> $GITHUB_OUTPUT
             echo "→ Already released, using current version"
           else
