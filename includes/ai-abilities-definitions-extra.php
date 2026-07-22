@@ -89,5 +89,31 @@ function tsvd_tools_ai_get_ability_definitions_extra() {
                 'annotations' => array('readonly' => true, 'destructive' => false, 'idempotent' => true),
             ),
         ),
+
+        'tsv-tools/reset-form-stats' => array(
+            'label'               => __('Formular-Statistik zurücksetzen', 'tsv-tools'),
+            'description'         => __('Setzt die Anfragen-/Interesse-Statistik zurück (TRUNCATE Zähler-Tabelle + animal_interest_form_count auf 0 bei allen Tieren). Betrifft NICHT den Vermittlungsstatus/animal_adoption_status echter Tiere. Nicht rückgängig zu machen — Bestätigungsfeld erforderlich.', 'tsv-tools'),
+            'category'            => 'tsv-tools-animals',
+            'input_schema'        => array(
+                'type'       => 'object',
+                'properties' => array(
+                    'confirm' => array('type' => 'boolean', 'description' => 'Muss true sein, sonst Fehler.'),
+                ),
+                'required'             => array('confirm'),
+                'additionalProperties' => false,
+            ),
+            'output_schema'       => array(
+                'type'       => 'object',
+                'properties' => array(
+                    'reset_animals' => array('type' => 'integer'),
+                ),
+            ),
+            'permission_callback' => 'tsvd_tools_ai_can_manage_settings',
+            'execute_callback'    => 'tsvd_tools_ai_reset_form_stats',
+            'meta'                => array(
+                'mcp'         => array('public' => true),
+                'annotations' => array('readonly' => false, 'destructive' => true, 'idempotent' => true),
+            ),
+        ),
     );
 }

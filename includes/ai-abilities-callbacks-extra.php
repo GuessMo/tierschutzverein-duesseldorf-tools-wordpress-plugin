@@ -39,6 +39,19 @@ function tsvd_tools_ai_list_redirects($input) {
     );
 }
 
+function tsvd_tools_ai_reset_form_stats($input) {
+    if (empty($input['confirm'])) {
+        return new WP_Error('tsvd_tools_ai_confirm_required', __('confirm muss true sein.', 'tsv-tools'));
+    }
+    if (!function_exists('tsvd_stats_table_name')) {
+        return new WP_Error('no_stats', __('Statistik-Funktionen (Theme) nicht geladen.', 'tsv-tools'));
+    }
+    global $wpdb;
+    $wpdb->query('TRUNCATE TABLE ' . tsvd_stats_table_name());
+    $n = function_exists('tsvd_interest_reset_form_data') ? tsvd_interest_reset_form_data() : 0;
+    return array('reset_animals' => (int) $n);
+}
+
 function tsvd_tools_ai_get_form_stats($input) {
     $dimension = isset($input['dimension']) ? sanitize_key($input['dimension']) : 'request_type';
 
