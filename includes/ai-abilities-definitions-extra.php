@@ -64,14 +64,14 @@ function tsvd_tools_ai_get_ability_definitions_extra() {
 
         'tsv-tools/get-form-stats' => array(
             'label'               => __('Formular-Statistik abfragen', 'tsv-tools'),
-            'description'         => __('Fragt die echte (anonyme) Formular-/Interesse-Statistik ab. dimension: request_type|residence|housing|outdoor|period|top_animals|species_term|breed_term.', 'tsv-tools'),
+            'description'         => __('Fragt die echte (anonyme) Formular-/Interesse-Statistik ab. dimension: request_type|residence|housing|outdoor|period|top_animals|species_term|breed_term|adoption_status|adoption_status_by_month.', 'tsv-tools'),
             'category'            => 'tsv-tools-animals',
             'input_schema'        => array(
                 'type'       => 'object',
                 'properties' => array(
                     'dimension' => array('type' => 'string', 'default' => 'request_type'),
                     'period'    => array('type' => 'string', 'description' => 'nur bei dimension=period: day|month|year'),
-                    'limit'     => array('type' => 'integer', 'description' => 'nur bei dimension=top_animals, Default 10'),
+                    'limit'     => array('type' => 'integer', 'description' => 'nur bei dimension=top_animals oder adoption_status_by_month, Default 10 bzw. 12'),
                 ),
                 'additionalProperties' => false,
             ),

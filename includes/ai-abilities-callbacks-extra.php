@@ -62,6 +62,13 @@ function tsvd_tools_ai_get_form_stats($input) {
         case 'breed_term':
             $rows = function_exists('tsvd_stats_interest_by_term') ? tsvd_stats_interest_by_term($dimension) : array();
             break;
+        case 'adoption_status':
+            $rows = function_exists('tsvd_stats_count_by_adoption_status') ? tsvd_stats_count_by_adoption_status() : array();
+            break;
+        case 'adoption_status_by_month':
+            $limit = isset($input['limit']) ? max(1, min(60, (int) $input['limit'])) : 12;
+            $rows = function_exists('tsvd_stats_adopted_by_month') ? tsvd_stats_adopted_by_month($limit) : array();
+            break;
         default:
             return new WP_Error('tsvd_tools_ai_invalid_dimension', __('Unbekannte Dimension.', 'tsv-tools'));
     }
