@@ -52,6 +52,53 @@ function tsvd_tools_ai_reset_form_stats($input) {
     return array('reset_animals' => (int) $n);
 }
 
+function tsvd_tools_ai_regenerate_attachment($attachment_id) {
+    $attachment_id = (int) $attachment_id;
+    if (!$attachment_id) {
+        return null;
+    }
+    $file = get_attached_file($attachment_id);
+    if (!$file || !file_exists($file)) {
+        return array('image_id' => $attachment_id, 'status' => 'file_missing');
+    }
+    if (!function_exists('wp_generate_attachment_metadata')) {
+        require_once ABSPATH . 'wp-admin/includes/image.php';
+    }
+    $metadata = wp_generate_attachment_metadata($attachment_id, $file);
+    wp_update_attachment_metadata($attachment_id, $metadata);
+    return array('image_id' => $attachment_id, 'status' => 'regenerated');
+}
+
+function tsvd_tools_ai_regenerate_project_images($input) {
+    $projects = get_posts(array(
+        'post_type'      => 'projects',
+        'post_status'    => 'any',
+        'posts_per_page' => -1,
+        'fields'         => 'ids',
+    ));
+
+    $results = array();
+    foreach ($projects as $pid) {
+        $desktop = tsvd_tools_ai_regenerate_attachment(get_post_meta($pid, 'project_desktop_image', true));
+        if ($desktop) {
+            $results[] = array_merge(array('project_id' => $pid, 'field' => 'project_desktop_image'), $desktop);
+        }
+        $mobile = tsvd_tools_ai_regenerate_attachment(get_post_meta($pid, 'project_mobile_image', true));
+        if ($mobile) {
+            $results[] = array_merge(array('project_id' => $pid, 'field' => 'project_mobile_image'), $mobile);
+        }
+        $impressions = (string) get_post_meta($pid, 'project_impression_images', true);
+        foreach (array_filter(array_map('absint', explode(',', $impressions))) as $img_id) {
+            $r = tsvd_tools_ai_regenerate_attachment($img_id);
+            if ($r) {
+                $results[] = array_merge(array('project_id' => $pid, 'field' => 'project_impression_images'), $r);
+            }
+        }
+    }
+
+    return array('total' => count($results), 'results' => $results);
+}
+
 function tsvd_tools_ai_get_form_stats($input) {
     $dimension = isset($input['dimension']) ? sanitize_key($input['dimension']) : 'request_type';
 

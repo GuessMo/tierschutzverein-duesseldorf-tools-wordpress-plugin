@@ -115,5 +115,29 @@ function tsvd_tools_ai_get_ability_definitions_extra() {
                 'annotations' => array('readonly' => false, 'destructive' => true, 'idempotent' => true),
             ),
         ),
+
+        'tsv-tools/regenerate-project-images' => array(
+            'label'               => __('Projekt-Bilder neu generieren', 'tsv-tools'),
+            'description'         => __('Regeneriert alle Bildgrößen (u.a. tsvd-card) für die Desktop-/Mobil-/Impressionsbilder aller Projekte, damit ein geänderter add_image_size-Zuschnitt auch für bereits hochgeladene Bilder greift.', 'tsv-tools'),
+            'category'            => 'tsv-tools-animals',
+            'input_schema'        => array(
+                'type'                 => 'object',
+                'properties'           => array(),
+                'additionalProperties' => false,
+            ),
+            'output_schema'       => array(
+                'type'       => 'object',
+                'properties' => array(
+                    'total'   => array('type' => 'integer'),
+                    'results' => array('type' => 'array'),
+                ),
+            ),
+            'permission_callback' => 'tsvd_tools_ai_can_manage_settings',
+            'execute_callback'    => 'tsvd_tools_ai_regenerate_project_images',
+            'meta'                => array(
+                'mcp'         => array('public' => true),
+                'annotations' => array('readonly' => false, 'destructive' => false, 'idempotent' => true),
+            ),
+        ),
     );
 }
