@@ -188,5 +188,38 @@ function tsvd_tools_ai_get_ability_definitions_extra() {
                 'annotations' => array('readonly' => false, 'destructive' => false, 'idempotent' => true),
             ),
         ),
+
+        'tsv-tools/cleanup-animal-image-artifacts' => array(
+            'label'               => __('Import-Artefakte aus Tier-Bildern entfernen', 'tsv-tools'),
+            'description'         => __('Entfernt Attachments, deren Titel auf ein REGEXP passt, aus animal_images und dem Beitragsbild aller Tiere — für Import-Artefakte wie eine pro Tier mitheruntergeladene Teaser-Grafik der Quellseite. Standard ist ein Dry-Run: erst mit apply=true wird geschrieben, Attachments werden nur mit delete_attachments=true endgültig gelöscht.', 'tsv-tools'),
+            'category'            => 'tsv-tools-animals',
+            'input_schema'        => array(
+                'type'       => 'object',
+                'properties' => array(
+                    'title_pattern'      => array('type' => 'string', 'description' => 'MySQL-REGEXP auf den Attachment-Titel, mind. 8 Zeichen, z.B. ^[0-9]{2}_teaser-3-e41c3afd'),
+                    'apply'              => array('type' => 'boolean', 'default' => false, 'description' => 'false = Dry-Run, es wird nichts geschrieben'),
+                    'delete_attachments' => array('type' => 'boolean', 'default' => false, 'description' => 'true = gefundene Attachments samt Dateien löschen (nur zusammen mit apply)'),
+                ),
+                'required'   => array('title_pattern'),
+                'additionalProperties' => false,
+            ),
+            'output_schema'       => array(
+                'type'       => 'object',
+                'properties' => array(
+                    'applied'             => array('type' => 'boolean'),
+                    'attachment_count'    => array('type' => 'integer'),
+                    'attachment_ids'      => array('type' => 'array'),
+                    'gallery_changed'     => array('type' => 'array'),
+                    'thumbnail_cleared'   => array('type' => 'array'),
+                    'attachments_deleted' => array('type' => 'integer'),
+                ),
+            ),
+            'permission_callback' => 'tsvd_tools_ai_can_manage_animals',
+            'execute_callback'    => 'tsvd_tools_ai_cleanup_animal_image_artifacts',
+            'meta'                => array(
+                'mcp'         => array('public' => true),
+                'annotations' => array('readonly' => false, 'destructive' => true, 'idempotent' => true),
+            ),
+        ),
     );
 }
