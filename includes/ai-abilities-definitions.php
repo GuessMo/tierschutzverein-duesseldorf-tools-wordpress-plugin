@@ -17,6 +17,17 @@ function tsvd_tools_ai_get_ability_definitions() {
             'mediator'        => array('type' => array('string', 'null')),
             'missing_status'  => array('type' => array('string', 'null')),
             'edit_link'       => array('type' => 'string'),
+            'post_date'       => array('type' => 'string'),
+            'teo_id'          => array('type' => array('string', 'null')),
+            'gender'          => array('type' => array('string', 'null')),
+            'size'            => array('type' => array('string', 'null')),
+            'life_stage'      => array('type' => array('string', 'null')),
+            'castrated'       => array('type' => array('string', 'null')),
+            'birthday'        => array('type' => array('string', 'null')),
+            'birthday_status' => array('type' => array('string', 'null')),
+            'breed'           => array('type' => 'array', 'items' => array('type' => 'string')),
+            'companion_ids'   => array('type' => 'array', 'items' => array('type' => 'integer')),
+            'image_count'     => array('type' => 'integer'),
         ),
     );
 

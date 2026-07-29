@@ -9,6 +9,11 @@ function tsvd_tools_ai_can_manage_animals() {
 
 function tsvd_tools_ai_format_animal($post_id) {
     $name = get_post_meta($post_id, 'animal_name', true);
+    $breeds = get_the_terms($post_id, 'animal_breed');
+    $breed_names = ($breeds && !is_wp_error($breeds)) ? wp_list_pluck($breeds, 'name') : array();
+    $companions = get_post_meta($post_id, 'animal_companion_animals', true);
+    $images = get_post_meta($post_id, 'animal_images', true);
+
     return array(
         'id'              => (int) $post_id,
         'title'           => get_the_title($post_id),
@@ -18,6 +23,17 @@ function tsvd_tools_ai_format_animal($post_id) {
         'mediator'        => get_post_meta($post_id, 'animal_mediator', true) ?: null,
         'missing_status'  => get_post_meta($post_id, 'animal_missing_status', true) ?: null,
         'edit_link'       => (string) get_edit_post_link($post_id, 'raw'),
+        'post_date'       => get_the_date('Y-m-d H:i:s', $post_id),
+        'teo_id'          => get_post_meta($post_id, 'animal_teo_id', true) ?: null,
+        'gender'          => get_post_meta($post_id, 'animal_gender', true) ?: null,
+        'size'            => get_post_meta($post_id, 'animal_size_cm', true) ?: null,
+        'life_stage'      => get_post_meta($post_id, 'animal_life_stage', true) ?: null,
+        'castrated'       => get_post_meta($post_id, 'animal_castrated', true) ?: null,
+        'birthday'        => get_post_meta($post_id, 'animal_birthday', true) ?: null,
+        'birthday_status' => get_post_meta($post_id, 'animal_birthday_status', true) ?: null,
+        'breed'           => $breed_names,
+        'companion_ids'   => is_array($companions) ? array_map('intval', $companions) : array(),
+        'image_count'     => is_array($images) ? count($images) : 0,
     );
 }
 
