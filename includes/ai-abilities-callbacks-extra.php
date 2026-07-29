@@ -99,6 +99,89 @@ function tsvd_tools_ai_regenerate_project_images($input) {
     return array('total' => count($results), 'results' => $results);
 }
 
+function tsvd_tools_ai_import_animal($input) {
+    if (empty($input['name'])) {
+        return new WP_Error('tsvd_tools_ai_missing_name', __('Name ist erforderlich.', 'tsv-tools'));
+    }
+
+    $postarr = array(
+        'post_type'    => 'animals',
+        'post_status'  => !empty($input['post_status']) ? sanitize_key($input['post_status']) : 'draft',
+        'post_title'   => sanitize_text_field($input['name']),
+        'post_content' => isset($input['description']) ? wp_kses_post($input['description']) : '',
+    );
+    if (!empty($input['post_date'])) {
+        $postarr['post_date'] = sanitize_text_field($input['post_date']);
+    }
+
+    $post_id = wp_insert_post($postarr, true);
+    if (is_wp_error($post_id)) {
+        return $post_id;
+    }
+
+    if (!isset($input['adoption_status'])) {
+        $input['adoption_status'] = 'for_adoption';
+    }
+    if (!isset($input['mediator'])) {
+        $input['mediator'] = 'tierschutzverein';
+    }
+    tsvd_tools_ai_apply_animal_meta($post_id, $input);
+
+    if (isset($input['teo_id']) && $input['teo_id'] !== '') {
+        update_post_meta($post_id, 'animal_teo_id', sanitize_text_field($input['teo_id']));
+    }
+    if (isset($input['life_stage'])) {
+        $life_stage = sanitize_key($input['life_stage']);
+        if (in_array($life_stage, array('young', 'adult', 'senior', 'undefined'), true)) {
+            update_post_meta($post_id, 'animal_life_stage', $life_stage);
+        }
+    }
+    if (isset($input['castrated'])) {
+        $castrated = sanitize_key($input['castrated']);
+        if (in_array($castrated, array('yes', 'no', 'unknown'), true)) {
+            update_post_meta($post_id, 'animal_castrated', $castrated);
+        }
+    }
+    if (!empty($input['birthday'])) {
+        update_post_meta($post_id, 'animal_birthday', sanitize_text_field($input['birthday']));
+    }
+    if (isset($input['birthday_status'])) {
+        $birthday_status = sanitize_key($input['birthday_status']);
+        if (in_array($birthday_status, array('known', 'estimated', 'unknown'), true)) {
+            update_post_meta($post_id, 'animal_birthday_status', $birthday_status);
+        }
+    }
+
+    if (!empty($input['image_ids']) && is_array($input['image_ids'])) {
+        $image_ids = array_values(array_filter(array_map('absint', $input['image_ids'])));
+        if ($image_ids) {
+            update_post_meta($post_id, 'animal_images', $image_ids);
+            set_post_thumbnail($post_id, $image_ids[0]);
+        }
+    }
+
+    if (!empty($input['companion_ids']) && is_array($input['companion_ids'])) {
+        $companion_ids = array_values(array_unique(array_filter(array_map('absint', $input['companion_ids']))));
+        if ($companion_ids) {
+            update_post_meta($post_id, 'animal_companion_animals', $companion_ids);
+            foreach ($companion_ids as $companion_id) {
+                $existing = get_post_meta($companion_id, 'animal_companion_animals', true);
+                $existing = is_array($existing) ? $existing : array();
+                if (!in_array($post_id, $existing, true)) {
+                    $existing[] = $post_id;
+                    update_post_meta($companion_id, 'animal_companion_animals', array_values(array_unique($existing)));
+                }
+            }
+        }
+    }
+
+    if (function_exists('tsvd_regenerate_animal_title')) {
+        tsvd_regenerate_animal_title($post_id, sanitize_text_field($input['name']));
+    }
+
+    return tsvd_tools_ai_format_animal($post_id);
+}
+
 function tsvd_tools_ai_get_form_stats($input) {
     $dimension = isset($input['dimension']) ? sanitize_key($input['dimension']) : 'request_type';
 
