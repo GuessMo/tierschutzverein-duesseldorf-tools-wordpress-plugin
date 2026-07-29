@@ -10,6 +10,7 @@ if (!defined('ABSPATH')) exit;
 require_once TSVD_TOOLS_DIR . 'includes/ai-abilities-callbacks.php';
 require_once TSVD_TOOLS_DIR . 'includes/ai-abilities-callbacks-extra.php';
 require_once TSVD_TOOLS_DIR . 'includes/ai-abilities-callbacks-maintenance.php';
+require_once TSVD_TOOLS_DIR . 'includes/ai-abilities-callbacks-image-sizes.php';
 require_once TSVD_TOOLS_DIR . 'includes/ai-abilities-definitions.php';
 require_once TSVD_TOOLS_DIR . 'includes/ai-abilities-definitions-extra.php';
 

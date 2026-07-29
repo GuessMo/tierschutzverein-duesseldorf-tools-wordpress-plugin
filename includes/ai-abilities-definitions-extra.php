@@ -221,5 +221,39 @@ function tsvd_tools_ai_get_ability_definitions_extra() {
                 'annotations' => array('readonly' => false, 'destructive' => true, 'idempotent' => true),
             ),
         ),
+
+        'tsv-tools/repair-edited-image-sizes' => array(
+            'label'               => __('Bildgrößen bearbeiteter Bilder reparieren', 'tsv-tools'),
+            'description'         => __('Findet Attachments, die im Bildeditor bearbeitet wurden, deren registrierte Größen aber noch auf die Datei vor der Bearbeitung zeigen — der Grund, warum das Frontend das alte Bild zeigt. Stößt für diese eine Metadaten-Aktualisierung an, wodurch die Größen neu erzeugt werden. Standard ist ein Dry-Run: erst mit apply=true wird geschrieben. Ohne attachment_ids werden alle bearbeiteten Bilder geprüft.', 'tsv-tools'),
+            'category'            => 'tsv-tools-animals',
+            'input_schema'        => array(
+                'type'       => 'object',
+                'properties' => array(
+                    'attachment_ids' => array(
+                        'type'        => 'array',
+                        'items'       => array('type' => 'integer'),
+                        'description' => 'Optional: nur diese Attachments prüfen.',
+                    ),
+                    'apply'          => array('type' => 'boolean', 'default' => false, 'description' => 'false = Dry-Run, es wird nichts geschrieben'),
+                ),
+                'additionalProperties' => false,
+            ),
+            'output_schema'       => array(
+                'type'       => 'object',
+                'properties' => array(
+                    'applied'     => array('type' => 'boolean'),
+                    'checked'     => array('type' => 'integer'),
+                    'affected'    => array('type' => 'array'),
+                    'repaired'    => array('type' => 'integer'),
+                    'still_stale' => array('type' => 'array'),
+                ),
+            ),
+            'permission_callback' => 'tsvd_tools_ai_can_manage_animals',
+            'execute_callback'    => 'tsvd_tools_ai_repair_edited_image_sizes',
+            'meta'                => array(
+                'mcp'         => array('public' => true),
+                'annotations' => array('readonly' => false, 'destructive' => true, 'idempotent' => true),
+            ),
+        ),
     );
 }
