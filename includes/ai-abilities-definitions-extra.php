@@ -255,5 +255,35 @@ function tsvd_tools_ai_get_ability_definitions_extra() {
                 'annotations' => array('readonly' => false, 'destructive' => true, 'idempotent' => true),
             ),
         ),
+
+        'tsv-tools/regenerate-focus-crops' => array(
+            'label'               => __('Fokus-Zuschnitte neu generieren', 'tsv-tools'),
+            'description'         => __('Schneidet animal-card und tsvd-card fokus-bewusst neu zu (statt WordPress-Standard-Mittenzuschnitt) für alle Attachments mit gesetzter Fokus-Region (Bildfokus Stufe 2). Ohne attachment_ids laufen alle Attachments mit Fokus-Region durch.', 'tsv-tools'),
+            'category'            => 'tsv-tools-animals',
+            'input_schema'        => array(
+                'type'       => 'object',
+                'properties' => array(
+                    'attachment_ids' => array(
+                        'type'        => 'array',
+                        'items'       => array('type' => 'integer'),
+                        'description' => 'Optional: nur diese Attachment-IDs verarbeiten statt aller mit Fokus-Region.',
+                    ),
+                ),
+                'additionalProperties' => false,
+            ),
+            'output_schema'       => array(
+                'type'       => 'object',
+                'properties' => array(
+                    'total'   => array('type' => 'integer'),
+                    'results' => array('type' => 'array'),
+                ),
+            ),
+            'permission_callback' => 'tsvd_tools_ai_can_manage_settings',
+            'execute_callback'    => 'tsvd_tools_ai_regenerate_focus_crops',
+            'meta'                => array(
+                'mcp'         => array('public' => true),
+                'annotations' => array('readonly' => false, 'destructive' => false, 'idempotent' => true),
+            ),
+        ),
     );
 }
