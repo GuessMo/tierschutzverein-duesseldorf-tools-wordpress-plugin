@@ -258,7 +258,7 @@ function tsvd_tools_ai_get_ability_definitions_extra() {
 
         'tsv-tools/regenerate-focus-crops' => array(
             'label'               => __('Fokus-Zuschnitte neu generieren', 'tsv-tools'),
-            'description'         => __('Schneidet animal-card und tsvd-card fokus-bewusst neu zu (statt WordPress-Standard-Mittenzuschnitt) für alle Attachments mit gesetzter Fokus-Region (Bildfokus Stufe 2). Ohne attachment_ids laufen alle Attachments mit Fokus-Region durch.', 'tsv-tools'),
+            'description'         => __('Schneidet die im Theme konfigurierten Bildgrößen (Filter tsvd_focus_crop_sizes, Standard: thumbnail) fokus-bewusst neu zu (statt WordPress-Standard-Mittenzuschnitt) für alle Attachments mit gesetzter Fokus-Region (Bildfokus Stufe 2). Ohne attachment_ids laufen alle Attachments mit Fokus-Region durch.', 'tsv-tools'),
             'category'            => 'tsv-tools-animals',
             'input_schema'        => array(
                 'type'       => 'object',
