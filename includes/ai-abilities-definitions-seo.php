@@ -23,7 +23,7 @@ function tsvd_tools_ai_get_ability_definitions_seo() {
     return array(
         'tsv-tools/get-seo-score' => array(
             'label'               => __('SEO-Score abrufen', 'tsv-tools'),
-            'description'         => __('Regelbasierter SEO-/Lesbarkeits-Score für einen Beitrag oder eine Seite: Satzlänge, Verbindungswörter, Lesbarkeit (Wiener Sachtextformel), Absatzlänge, Zwischenüberschriften, kein Gendern, Du-Anrede, Textlänge, Fokus-Keyword-Kriterien und Meta-Description-Länge. Rein lesend, keine Änderungen.', 'tsv-tools'),
+            'description'         => __('Regelbasierter SEO-/Lesbarkeits-Score für einen Beitrag oder eine Seite: Satzlänge, Verbindungswörter, Lesbarkeit (Wiener Sachtextformel), Absatzlänge, Zwischenüberschriften, kein Gendern, keine Sie-Anrede, Du-Anrede, Textlänge, Fokus-Keyword-Kriterien und Meta-Description-Länge. Rein lesend, keine Änderungen.', 'tsv-tools'),
             'category'            => 'tsv-tools-animals',
             'input_schema'        => array(
                 'type'       => 'object',
