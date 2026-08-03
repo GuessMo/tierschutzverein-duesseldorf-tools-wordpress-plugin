@@ -13,15 +13,18 @@ require_once TSVD_TOOLS_DIR . 'includes/ai-abilities-callbacks-maintenance.php';
 require_once TSVD_TOOLS_DIR . 'includes/ai-abilities-callbacks-image-sizes.php';
 require_once TSVD_TOOLS_DIR . 'includes/ai-abilities-callbacks-focus-crops.php';
 require_once TSVD_TOOLS_DIR . 'includes/ai-abilities-callbacks-seo.php';
+require_once TSVD_TOOLS_DIR . 'includes/ai-abilities-callbacks-ai-optimize.php';
 require_once TSVD_TOOLS_DIR . 'includes/ai-abilities-definitions.php';
 require_once TSVD_TOOLS_DIR . 'includes/ai-abilities-definitions-extra.php';
 require_once TSVD_TOOLS_DIR . 'includes/ai-abilities-definitions-seo.php';
+require_once TSVD_TOOLS_DIR . 'includes/ai-abilities-definitions-ai-optimize.php';
 
 function tsvd_tools_ai_get_all_ability_definitions() {
     return array_merge(
         tsvd_tools_ai_get_ability_definitions(),
         tsvd_tools_ai_get_ability_definitions_extra(),
-        tsvd_tools_ai_get_ability_definitions_seo()
+        tsvd_tools_ai_get_ability_definitions_seo(),
+        tsvd_tools_ai_get_ability_definitions_ai_optimize()
     );
 }
 
