@@ -13,7 +13,7 @@ function tsvd_anfragen_render_detail( $id ) {
 	global $wpdb;
 	$table         = tsvd_anfragen_table_name();
 	$replies_table = tsvd_anfragen_replies_table_name();
-	$list_url      = admin_url( 'edit.php?post_type=tsvd_form&page=tsvd-anfragen' );
+	$list_url      = admin_url( 'edit.php?post_type=animals&page=tsvd-anfragen' );
 
 	$anfrage = $wpdb->get_row( $wpdb->prepare( "SELECT * FROM {$table} WHERE id = %d", $id ), ARRAY_A );
 

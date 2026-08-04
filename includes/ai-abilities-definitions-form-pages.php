@@ -63,5 +63,33 @@ function tsvd_tools_ai_get_ability_definitions_form_pages() {
                 'annotations' => array('readonly' => false, 'destructive' => false, 'idempotent' => true),
             ),
         ),
+
+        'tsv-tools/anfragen-dashboard-status' => array(
+            'label'               => __('Anfragen-Dashboard-Status abfragen', 'tsv-tools'),
+            'description'         => __('Löst die lazy auf admin_init gehookten Einmal-Migrationen aus (DB-Tabellen, Capability-Grant) und meldet den aktuellen Status des Anfragen-Dashboards zurück.', 'tsv-tools'),
+            'category'            => 'tsv-tools-animals',
+            'input_schema'        => array(
+                'type'       => 'object',
+                'properties' => new stdClass(),
+                'additionalProperties' => false,
+            ),
+            'output_schema'       => array(
+                'type'       => 'object',
+                'properties' => array(
+                    'tables_exist'                 => array('type' => 'boolean'),
+                    'anfragen_count'               => array('type' => array('integer', 'null')),
+                    'administrator_has_capability' => array('type' => 'boolean'),
+                    'interessentenbogen_form_id'   => array('type' => 'integer'),
+                    'persist_inquiry_enabled'      => array('type' => 'boolean'),
+                    'dashboard_url'                => array('type' => 'string'),
+                ),
+            ),
+            'permission_callback' => 'tsvd_tools_ai_can_manage_settings',
+            'execute_callback'    => 'tsvd_tools_ai_anfragen_dashboard_status',
+            'meta'                => array(
+                'mcp'         => array('public' => true),
+                'annotations' => array('readonly' => false, 'destructive' => false, 'idempotent' => true),
+            ),
+        ),
     );
 }

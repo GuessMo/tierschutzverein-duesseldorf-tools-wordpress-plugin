@@ -13,7 +13,7 @@ add_action( 'admin_menu', 'tsvd_anfragen_admin_menu' );
 
 function tsvd_anfragen_admin_menu() {
 	$hook = add_submenu_page(
-		'edit.php?post_type=tsvd_form',
+		'edit.php?post_type=animals',
 		__( 'Anfragen', 'tsvd' ),
 		__( 'Anfragen', 'tsvd' ),
 		'manage_tsvd_anfragen',
@@ -59,7 +59,7 @@ function tsvd_anfragen_render_list() {
 	}
 	$rows = $wpdb->get_results( "SELECT * FROM {$table} {$where} ORDER BY created_at DESC LIMIT 200", ARRAY_A );
 
-	$base_url = admin_url( 'edit.php?post_type=tsvd_form&page=tsvd-anfragen' );
+	$base_url = admin_url( 'edit.php?post_type=animals&page=tsvd-anfragen' );
 
 	echo '<div class="wrap"><h1>' . esc_html__( 'Anfragen', 'tsvd' ) . '</h1>';
 
@@ -127,6 +127,6 @@ function tsvd_anfragen_handle_delete() {
 	$wpdb->delete( tsvd_anfragen_replies_table_name(), array( 'anfrage_id' => $id ), array( '%d' ) );
 	$wpdb->delete( tsvd_anfragen_table_name(), array( 'id' => $id ), array( '%d' ) );
 
-	wp_safe_redirect( add_query_arg( 'deleted', '1', admin_url( 'edit.php?post_type=tsvd_form&page=tsvd-anfragen' ) ) );
+	wp_safe_redirect( add_query_arg( 'deleted', '1', admin_url( 'edit.php?post_type=animals&page=tsvd-anfragen' ) ) );
 	exit;
 }

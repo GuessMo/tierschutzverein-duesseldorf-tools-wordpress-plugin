@@ -92,3 +92,41 @@ function tsvd_tools_ai_add_maintenance_allowed_path($input) {
         'message' => __('Pfad zur Wartungsmodus-Ausnahmeliste hinzugefügt.', 'tsv-tools'),
     );
 }
+
+/**
+ * Anfragen-Dashboard: Status abfragen und dabei die lazy auf admin_init
+ * gehookten Einmal-Migrationen (DB-Tabellen, Capability-Grant) auslösen.
+ * Ein MCP-/REST-Aufruf durchläuft admin_init NICHT von selbst (das feuert nur
+ * bei einem echten wp-admin-Request) — ohne diesen manuellen Trigger blieben
+ * Tabellen/Capability bis zum ersten echten Admin-Besuch ungesetzt.
+ */
+function tsvd_tools_ai_anfragen_dashboard_status($input) {
+    do_action('admin_init');
+
+    global $wpdb;
+    $table_exists = function_exists('tsvd_anfragen_table_name')
+        ? (bool) $wpdb->get_var($wpdb->prepare('SHOW TABLES LIKE %s', tsvd_anfragen_table_name()))
+        : false;
+    $replies_table_exists = function_exists('tsvd_anfragen_replies_table_name')
+        ? (bool) $wpdb->get_var($wpdb->prepare('SHOW TABLES LIKE %s', tsvd_anfragen_replies_table_name()))
+        : false;
+
+    $anfragen_count = ($table_exists && function_exists('tsvd_anfragen_table_name'))
+        ? (int) $wpdb->get_var('SELECT COUNT(*) FROM ' . tsvd_anfragen_table_name())
+        : null;
+
+    $admin_role = get_role('administrator');
+    $admin_has_cap = $admin_role ? $admin_role->has_cap('manage_tsvd_anfragen') : false;
+
+    $form_id = (int) get_option('tsvd_interessentenbogen_form', 0);
+    $persist_enabled = $form_id ? (bool) get_post_meta($form_id, '_tsvd_form_persist_inquiry', true) : false;
+
+    return array(
+        'tables_exist'                 => $table_exists && $replies_table_exists,
+        'anfragen_count'               => $anfragen_count,
+        'administrator_has_capability' => $admin_has_cap,
+        'interessentenbogen_form_id'   => $form_id,
+        'persist_inquiry_enabled'      => $persist_enabled,
+        'dashboard_url'                => admin_url('edit.php?post_type=animals&page=tsvd-anfragen'),
+    );
+}
