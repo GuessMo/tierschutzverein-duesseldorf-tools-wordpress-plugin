@@ -33,7 +33,7 @@ function tsvd_anfragen_render_detail( $id ) {
 	}
 
 	tsvd_anfragen_render_payload( $anfrage );
-	tsvd_anfragen_render_replies( $wpdb, $replies_table, $id );
+	tsvd_anfragen_render_replies( $wpdb, $replies_table, $id, $anfrage['applicant_name'] );
 	tsvd_anfragen_render_reply_form( $id );
 	tsvd_anfragen_render_delete_form( $id );
 
@@ -61,7 +61,7 @@ function tsvd_anfragen_render_payload( $anfrage ) {
 	echo '</tbody></table>';
 }
 
-function tsvd_anfragen_render_replies( $wpdb, $replies_table, $id ) {
+function tsvd_anfragen_render_replies( $wpdb, $replies_table, $id, $applicant_name = '' ) {
 	echo '<h2>' . esc_html__( 'Verlauf', 'tsvd' ) . '</h2>';
 	$replies = $wpdb->get_results( $wpdb->prepare( "SELECT * FROM {$replies_table} WHERE anfrage_id = %d ORDER BY sent_at ASC", $id ), ARRAY_A );
 
@@ -71,8 +71,14 @@ function tsvd_anfragen_render_replies( $wpdb, $replies_table, $id ) {
 	}
 
 	foreach ( $replies as $reply ) {
-		$author = $reply['user_id'] ? get_the_author_meta( 'display_name', $reply['user_id'] ) : __( 'Unbekannt', 'tsvd' );
-		echo '<div style="border:1px solid #ccd0d4;padding:10px 14px;margin-bottom:10px;background:#fff;">';
+		if ( 'in' === $reply['direction'] ) {
+			// Per IMAP-Abruf eingegangene Antwort der interessierten Person (siehe
+			// anfragen-imap-poll.php) — kein WP-Benutzer, applicant_name statt Autor.
+			$author = $applicant_name !== '' ? $applicant_name : __( 'Interessent:in', 'tsvd' );
+		} else {
+			$author = $reply['user_id'] ? get_the_author_meta( 'display_name', $reply['user_id'] ) : __( 'Unbekannt', 'tsvd' );
+		}
+		echo '<div style="border:1px solid #ccd0d4;padding:10px 14px;margin-bottom:10px;background:#fff;' . ( 'in' === $reply['direction'] ? 'border-left:4px solid #2271b1;' : '' ) . '">';
 		echo '<p style="margin:0 0 6px;color:#666;font-size:12px;">' . esc_html( $author ) . ' &middot; ' . esc_html( get_date_from_gmt( $reply['sent_at'], 'Y-m-d H:i' ) ) . '</p>';
 		echo '<p style="margin:0;white-space:pre-wrap;">' . esc_html( $reply['body'] ) . '</p>';
 		echo '</div>';
@@ -163,7 +169,19 @@ function tsvd_ajax_anfrage_reply() {
 		wp_send_json_error( array( 'message' => __( 'Keine gültige E-Mail-Adresse hinterlegt.', 'tsvd' ) ) );
 	}
 
-	$sent = wp_mail( $anfrage['applicant_email'], __( 'Antwort auf Ihre Anfrage', 'tsvd' ), $body );
+	// Reply-To = derselbe Empfänger, der im Formular für neue Anfragen hinterlegt ist
+	// (_tsvd_form_recipient) — Antworten der interessierten Person landen dadurch in
+	// derselben Mailbox, die auch die ursprüngliche Anfrage bekommen hat, statt im
+	// technischen WordPress-Standardabsender zu verschwinden.
+	$reply_to = get_post_meta( (int) $anfrage['form_id'], '_tsvd_form_recipient', true );
+	$reply_to = is_email( $reply_to ) ? $reply_to : get_option( 'admin_email' );
+	$headers  = array( 'Reply-To: ' . $reply_to );
+
+	// Anfragen-Nummer im Betreff, damit ein späterer IMAP-Abruf die Antwort der
+	// richtigen Anfrage zuordnen kann (Referenz-Token).
+	$subject = sprintf( __( 'Antwort auf Ihre Anfrage #%d', 'tsvd' ), $id );
+
+	$sent = wp_mail( $anfrage['applicant_email'], $subject, $body, $headers );
 	if ( ! $sent ) {
 		wp_send_json_error( array( 'message' => __( 'E-Mail konnte nicht gesendet werden.', 'tsvd' ) ) );
 	}
