@@ -143,30 +143,29 @@ function tsvd_anfragen_render_delete_form( $id ) {
 	<?php
 }
 
-add_action( 'wp_ajax_tsvd_anfrage_reply', 'tsvd_ajax_anfrage_reply' );
-
-function tsvd_ajax_anfrage_reply() {
-	$id = isset( $_POST['id'] ) ? absint( $_POST['id'] ) : 0;
-	if ( ! $id || ! current_user_can( 'manage_tsvd_anfragen' ) ) {
-		wp_send_json_error( array( 'message' => __( 'Keine Berechtigung.', 'tsvd' ) ) );
-	}
-	if ( ! isset( $_POST['nonce'] ) || ! wp_verify_nonce( $_POST['nonce'], 'tsvd_anfrage_reply_' . $id ) ) {
-		wp_send_json_error( array( 'message' => __( 'Sicherheitsfehler.', 'tsvd' ) ) );
-	}
-
-	$body = isset( $_POST['body'] ) ? sanitize_textarea_field( wp_unslash( $_POST['body'] ) ) : '';
+/**
+ * Sendet eine Antwort auf eine Anfrage und protokolliert sie im Verlauf —
+ * gemeinsame Logik für die AJAX-Aktion im Dashboard UND die MCP-Ability
+ * tsv-tools/reply-to-anfrage (siehe anfragen-mcp-callbacks.php).
+ *
+ * @param int    $id      Anfragen-ID.
+ * @param string $body    Antworttext (bereits sanitiert erwartet).
+ * @param int    $user_id WP-Benutzer-ID des Absenders (0 = kein WP-Benutzer, z. B. MCP).
+ * @return true|WP_Error
+ */
+function tsvd_anfragen_send_reply( $id, $body, $user_id = 0 ) {
 	if ( '' === trim( $body ) ) {
-		wp_send_json_error( array( 'message' => __( 'Antworttext darf nicht leer sein.', 'tsvd' ) ) );
+		return new WP_Error( 'empty_body', __( 'Antworttext darf nicht leer sein.', 'tsvd' ) );
 	}
 
 	global $wpdb;
 	$table   = tsvd_anfragen_table_name();
 	$anfrage = $wpdb->get_row( $wpdb->prepare( "SELECT * FROM {$table} WHERE id = %d", $id ), ARRAY_A );
 	if ( ! $anfrage ) {
-		wp_send_json_error( array( 'message' => __( 'Anfrage nicht gefunden.', 'tsvd' ) ) );
+		return new WP_Error( 'not_found', __( 'Anfrage nicht gefunden.', 'tsvd' ) );
 	}
 	if ( ! is_email( $anfrage['applicant_email'] ) ) {
-		wp_send_json_error( array( 'message' => __( 'Keine gültige E-Mail-Adresse hinterlegt.', 'tsvd' ) ) );
+		return new WP_Error( 'invalid_email', __( 'Keine gültige E-Mail-Adresse hinterlegt.', 'tsvd' ) );
 	}
 
 	// Reply-To = derselbe Empfänger, der im Formular für neue Anfragen hinterlegt ist
@@ -183,7 +182,7 @@ function tsvd_ajax_anfrage_reply() {
 
 	$sent = wp_mail( $anfrage['applicant_email'], $subject, $body, $headers );
 	if ( ! $sent ) {
-		wp_send_json_error( array( 'message' => __( 'E-Mail konnte nicht gesendet werden.', 'tsvd' ) ) );
+		return new WP_Error( 'mail_failed', __( 'E-Mail konnte nicht gesendet werden.', 'tsvd' ) );
 	}
 
 	$now = current_time( 'mysql' );
@@ -191,7 +190,7 @@ function tsvd_ajax_anfrage_reply() {
 		tsvd_anfragen_replies_table_name(),
 		array(
 			'anfrage_id' => $id,
-			'user_id'    => get_current_user_id(),
+			'user_id'    => $user_id ?: null,
 			'direction'  => 'out',
 			'body'       => $body,
 			'sent_at'    => $now,
@@ -206,6 +205,27 @@ function tsvd_ajax_anfrage_reply() {
 		array( '%s', '%s' ),
 		array( '%d' )
 	);
+
+	return true;
+}
+
+add_action( 'wp_ajax_tsvd_anfrage_reply', 'tsvd_ajax_anfrage_reply' );
+
+function tsvd_ajax_anfrage_reply() {
+	$id = isset( $_POST['id'] ) ? absint( $_POST['id'] ) : 0;
+	if ( ! $id || ! current_user_can( 'manage_tsvd_anfragen' ) ) {
+		wp_send_json_error( array( 'message' => __( 'Keine Berechtigung.', 'tsvd' ) ) );
+	}
+	if ( ! isset( $_POST['nonce'] ) || ! wp_verify_nonce( $_POST['nonce'], 'tsvd_anfrage_reply_' . $id ) ) {
+		wp_send_json_error( array( 'message' => __( 'Sicherheitsfehler.', 'tsvd' ) ) );
+	}
+
+	$body   = isset( $_POST['body'] ) ? sanitize_textarea_field( wp_unslash( $_POST['body'] ) ) : '';
+	$result = tsvd_anfragen_send_reply( $id, $body, get_current_user_id() );
+
+	if ( is_wp_error( $result ) ) {
+		wp_send_json_error( array( 'message' => $result->get_error_message() ) );
+	}
 
 	wp_send_json_success( array( 'message' => __( 'Antwort gesendet.', 'tsvd' ) ) );
 }
