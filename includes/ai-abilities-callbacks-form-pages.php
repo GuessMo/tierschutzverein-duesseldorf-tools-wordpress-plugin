@@ -99,9 +99,19 @@ function tsvd_tools_ai_add_maintenance_allowed_path($input) {
  * Ein MCP-/REST-Aufruf durchläuft admin_init NICHT von selbst (das feuert nur
  * bei einem echten wp-admin-Request) — ohne diesen manuellen Trigger blieben
  * Tabellen/Capability bis zum ersten echten Admin-Besuch ungesetzt.
+ *
+ * Ruft dafür gezielt NUR die beiden bekannten Migrations-Funktionen auf, statt
+ * pauschal do_action('admin_init') zu feuern — Letzteres löst auch fremde
+ * admin_init-Hooks aus (z. B. Settings-API-Aufrufe wie add_settings_section()),
+ * die außerhalb eines echten wp-admin-Bootstraps fatal fehlschlagen.
  */
 function tsvd_tools_ai_anfragen_dashboard_status($input) {
-    do_action('admin_init');
+    if (function_exists('tsvd_anfragen_maybe_upgrade_db')) {
+        tsvd_anfragen_maybe_upgrade_db();
+    }
+    if (function_exists('tsvd_role_manager_maybe_grant_anfragen_cap')) {
+        tsvd_role_manager_maybe_grant_anfragen_cap();
+    }
 
     global $wpdb;
     $table_exists = function_exists('tsvd_anfragen_table_name')
