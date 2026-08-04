@@ -41,3 +41,7 @@ require_once TSVD_TOOLS_DIR . 'includes/backups.php';
 require_once TSVD_TOOLS_DIR . 'includes/redirects-api.php';
 require_once TSVD_TOOLS_DIR . 'includes/redirects.php';
 require_once TSVD_TOOLS_DIR . 'includes/redirects-auto-slug.php';
+require_once TSVD_TOOLS_DIR . 'includes/anfragen-db.php';
+require_once TSVD_TOOLS_DIR . 'includes/anfragen-listener.php';
+require_once TSVD_TOOLS_DIR . 'includes/anfragen-admin.php';
+require_once TSVD_TOOLS_DIR . 'includes/anfragen-admin-detail.php';
