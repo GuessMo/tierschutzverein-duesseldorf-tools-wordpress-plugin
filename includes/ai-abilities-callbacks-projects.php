@@ -7,6 +7,9 @@ function tsvd_tools_ai_can_manage_projects() {
 }
 
 function tsvd_tools_ai_normalize_milestone_progress($status, $progress) {
+    if ('pending' === $status) {
+        return 0;
+    }
     if ('completed' === $status) {
         return 100;
     }
