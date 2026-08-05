@@ -98,20 +98,20 @@ function tsvd_tools_ai_get_ability_definitions_projects() {
 
         'tsv-tools/add-project-milestone' => array(
             'label'               => __('Projekt-Meilenstein hinzufügen', 'tsv-tools'),
-            'description'         => __('Fügt einem bestehenden Projekt einen neuen Meilenstein an (Repeater-Feld). Synct optional nach "Aktuelles".', 'tsv-tools'),
+            'description'         => __('Fügt einem bestehenden Projekt einen neuen Meilenstein an (Repeater-Feld).', 'tsv-tools'),
             'category'            => 'tsv-tools-animals',
             'input_schema'        => array(
                 'type'       => 'object',
                 'properties' => array(
                     'id'           => array('type' => 'integer', 'description' => 'Projekt-ID'),
                     'title'        => array('type' => 'string', 'description' => 'Titel des Meilensteins'),
-                    'description'  => array('type' => 'string', 'description' => 'Beschreibungstext (Klartext, kein HTML). Wird auf der Karte per wpautop in Absaetze umgewandelt; beim Aktuelles-Sync ebenso.'),
+                    'description'  => array('type' => 'string', 'description' => 'Beschreibungstext (Klartext, kein HTML). Wird auf der Karte per wpautop in Absaetze umgewandelt.'),
                     'date'         => array('type' => 'string', 'description' => 'Datum im Format YYYY-MM-DD.'),
                     'status'       => array('type' => 'string', 'enum' => array('pending', 'in_progress', 'completed'), 'description' => 'Standard: pending.'),
                     'progress'     => array('type' => 'integer', 'description' => 'Fortschritt in Prozent (0-100). 0 blendet die Fortschrittsanzeige aus.'),
                     'image'        => array('type' => 'integer', 'description' => 'Attachment-ID fuer das Meilenstein-Bild (optional).'),
                     'publish_at'   => array('type' => 'string', 'description' => 'Optionaler Zeitplan (YYYY-MM-DDTHH:MM). Leer = sofort sichtbar.'),
-                    'show_in_news' => array('type' => 'boolean', 'description' => 'true: zusaetzlich als veroeffentlichter Beitrag unter "Aktuelles" anlegen.'),
+                    'show_in_news' => array('type' => 'boolean', 'description' => 'true: Meilenstein erscheint zusaetzlich als eigene Karte im Aktuelles-Slider (verlinkt zur Projektseite, kein eigener Beitrag).'),
                 ),
                 'required'   => array('id', 'title'),
                 'additionalProperties' => false,

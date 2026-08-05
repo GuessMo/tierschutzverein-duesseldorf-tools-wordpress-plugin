@@ -129,10 +129,6 @@ function tsvd_tools_ai_add_project_milestone($input) {
 
     update_post_meta($post_id, 'project_milestones', $milestones);
 
-    if (function_exists('tsvd_sync_milestone_news_posts')) {
-        tsvd_sync_milestone_news_posts($post_id);
-    }
-
     return array(
         'id'              => $post_id,
         'milestone_count' => count($milestones),
