@@ -6,6 +6,16 @@ function tsvd_tools_ai_can_manage_projects() {
     return current_user_can('edit_projects') || current_user_can('edit_posts');
 }
 
+function tsvd_tools_ai_normalize_milestone_progress($status, $progress) {
+    if ('completed' === $status) {
+        return 100;
+    }
+    if ('in_progress' === $status && $progress < 10) {
+        return 10;
+    }
+    return $progress;
+}
+
 function tsvd_tools_ai_create_project($input) {
     if (empty($input['title'])) {
         return new WP_Error('tsvd_tools_ai_missing_title', __('Titel ist erforderlich.', 'tsv-tools'));
@@ -120,7 +130,7 @@ function tsvd_tools_ai_add_project_milestone($input) {
         'title'        => sanitize_text_field($input['title']),
         'description'  => sanitize_textarea_field($input['description'] ?? ''),
         'date'         => sanitize_text_field($input['date'] ?? ''),
-        'progress'     => min(100, absint($input['progress'] ?? 0)),
+        'progress'     => tsvd_tools_ai_normalize_milestone_progress($status, min(100, absint($input['progress'] ?? 0))),
         'status'       => $status,
         'image'        => absint($input['image'] ?? 0),
         'publish_at'   => sanitize_text_field($input['publish_at'] ?? ''),
@@ -187,6 +197,11 @@ function tsvd_tools_ai_update_project_milestone($input) {
     if (isset($input['show_in_news'])) {
         $milestones[$index]['show_in_news'] = !empty($input['show_in_news']);
     }
+
+    $milestones[$index]['progress'] = tsvd_tools_ai_normalize_milestone_progress(
+        $milestones[$index]['status'] ?? 'pending',
+        absint($milestones[$index]['progress'] ?? 0)
+    );
 
     update_post_meta($post_id, 'project_milestones', $milestones);
 
