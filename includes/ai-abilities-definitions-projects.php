@@ -132,5 +132,43 @@ function tsvd_tools_ai_get_ability_definitions_projects() {
                 'annotations' => array('readonly' => false, 'destructive' => false, 'idempotent' => false),
             ),
         ),
+
+        'tsv-tools/update-project-milestone' => array(
+            'label'               => __('Projekt-Meilenstein aktualisieren', 'tsv-tools'),
+            'description'         => __('Aktualisiert einzelne Felder eines bestehenden Meilensteins, gefunden per exaktem Titel-Match.', 'tsv-tools'),
+            'category'            => 'tsv-tools-animals',
+            'input_schema'        => array(
+                'type'       => 'object',
+                'properties' => array(
+                    'id'           => array('type' => 'integer', 'description' => 'Projekt-ID'),
+                    'match_title'  => array('type' => 'string', 'description' => 'Exakter aktueller Titel des zu aendernden Meilensteins.'),
+                    'title'        => array('type' => 'string', 'description' => 'Neuer Titel (optional).'),
+                    'description'  => array('type' => 'string', 'description' => 'Neue Beschreibung (optional, Klartext).'),
+                    'date'         => array('type' => 'string', 'description' => 'Neues Datum im Format YYYY-MM-DD (optional).'),
+                    'status'       => array('type' => 'string', 'enum' => array('pending', 'in_progress', 'completed'), 'description' => 'Neuer Status (optional).'),
+                    'progress'     => array('type' => 'integer', 'description' => 'Neuer Fortschritt in Prozent (optional).'),
+                    'image'        => array('type' => 'integer', 'description' => 'Neue Attachment-ID fuer das Bild (optional).'),
+                    'publish_at'   => array('type' => 'string', 'description' => 'Neuer Zeitplan (optional).'),
+                    'show_in_news' => array('type' => 'boolean', 'description' => 'Neuer Aktuelles-Sync-Status (optional).'),
+                ),
+                'required'   => array('id', 'match_title'),
+                'additionalProperties' => false,
+            ),
+            'output_schema'       => array(
+                'type'       => 'object',
+                'properties' => array(
+                    'id'       => array('type' => 'integer'),
+                    'index'    => array('type' => 'integer'),
+                    'edit_url' => array('type' => 'string'),
+                    'view_url' => array('type' => 'string'),
+                ),
+            ),
+            'permission_callback' => 'tsvd_tools_ai_can_manage_projects',
+            'execute_callback'    => 'tsvd_tools_ai_update_project_milestone',
+            'meta'                => array(
+                'mcp'         => array('public' => true),
+                'annotations' => array('readonly' => false, 'destructive' => false, 'idempotent' => true),
+            ),
+        ),
     );
 }

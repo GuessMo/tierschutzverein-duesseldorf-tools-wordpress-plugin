@@ -136,3 +136,64 @@ function tsvd_tools_ai_add_project_milestone($input) {
         'view_url'        => get_permalink($post_id),
     );
 }
+
+function tsvd_tools_ai_update_project_milestone($input) {
+    $post_id = absint($input['id'] ?? 0);
+    $post    = $post_id ? get_post($post_id) : null;
+
+    if (!$post || 'projects' !== $post->post_type) {
+        return new WP_Error('tsvd_tools_ai_project_not_found', __('Projekt nicht gefunden.', 'tsv-tools'));
+    }
+    if (empty($input['match_title'])) {
+        return new WP_Error('tsvd_tools_ai_missing_match_title', __('match_title ist erforderlich.', 'tsv-tools'));
+    }
+
+    $milestones = get_post_meta($post_id, 'project_milestones', true);
+    $milestones = is_array($milestones) ? $milestones : array();
+
+    $index = null;
+    foreach ($milestones as $i => $milestone) {
+        if (($milestone['title'] ?? '') === $input['match_title']) {
+            $index = $i;
+            break;
+        }
+    }
+
+    if (null === $index) {
+        return new WP_Error('tsvd_tools_ai_milestone_not_found', __('Kein Meilenstein mit diesem Titel gefunden.', 'tsv-tools'));
+    }
+
+    if (isset($input['title'])) {
+        $milestones[$index]['title'] = sanitize_text_field($input['title']);
+    }
+    if (isset($input['description'])) {
+        $milestones[$index]['description'] = sanitize_textarea_field($input['description']);
+    }
+    if (isset($input['date'])) {
+        $milestones[$index]['date'] = sanitize_text_field($input['date']);
+    }
+    if (isset($input['progress'])) {
+        $milestones[$index]['progress'] = min(100, absint($input['progress']));
+    }
+    if (isset($input['status']) && in_array($input['status'], array('pending', 'in_progress', 'completed'), true)) {
+        $milestones[$index]['status'] = $input['status'];
+    }
+    if (isset($input['image'])) {
+        $milestones[$index]['image'] = absint($input['image']);
+    }
+    if (isset($input['publish_at'])) {
+        $milestones[$index]['publish_at'] = sanitize_text_field($input['publish_at']);
+    }
+    if (isset($input['show_in_news'])) {
+        $milestones[$index]['show_in_news'] = !empty($input['show_in_news']);
+    }
+
+    update_post_meta($post_id, 'project_milestones', $milestones);
+
+    return array(
+        'id'         => $post_id,
+        'index'      => $index,
+        'edit_url'   => get_edit_post_link($post_id, 'raw'),
+        'view_url'   => get_permalink($post_id),
+    );
+}
