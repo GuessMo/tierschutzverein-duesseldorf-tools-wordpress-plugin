@@ -34,3 +34,32 @@ function tsvd_tools_ai_create_project($input) {
         'view_url' => get_permalink($post_id),
     );
 }
+
+function tsvd_tools_ai_update_project($input) {
+    $post_id = absint($input['id'] ?? 0);
+    $post    = $post_id ? get_post($post_id) : null;
+
+    if (!$post || 'projects' !== $post->post_type) {
+        return new WP_Error('tsvd_tools_ai_project_not_found', __('Projekt nicht gefunden.', 'tsv-tools'));
+    }
+
+    $postarr = array('ID' => $post_id);
+    if (isset($input['title'])) {
+        $postarr['post_title'] = sanitize_text_field($input['title']);
+    }
+    if (isset($input['content'])) {
+        $postarr['post_content'] = wp_kses_post($input['content']);
+    }
+
+    $result = wp_update_post($postarr, true);
+    if (is_wp_error($result)) {
+        return $result;
+    }
+
+    return array(
+        'id'       => $post_id,
+        'status'   => get_post_status($post_id),
+        'edit_url' => get_edit_post_link($post_id, 'raw'),
+        'view_url' => get_permalink($post_id),
+    );
+}
