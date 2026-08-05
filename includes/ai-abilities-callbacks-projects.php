@@ -98,3 +98,45 @@ function tsvd_tools_ai_update_project($input) {
         'view_url' => get_permalink($post_id),
     );
 }
+
+function tsvd_tools_ai_add_project_milestone($input) {
+    $post_id = absint($input['id'] ?? 0);
+    $post    = $post_id ? get_post($post_id) : null;
+
+    if (!$post || 'projects' !== $post->post_type) {
+        return new WP_Error('tsvd_tools_ai_project_not_found', __('Projekt nicht gefunden.', 'tsv-tools'));
+    }
+    if (empty($input['title'])) {
+        return new WP_Error('tsvd_tools_ai_missing_milestone_title', __('Titel ist erforderlich.', 'tsv-tools'));
+    }
+
+    $status = in_array($input['status'] ?? 'pending', array('pending', 'in_progress', 'completed'), true)
+        ? $input['status']
+        : 'pending';
+
+    $milestones   = get_post_meta($post_id, 'project_milestones', true);
+    $milestones   = is_array($milestones) ? $milestones : array();
+    $milestones[] = array(
+        'title'        => sanitize_text_field($input['title']),
+        'description'  => sanitize_textarea_field($input['description'] ?? ''),
+        'date'         => sanitize_text_field($input['date'] ?? ''),
+        'progress'     => min(100, absint($input['progress'] ?? 0)),
+        'status'       => $status,
+        'image'        => absint($input['image'] ?? 0),
+        'publish_at'   => sanitize_text_field($input['publish_at'] ?? ''),
+        'show_in_news' => !empty($input['show_in_news']),
+    );
+
+    update_post_meta($post_id, 'project_milestones', $milestones);
+
+    if (function_exists('tsvd_sync_milestone_news_posts')) {
+        tsvd_sync_milestone_news_posts($post_id);
+    }
+
+    return array(
+        'id'              => $post_id,
+        'milestone_count' => count($milestones),
+        'edit_url'        => get_edit_post_link($post_id, 'raw'),
+        'view_url'        => get_permalink($post_id),
+    );
+}

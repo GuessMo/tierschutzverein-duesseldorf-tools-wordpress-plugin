@@ -95,5 +95,42 @@ function tsvd_tools_ai_get_ability_definitions_projects() {
                 'annotations' => array('readonly' => false, 'destructive' => false, 'idempotent' => true),
             ),
         ),
+
+        'tsv-tools/add-project-milestone' => array(
+            'label'               => __('Projekt-Meilenstein hinzufügen', 'tsv-tools'),
+            'description'         => __('Fügt einem bestehenden Projekt einen neuen Meilenstein an (Repeater-Feld). Synct optional nach "Aktuelles".', 'tsv-tools'),
+            'category'            => 'tsv-tools-animals',
+            'input_schema'        => array(
+                'type'       => 'object',
+                'properties' => array(
+                    'id'           => array('type' => 'integer', 'description' => 'Projekt-ID'),
+                    'title'        => array('type' => 'string', 'description' => 'Titel des Meilensteins'),
+                    'description'  => array('type' => 'string', 'description' => 'Beschreibungstext (Klartext, kein HTML). Wird auf der Karte per wpautop in Absaetze umgewandelt; beim Aktuelles-Sync ebenso.'),
+                    'date'         => array('type' => 'string', 'description' => 'Datum im Format YYYY-MM-DD.'),
+                    'status'       => array('type' => 'string', 'enum' => array('pending', 'in_progress', 'completed'), 'description' => 'Standard: pending.'),
+                    'progress'     => array('type' => 'integer', 'description' => 'Fortschritt in Prozent (0-100). 0 blendet die Fortschrittsanzeige aus.'),
+                    'image'        => array('type' => 'integer', 'description' => 'Attachment-ID fuer das Meilenstein-Bild (optional).'),
+                    'publish_at'   => array('type' => 'string', 'description' => 'Optionaler Zeitplan (YYYY-MM-DDTHH:MM). Leer = sofort sichtbar.'),
+                    'show_in_news' => array('type' => 'boolean', 'description' => 'true: zusaetzlich als veroeffentlichter Beitrag unter "Aktuelles" anlegen.'),
+                ),
+                'required'   => array('id', 'title'),
+                'additionalProperties' => false,
+            ),
+            'output_schema'       => array(
+                'type'       => 'object',
+                'properties' => array(
+                    'id'              => array('type' => 'integer'),
+                    'milestone_count' => array('type' => 'integer'),
+                    'edit_url'        => array('type' => 'string'),
+                    'view_url'        => array('type' => 'string'),
+                ),
+            ),
+            'permission_callback' => 'tsvd_tools_ai_can_manage_projects',
+            'execute_callback'    => 'tsvd_tools_ai_add_project_milestone',
+            'meta'                => array(
+                'mcp'         => array('public' => true),
+                'annotations' => array('readonly' => false, 'destructive' => false, 'idempotent' => false),
+            ),
+        ),
     );
 }
