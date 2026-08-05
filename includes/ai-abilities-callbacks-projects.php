@@ -48,7 +48,10 @@ function tsvd_tools_ai_update_project($input) {
         $postarr['post_title'] = sanitize_text_field($input['title']);
     }
     if (isset($input['content'])) {
-        $postarr['post_content'] = wp_kses_post($input['content']);
+        $new_content = wp_kses_post($input['content']);
+        $postarr['post_content'] = !empty($input['append'])
+            ? $post->post_content . $new_content
+            : $new_content;
     }
 
     $result = wp_update_post($postarr, true);

@@ -44,7 +44,8 @@ function tsvd_tools_ai_get_ability_definitions_projects() {
                 'properties' => array(
                     'id'      => array('type' => 'integer', 'description' => 'Projekt-ID'),
                     'title'   => array('type' => 'string', 'description' => 'Neuer Titel (optional).'),
-                    'content' => array('type' => 'string', 'description' => 'Neuer Beitragsinhalt als HTML (optional).'),
+                    'content' => array('type' => 'string', 'description' => 'Beitragsinhalt als HTML (optional). Wird ersetzt, ausser append=true.'),
+                    'append'  => array('type' => 'boolean', 'description' => 'true: content ans bestehende Ende anhaengen statt ersetzen (fuer sehr lange Texte in mehreren Aufrufen).'),
                 ),
                 'required'   => array('id'),
                 'additionalProperties' => false,
