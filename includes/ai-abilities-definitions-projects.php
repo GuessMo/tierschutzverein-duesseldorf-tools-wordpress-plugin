@@ -66,5 +66,31 @@ function tsvd_tools_ai_get_ability_definitions_projects() {
                 'annotations' => array('readonly' => false, 'destructive' => false, 'idempotent' => true),
             ),
         ),
+
+        'tsv-tools/set-projects-max-lines' => array(
+            'label'               => __('Zeilenlimit für Projekt-Beschreibungen setzen', 'tsv-tools'),
+            'description'         => __('Setzt das globale Zeilenlimit (tsvd_projects_description_max_lines), ab dem das Beschreibungsfeld der Projects CPT beim Speichern gekürzt wird.', 'tsv-tools'),
+            'category'            => 'tsv-tools-animals',
+            'input_schema'        => array(
+                'type'       => 'object',
+                'properties' => array(
+                    'max_lines' => array('type' => 'integer', 'description' => 'Neues Zeilenlimit (> 0).'),
+                ),
+                'required'   => array('max_lines'),
+                'additionalProperties' => false,
+            ),
+            'output_schema'       => array(
+                'type'       => 'object',
+                'properties' => array(
+                    'max_lines' => array('type' => 'integer'),
+                ),
+            ),
+            'permission_callback' => 'tsvd_tools_ai_can_manage_projects_settings',
+            'execute_callback'    => 'tsvd_tools_ai_set_projects_max_lines',
+            'meta'                => array(
+                'mcp'         => array('public' => true),
+                'annotations' => array('readonly' => false, 'destructive' => false, 'idempotent' => true),
+            ),
+        ),
     );
 }
