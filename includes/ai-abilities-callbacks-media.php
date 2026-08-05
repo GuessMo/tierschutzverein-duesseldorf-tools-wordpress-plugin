@@ -14,7 +14,27 @@ function tsvd_tools_ai_upload_media($input) {
         return new WP_Error('tsvd_tools_ai_missing_file', __('file_base64 ist erforderlich.', 'tsv-tools'));
     }
 
-    $decoded = base64_decode($input['file_base64'], true);
+    $transient_key = 'tsvd_media_chunks_' . md5(sanitize_file_name($input['filename']));
+    $total_chunks  = isset($input['total_chunks']) ? absint($input['total_chunks']) : 1;
+
+    if ($total_chunks > 1) {
+        $chunks   = get_transient($transient_key);
+        $chunks   = is_array($chunks) ? $chunks : array();
+        $chunks[(int) ($input['chunk_index'] ?? 0)] = $input['file_base64'];
+        set_transient($transient_key, $chunks, 10 * MINUTE_IN_SECONDS);
+
+        if (count($chunks) < $total_chunks) {
+            return array('chunks_received' => count($chunks), 'total_chunks' => $total_chunks);
+        }
+
+        ksort($chunks);
+        $full_base64 = implode('', $chunks);
+        delete_transient($transient_key);
+    } else {
+        $full_base64 = $input['file_base64'];
+    }
+
+    $decoded = base64_decode($full_base64, true);
     if (false === $decoded) {
         return new WP_Error('tsvd_tools_ai_invalid_base64', __('file_base64 ist kein gueltiges Base64.', 'tsv-tools'));
     }
