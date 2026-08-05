@@ -74,6 +74,23 @@ function tsvd_tools_ai_update_project($input) {
         return $result;
     }
 
+    $image_fields = array(
+        'desktop_image' => 'project_desktop_image',
+        'mobile_image'  => 'project_mobile_image',
+        'logo_image'    => 'project_logo_image',
+    );
+    foreach ($image_fields as $input_key => $meta_key) {
+        if (!isset($input[$input_key])) {
+            continue;
+        }
+        $attachment_id = absint($input[$input_key]);
+        if ($attachment_id > 0) {
+            update_post_meta($post_id, $meta_key, $attachment_id);
+        } else {
+            delete_post_meta($post_id, $meta_key);
+        }
+    }
+
     return array(
         'id'       => $post_id,
         'status'   => get_post_status($post_id),

@@ -37,15 +37,18 @@ function tsvd_tools_ai_get_ability_definitions_projects() {
 
         'tsv-tools/update-project' => array(
             'label'               => __('Projekt aktualisieren', 'tsv-tools'),
-            'description'         => __('Aktualisiert Titel und/oder Inhalt eines bestehenden Projekts (Projects CPT). Lässt Bilder, Meilensteine, Assets und Social-Links unangetastet.', 'tsv-tools'),
+            'description'         => __('Aktualisiert Titel, Inhalt und/oder Bilder eines bestehenden Projekts (Projects CPT). Lässt Meilensteine, Assets und Social-Links unangetastet.', 'tsv-tools'),
             'category'            => 'tsv-tools-animals',
             'input_schema'        => array(
                 'type'       => 'object',
                 'properties' => array(
-                    'id'      => array('type' => 'integer', 'description' => 'Projekt-ID'),
-                    'title'   => array('type' => 'string', 'description' => 'Neuer Titel (optional).'),
-                    'content' => array('type' => 'string', 'description' => 'Beitragsinhalt als HTML (optional). Wird ersetzt, ausser append=true.'),
-                    'append'  => array('type' => 'boolean', 'description' => 'true: content ans bestehende Ende anhaengen statt ersetzen (fuer sehr lange Texte in mehreren Aufrufen).'),
+                    'id'             => array('type' => 'integer', 'description' => 'Projekt-ID'),
+                    'title'          => array('type' => 'string', 'description' => 'Neuer Titel (optional).'),
+                    'content'        => array('type' => 'string', 'description' => 'Beitragsinhalt als HTML (optional). Wird ersetzt, ausser append=true.'),
+                    'append'         => array('type' => 'boolean', 'description' => 'true: content ans bestehende Ende anhaengen statt ersetzen (fuer sehr lange Texte in mehreren Aufrufen).'),
+                    'desktop_image'  => array('type' => 'integer', 'description' => 'Attachment-ID fuer das Hero-Desktop-Bild (optional). 0 entfernt es.'),
+                    'mobile_image'   => array('type' => 'integer', 'description' => 'Attachment-ID fuer das Hero-Mobile-Bild (optional). 0 entfernt es.'),
+                    'logo_image'     => array('type' => 'integer', 'description' => 'Attachment-ID fuer das kleine Logo-Bild (optional, Alternative zum Hero-Bild). 0 entfernt es.'),
                 ),
                 'required'   => array('id'),
                 'additionalProperties' => false,
