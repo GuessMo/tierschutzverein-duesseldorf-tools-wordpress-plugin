@@ -740,6 +740,13 @@ function tsvd_tools_ai_rest_request($input) {
         $request->set_param($key, $value);
     }
 
+    // Write methods: also set the JSON body so handlers that read via
+    // get_json_params() (e.g. klaro/v1/options) receive the payload.
+    if (in_array($method, array('POST', 'PUT', 'PATCH', 'DELETE'), true) && ! empty($params)) {
+        $request->set_header('Content-Type', 'application/json');
+        $request->set_body(wp_json_encode($params));
+    }
+
     $server   = rest_get_server();
     $response = rest_do_request($request);
     $data     = $server->response_to_data($response, false);
