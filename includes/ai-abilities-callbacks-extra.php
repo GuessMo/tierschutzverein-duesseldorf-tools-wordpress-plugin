@@ -39,6 +39,49 @@ function tsvd_tools_ai_list_redirects($input) {
     );
 }
 
+function tsvd_tools_ai_update_redirects($input) {
+    if (!function_exists('tsvd_r301_configured') || !tsvd_r301_configured()) {
+        return new WP_Error('tsvd_tools_ai_route301_unavailable', __('Route301 ist nicht konfiguriert.', 'tsv-tools'));
+    }
+    $domain  = !empty($input['domain']) ? sanitize_text_field($input['domain']) : 'tierheim-duesseldorf.de';
+    $updated = 0;
+    $skipped = 0;
+    $failed  = array();
+    foreach ((array) $input['redirects'] as $item) {
+        $id    = isset($item['id']) ? (int) $item['id'] : 0;
+        $route = isset($item['route_code']) ? sanitize_key((string) $item['route_code']) : '';
+        if ($id < 1 || '' === $route) {
+            $skipped++;
+            continue;
+        }
+        $res = tsvd_r301_request('GET', '/api/redirects/' . $id);
+        $r   = isset($res['data']) && is_array($res['data']) ? $res['data'] : null;
+        if (!$r) {
+            $failed[] = array('id' => $id, 'error' => isset($res['error']) ? $res['error'] : 'nicht gefunden');
+            continue;
+        }
+        $target = isset($r['target']) ? (string) $r['target'] : '';
+        if ('' === $target) {
+            $skipped++;
+            continue;
+        }
+        $body = array(
+            'domain'     => isset($r['domain']) ? (string) $r['domain'] : $domain,
+            'sourcePath' => isset($r['sourcePath']) ? (string) $r['sourcePath'] : '',
+            'target'     => tsvd_r301_target_with_route($target, $route),
+            'statusCode' => isset($r['statusCode']) ? (int) $r['statusCode'] : 301,
+            'enabled'    => !empty($r['enabled']),
+        );
+        $upd = tsvd_r301_request('PATCH', '/api/redirects/' . $id, $body);
+        if ($upd['code'] >= 200 && $upd['code'] < 300) {
+            $updated++;
+        } else {
+            $failed[] = array('id' => $id, 'error' => $upd['error']);
+        }
+    }
+    return array('updated' => $updated, 'skipped' => $skipped, 'failed' => $failed);
+}
+
 function tsvd_tools_ai_reset_form_stats($input) {
     if (empty($input['confirm'])) {
         return new WP_Error('tsvd_tools_ai_confirm_required', __('confirm muss true sein.', 'tsv-tools'));

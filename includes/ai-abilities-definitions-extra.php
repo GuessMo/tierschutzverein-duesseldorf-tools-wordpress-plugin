@@ -62,6 +62,46 @@ function tsvd_tools_ai_get_ability_definitions_extra() {
             ),
         ),
 
+        'tsv-tools/update-redirects' => array(
+            'label'               => __('Redirects aktualisieren', 'tsv-tools'),
+            'description'         => __('Ergänzt Redirect-Ziele (Route301) idempotent um einen Route-Code (?route=<code>).', 'tsv-tools'),
+            'category'            => 'tsv-tools-animals',
+            'input_schema'        => array(
+                'type'       => 'object',
+                'properties' => array(
+                    'domain'    => array('type' => 'string', 'description' => 'Default: tierheim-duesseldorf.de'),
+                    'redirects' => array(
+                        'type'  => 'array',
+                        'items' => array(
+                            'type'       => 'object',
+                            'properties' => array(
+                                'id'         => array('type' => 'integer'),
+                                'route_code' => array('type' => 'string', 'description' => 'Route-Code, z.B. thd oder tms'),
+                            ),
+                            'required'   => array('id'),
+                            'additionalProperties' => false,
+                        ),
+                    ),
+                ),
+                'required'   => array('redirects'),
+                'additionalProperties' => false,
+            ),
+            'output_schema'       => array(
+                'type'       => 'object',
+                'properties' => array(
+                    'updated' => array('type' => 'integer'),
+                    'skipped' => array('type' => 'integer'),
+                    'failed'  => array('type' => 'array'),
+                ),
+            ),
+            'permission_callback' => 'tsvd_tools_ai_can_manage_settings',
+            'execute_callback'    => 'tsvd_tools_ai_update_redirects',
+            'meta'                => array(
+                'mcp'         => array('public' => true),
+                'annotations' => array('readonly' => false, 'destructive' => false, 'idempotent' => true),
+            ),
+        ),
+
         'tsv-tools/get-form-stats' => array(
             'label'               => __('Formular-Statistik abfragen', 'tsv-tools'),
             'description'         => __('Fragt die echte (anonyme) Formular-/Interesse-Statistik ab. dimension: request_type|residence|housing|outdoor|period|top_animals|species_term|breed_term|adoption_status|adoption_status_by_month|adoption_source.', 'tsv-tools'),
