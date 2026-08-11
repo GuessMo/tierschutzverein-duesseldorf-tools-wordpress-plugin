@@ -32,9 +32,13 @@ add_action('init', function() {
     }
 }, 5);
 
+function tsvd_tools_theme_active() {
+    return 'tsvd' === wp_get_theme(get_template())->get('TextDomain');
+}
+
 add_action('admin_menu', 'tsvd_tools_register_admin_page');
 function tsvd_tools_register_admin_page() {
-    if ('tsvd' !== get_template()) {
+    if (!tsvd_tools_theme_active()) {
         return;
     }
     add_menu_page(
@@ -50,7 +54,7 @@ function tsvd_tools_register_admin_page() {
 
 add_action('admin_notices', 'tsvd_tools_theme_notice');
 function tsvd_tools_theme_notice() {
-    if ('tsvd' === get_template() || !current_user_can('manage_options')) {
+    if (tsvd_tools_theme_active() || !current_user_can('manage_options')) {
         return;
     }
     echo '<div class="notice notice-warning"><p>'
@@ -60,7 +64,7 @@ function tsvd_tools_theme_notice() {
 
 add_action('admin_enqueue_scripts', 'tsvd_tools_enqueue_assets');
 function tsvd_tools_enqueue_assets($hook) {
-    if ($hook !== 'toplevel_page_tsvd-tools' || 'tsvd' !== get_template()) return;
+    if ($hook !== 'toplevel_page_tsvd-tools' || !tsvd_tools_theme_active()) return;
     wp_enqueue_style('tsvd-tools-admin', TSVD_TOOLS_URL . 'assets/admin.css', array(), TSVD_TOOLS_VERSION);
     wp_enqueue_script('tsvd-tools-admin', TSVD_TOOLS_URL . 'assets/admin.js', array(), TSVD_TOOLS_VERSION, true);
 
