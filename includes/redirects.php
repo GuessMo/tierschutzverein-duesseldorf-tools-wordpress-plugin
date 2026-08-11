@@ -151,6 +151,7 @@ function tsvd_r301_render_list() {
         $reachCell = 'yes' === $reach ? '<span style="color:#227122">&#10003;</span>'
             : ( 'no' === $reach ? '<span style="color:#b32d2e" title="Ziel nicht auf der neuen Seite gefunden">&#10007;</span>'
             : ( 'gone' === $reach ? '<span class="description">&ndash; (410)</span>' : '?' ) );
+        $reachSort = in_array( $reach, array( 'yes', 'no', 'gone' ), true ) ? $reach : 'unknown';
         $del = '<form method="post" action="' . esc_url( admin_url( 'admin-post.php' ) ) . '" style="display:inline" onsubmit="return confirm(\'Redirect loeschen?\')">'
             . '<input type="hidden" name="action" value="tsvd_r301_delete">'
             . wp_nonce_field( 'tsvd_r301_delete', '_wpnonce', true, false )
@@ -160,8 +161,8 @@ function tsvd_r301_render_list() {
             . '<td><a href="' . esc_url( tsvd_r301_edit_url( (int) $r['id'] ) ) . '"><code>' . esc_html( $r['sourcePath'] ) . '</code></a></td>'
             . '<td><code>' . esc_html( $r['target'] ) . '</code></td>'
             . '<td>' . (int) $r['statusCode'] . '</td>'
-            . '<td>' . ( ! empty( $r['enabled'] ) ? '&#10003;' : '&ndash;' ) . '</td>'
-            . '<td>' . $reachCell . '</td>'
+            . '<td data-sortv="' . ( ! empty( $r['enabled'] ) ? '1' : '0' ) . '">' . ( ! empty( $r['enabled'] ) ? '&#10003;' : '&ndash;' ) . '</td>'
+            . '<td data-sortv="' . esc_attr( $reachSort ) . '">' . $reachCell . '</td>'
             . '<td>' . (int) $r['hitCount'] . '</td>'
             . '<td><a href="' . esc_url( tsvd_r301_edit_url( (int) $r['id'] ) ) . '" class="button button-small">Bearbeiten</a> ' . $del . '</td>'
             . '</tr>';
@@ -193,7 +194,7 @@ function tsvd_r301_render_list() {
         echo '<tr><td>' . esc_html( $l['host'] ) . '</td>'
             . '<td><code>' . esc_html( $l['path'] ) . '</code></td>'
             . '<td>' . (int) $l['hitCount'] . '</td>'
-            . '<td>' . esc_html( isset( $l['lastHitAt'] ) ? substr( (string) $l['lastHitAt'], 0, 16 ) : '' ) . '</td>'
+            . '<td data-sortv="' . esc_attr( isset( $l['lastHitAt'] ) ? (string) $l['lastHitAt'] : '' ) . '">' . esc_html( isset( $l['lastHitAt'] ) ? substr( (string) $l['lastHitAt'], 0, 16 ) : '' ) . '</td>'
             . '<td>' . $status . '</td>'
             . '<td>' . $action . '</td></tr>';
     }
