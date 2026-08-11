@@ -98,6 +98,8 @@ function tsvd_r301_render_edit() {
             $r['domain'] = sanitize_text_field( wp_unslash( $_GET['domain'] ) );
         }
     }
+    $route  = tsvd_r301_extract_route( $r['target'] );
+    $target = remove_query_arg( 'route', (string) $r['target'] );
 
     echo '<div class="wrap"><h1>' . ( $id ? 'Redirect bearbeiten' : 'Redirect hinzufuegen' ) . '</h1>';
     tsvd_r301_notice();
@@ -109,7 +111,8 @@ function tsvd_r301_render_edit() {
         . '<table class="form-table"><tbody>'
         . '<tr><th><label for="r301-domain">Domain</label></th><td><input type="text" name="domain" id="r301-domain" class="regular-text" value="' . esc_attr( $r['domain'] ) . '" required></td></tr>'
         . '<tr><th><label for="r301-source">Quelle (Pfad)</label></th><td><input type="text" name="sourcePath" id="r301-source" class="regular-text" value="' . esc_attr( $r['sourcePath'] ) . '" placeholder="/de/alte-url" required></td></tr>'
-        . '<tr><th><label for="r301-target">Ziel</label></th><td><input type="text" name="target" id="r301-target" class="regular-text" value="' . esc_attr( $r['target'] ) . '" placeholder="https://tierschutzverein-duesseldorf.de/neue-url/"><p class="description">Bei 410 ohne Ziel.</p></td></tr>'
+        . '<tr><th><label for="r301-target">Ziel</label></th><td><input type="text" name="target" id="r301-target" class="regular-text" value="' . esc_attr( $target ) . '" placeholder="https://tierschutzverein-duesseldorf.de/neue-url/"><p class="description">Bei 410 ohne Ziel.</p></td></tr>'
+        . '<tr><th><label for="r301-route">Route-Code</label></th><td><input type="text" name="route" id="r301-route" class="regular-text" value="' . esc_attr( (string) $route ) . '" placeholder="z. B. thd" maxlength="20"><p class="description">Statistik-Route (Skylark-Dashboard-Widget). Wird als <code>?route=&lt;code&gt;</code> ans Ziel angeh&auml;ngt.</p></td></tr>'
         . '<tr><th><label for="r301-status">Status</label></th><td><select name="statusCode" id="r301-status" class="regular-text">' . tsvd_r301_status_options( (int) $r['statusCode'] ) . '</select></td></tr>'
         . '<tr><th>Aktiv</th><td><label><input type="checkbox" name="enabled" value="1" ' . checked( ! empty( $r['enabled'] ), true, false ) . '> aktiviert</label></td></tr>'
         . '</tbody></table>'

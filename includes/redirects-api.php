@@ -53,6 +53,25 @@ function tsvd_r301_target_reachable( $statusCode, $target ) {
     return url_to_postid( $target ) > 0 ? 'yes' : 'no';
 }
 
+function tsvd_r301_extract_route( $target ) {
+    $query = wp_parse_url( (string) $target, PHP_URL_QUERY );
+    if ( ! $query ) {
+        return null;
+    }
+    parse_str( $query, $params );
+    $code = isset( $params['route'] ) ? sanitize_key( (string) $params['route'] ) : '';
+    return '' !== $code ? $code : null;
+}
+
+function tsvd_r301_target_with_route( $target, $route ) {
+    $target = remove_query_arg( 'route', (string) $target );
+    $route  = sanitize_key( (string) $route );
+    if ( '' === $route ) {
+        return $target;
+    }
+    return add_query_arg( 'route', $route, $target );
+}
+
 function tsvd_r301_get_not_found( $limit = 200 ) {
     $r = tsvd_r301_request( 'GET', '/api/not-found?limit=' . (int) $limit );
     return is_array( $r['data'] ) ? $r['data'] : array();
@@ -101,7 +120,10 @@ function tsvd_r301_handle_save() {
     $body = array(
         'domain'     => sanitize_text_field( wp_unslash( $_POST['domain'] ?? '' ) ),
         'sourcePath' => sanitize_text_field( wp_unslash( $_POST['sourcePath'] ?? '' ) ),
-        'target'     => sanitize_text_field( wp_unslash( $_POST['target'] ?? '' ) ),
+        'target'     => tsvd_r301_target_with_route(
+            sanitize_text_field( wp_unslash( $_POST['target'] ?? '' ) ),
+            isset( $_POST['route'] ) ? sanitize_key( wp_unslash( $_POST['route'] ) ) : ''
+        ),
         'statusCode' => (int) ( $_POST['statusCode'] ?? 301 ),
         'enabled'    => ! empty( $_POST['enabled'] ),
     );
