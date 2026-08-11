@@ -34,6 +34,9 @@ add_action('init', function() {
 
 add_action('admin_menu', 'tsvd_tools_register_admin_page');
 function tsvd_tools_register_admin_page() {
+    if ('tsvd' !== get_template()) {
+        return;
+    }
     add_menu_page(
         'TSV Tools',
         'TSV Tools',
@@ -45,9 +48,19 @@ function tsvd_tools_register_admin_page() {
     );
 }
 
+add_action('admin_notices', 'tsvd_tools_theme_notice');
+function tsvd_tools_theme_notice() {
+    if ('tsvd' === get_template() || !current_user_can('manage_options')) {
+        return;
+    }
+    echo '<div class="notice notice-warning"><p>'
+        . esc_html__('TSV Tools benötigt das aktive Theme "tsvd" (Tierschutzverein Düsseldorf). Die Plugin-Seiten sind deaktiviert, solange ein anderes Theme aktiv ist.', 'tsvd-tools')
+        . '</p></div>';
+}
+
 add_action('admin_enqueue_scripts', 'tsvd_tools_enqueue_assets');
 function tsvd_tools_enqueue_assets($hook) {
-    if ($hook !== 'toplevel_page_tsvd-tools') return;
+    if ($hook !== 'toplevel_page_tsvd-tools' || 'tsvd' !== get_template()) return;
     wp_enqueue_style('tsvd-tools-admin', TSVD_TOOLS_URL . 'assets/admin.css', array(), TSVD_TOOLS_VERSION);
     wp_enqueue_script('tsvd-tools-admin', TSVD_TOOLS_URL . 'assets/admin.js', array(), TSVD_TOOLS_VERSION, true);
 
