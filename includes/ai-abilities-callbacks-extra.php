@@ -61,6 +61,9 @@ function tsvd_tools_ai_update_redirects($input) {
             continue;
         }
         $target = isset($r['target']) ? (string) $r['target'] : '';
+        if (isset($item['target']) && '' !== (string) $item['target']) {
+            $target = sanitize_text_field((string) $item['target']);
+        }
         if ('' === $target) {
             $skipped++;
             continue;

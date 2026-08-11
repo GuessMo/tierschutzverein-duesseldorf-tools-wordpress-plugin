@@ -77,6 +77,7 @@ function tsvd_tools_ai_get_ability_definitions_extra() {
                             'properties' => array(
                                 'id'         => array('type' => 'integer'),
                                 'route_code' => array('type' => 'string', 'description' => 'Route-Code, z.B. thd oder tms'),
+                                'target'     => array('type' => 'string', 'description' => 'Optional: ersetzt das Ziel vor dem Anhängen des Route-Codes'),
                             ),
                             'required'   => array('id'),
                             'additionalProperties' => false,
