@@ -41,7 +41,7 @@ function tsvd_tools_ai_get_ability_definitions_seo() {
                         'type'       => 'object',
                         'properties' => array(
                             'score'             => array('type' => 'integer'),
-                            'status'            => array('type' => 'string', 'enum' => array('pass', 'warn', 'fail')),
+                            'status'            => array('type' => 'string', 'enum' => array('pass', 'warn', 'fail', 'skipped')),
                             'forced_red_reason' => array('type' => array('string', 'null')),
                         ),
                     ),
