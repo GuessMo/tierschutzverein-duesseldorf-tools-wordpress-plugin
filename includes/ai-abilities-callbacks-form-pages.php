@@ -21,39 +21,39 @@ function tsvd_tools_ai_create_form_page($input) {
         return new WP_Error('invalid_form', __('form_id verweist auf kein bestehendes tsvd_form.', 'tsv-tools'));
     }
 
-    $animal_id = wp_insert_post(array(
-        'post_type'   => 'animals',
+    $page_id = wp_insert_post(array(
+        'post_type'   => 'page',
         'post_status' => 'publish',
         'post_title'  => $title,
         'post_name'   => $slug,
     ), true);
-    if (is_wp_error($animal_id)) {
-        return $animal_id;
+    if (is_wp_error($page_id)) {
+        return $page_id;
     }
 
-    update_post_meta($animal_id, 'animal_adoption_status', 'not_for_adoption');
-    update_post_meta($animal_id, '_tsvd_animal_is_form_page', '1');
-    update_post_meta($animal_id, '_tsvd_animal_form_id', $form_id);
+    update_post_meta($page_id, '_tsvd_form_page_form_id', $form_id);
 
     $pages = get_option('tsvd_animal_form_pages', array());
     if (!is_array($pages)) {
         $pages = array();
     }
     $pages[] = array(
-        'animal_id' => (int) $animal_id,
-        'form_id'   => $form_id,
-        'title'     => $title,
-        'slug'      => $slug,
+        'page_id' => (int) $page_id,
+        'form_id' => $form_id,
+        'title'   => $title,
+        'slug'    => $slug,
     );
     update_option('tsvd_animal_form_pages', $pages);
 
     flush_rewrite_rules();
 
+    $single_slug = function_exists('tsvd_get_animal_single_slug') ? tsvd_get_animal_single_slug() : 'tiere';
+
     return array(
-        'created'   => true,
-        'animal_id' => (int) $animal_id,
-        'page_url'  => (string) get_permalink($animal_id),
-        'message'   => __('Formular-Seite angelegt.', 'tsv-tools'),
+        'created' => true,
+        'page_id' => (int) $page_id,
+        'page_url' => home_url('/' . $single_slug . '/' . $slug . '/'),
+        'message' => __('Formular-Seite angelegt.', 'tsv-tools'),
     );
 }
 

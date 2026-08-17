@@ -33,6 +33,7 @@ if (is_readable($tsvd_tools_autoload)) {
 }
 
 require_once TSVD_TOOLS_DIR . 'includes/admin.php';
+require_once TSVD_TOOLS_DIR . 'includes/dark-mode.php';
 require_once TSVD_TOOLS_DIR . 'includes/password-reset.php';
 require_once TSVD_TOOLS_DIR . 'includes/ai-abilities.php';
 require_once TSVD_TOOLS_DIR . 'includes/ai-admin.php';

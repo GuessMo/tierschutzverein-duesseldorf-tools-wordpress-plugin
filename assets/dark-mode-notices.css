@@ -1,0 +1,113 @@
+:root {
+    --tsvd-notice-success-bg: #eff9f1;
+    --tsvd-notice-success-border: #237a41;
+    --tsvd-notice-warning-bg: #fef8ee;
+    --tsvd-notice-warning-border: #96640a;
+    --tsvd-notice-error-bg: #fcf0f0;
+    --tsvd-notice-error-border: #cc1818;
+    --tsvd-notice-info-bg: #fff;
+    --tsvd-notice-info-border: var(--wp-admin-theme-color, #3858e9);
+    --tsvd-notice-text: #1e1e1e;
+    --tsvd-notice-link: #2145e6;
+}
+
+:root[data-theme="dark"] {
+    --tsvd-notice-success-bg: #16281c;
+    --tsvd-notice-success-border: #4ab866;
+    --tsvd-notice-warning-bg: #2b2415;
+    --tsvd-notice-warning-border: #f0b849;
+    --tsvd-notice-error-bg: #2b1616;
+    --tsvd-notice-error-border: #ff6b6b;
+    --tsvd-notice-info-bg: #1a1f33;
+    --tsvd-notice-info-border: #8aa8ff;
+    --tsvd-notice-text: #e3e5e8;
+    --tsvd-notice-link: #8aa8ff;
+}
+
+@media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+        --tsvd-notice-success-bg: #16281c;
+        --tsvd-notice-success-border: #4ab866;
+        --tsvd-notice-warning-bg: #2b2415;
+        --tsvd-notice-warning-border: #f0b849;
+        --tsvd-notice-error-bg: #2b1616;
+        --tsvd-notice-error-border: #ff6b6b;
+        --tsvd-notice-info-bg: #1a1f33;
+        --tsvd-notice-info-border: #8aa8ff;
+        --tsvd-notice-text: #e3e5e8;
+        --tsvd-notice-link: #8aa8ff;
+    }
+}
+
+.notice,
+div.updated,
+div.error {
+    background: var(--tsvd-chrome-surface);
+    border-color: var(--tsvd-chrome-text-muted);
+    border-style: solid;
+    border-width: 1px;
+    border-left-width: 4px;
+}
+
+.notice p,
+.notice-title,
+div.updated p,
+div.error p {
+    color: var(--tsvd-notice-text);
+}
+
+.notice-success,
+div.updated {
+    background-color: var(--tsvd-notice-success-bg);
+    border-color: var(--tsvd-notice-success-border);
+}
+
+.notice-success,
+.notice-success p,
+.notice-success .notice-title,
+div.updated,
+div.updated p {
+    color: var(--tsvd-notice-success-border);
+}
+
+.notice-warning {
+    background-color: var(--tsvd-notice-warning-bg);
+    border-color: var(--tsvd-notice-warning-border);
+}
+
+.notice-warning,
+.notice-warning p,
+.notice-warning .notice-title {
+    color: var(--tsvd-notice-warning-border);
+}
+
+.notice-error,
+div.error {
+    background-color: var(--tsvd-notice-error-bg);
+    border-color: var(--tsvd-notice-error-border);
+}
+
+.notice-error,
+.notice-error p,
+.notice-error .notice-title,
+div.error,
+div.error p {
+    color: var(--tsvd-notice-error-border);
+}
+
+.notice-info {
+    background-color: var(--tsvd-notice-info-bg);
+    border-color: var(--tsvd-notice-info-border);
+}
+
+.notice-info,
+.notice-info p,
+.notice-info .notice-title {
+    color: var(--tsvd-notice-info-border);
+}
+
+.notice a,
+div.updated a,
+div.error a {
+    color: var(--tsvd-notice-link);
+}

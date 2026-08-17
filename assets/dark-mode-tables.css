@@ -1,0 +1,90 @@
+.wp-list-table.widefat {
+    background: var(--tsvd-chrome-surface);
+    color: var(--tsvd-chrome-text);
+}
+
+.wp-list-table th,
+.wp-list-table td {
+    border-color: var(--tsvd-chrome-border);
+    color: var(--tsvd-chrome-text);
+}
+
+.wp-list-table thead th,
+.wp-list-table tfoot th,
+.wp-list-table .column-title {
+    color: var(--tsvd-chrome-heading);
+}
+
+.wp-list-table.widefat thead tr td,
+.wp-list-table.widefat thead tr th,
+.wp-list-table.widefat tfoot tr td,
+.wp-list-table.widefat tfoot tr th {
+    color: var(--tsvd-chrome-heading);
+}
+
+.widefat thead td,
+.widefat thead th {
+    border-bottom-color: var(--tsvd-chrome-border);
+}
+
+.widefat tfoot td,
+.widefat tfoot th {
+    border-top-color: var(--tsvd-chrome-border);
+}
+
+.plugins thead tr,
+.plugins tfoot tr {
+    background: var(--tsvd-chrome-surface);
+}
+
+.wp-list-table.widefat p,
+.wp-list-table.widefat ol,
+.wp-list-table.widefat ul {
+    color: var(--tsvd-chrome-text);
+}
+
+.plugins .row-actions {
+    color: var(--tsvd-chrome-text-muted);
+}
+
+.wp-list-table .sorting-indicator:before {
+    color: var(--tsvd-chrome-text-muted);
+}
+
+.wp-list-table.widefat > tbody > tr {
+    background: var(--tsvd-chrome-surface);
+}
+
+.wp-list-table.striped > tbody > tr:nth-child(2n+1),
+.wp-list-table.widefat tr.alternate,
+.wp-list-table.widefat .alternate {
+    background: var(--tsvd-chrome-canvas);
+}
+
+.tablenav-pages a,
+.tablenav-pages span.current {
+    background: var(--tsvd-chrome-surface);
+    border-color: var(--tsvd-chrome-border);
+    color: var(--tsvd-chrome-text);
+}
+
+.form-table th {
+    color: var(--tsvd-chrome-heading);
+}
+
+.form-table td,
+.form-table th {
+    border-color: var(--tsvd-chrome-border);
+}
+
+table,
+table th,
+table td,
+table.widefat {
+    border-color: var(--tsvd-chrome-border);
+}
+
+#the-list tr:last-child td,
+#the-list tr:last-child th {
+    border-bottom-color: var(--tsvd-chrome-border);
+}

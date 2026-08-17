@@ -22,10 +22,10 @@ function tsvd_tools_ai_get_ability_definitions_form_pages() {
             'output_schema'       => array(
                 'type'       => 'object',
                 'properties' => array(
-                    'created'   => array('type' => 'boolean'),
-                    'animal_id' => array('type' => 'integer'),
-                    'page_url'  => array('type' => 'string'),
-                    'message'   => array('type' => 'string'),
+                    'created' => array('type' => 'boolean'),
+                    'page_id' => array('type' => 'integer'),
+                    'page_url' => array('type' => 'string'),
+                    'message' => array('type' => 'string'),
                 ),
             ),
             'permission_callback' => 'tsvd_tools_ai_can_manage_settings',

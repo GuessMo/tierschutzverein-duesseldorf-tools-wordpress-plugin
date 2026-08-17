@@ -1,0 +1,25 @@
+#wpadminbar .tsvd-dark-mode-node {
+    display: flex;
+    align-items: center;
+}
+
+#wpadminbar .tsvd-theme-toggle {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 32px;
+    height: 32px;
+    padding: 0;
+    background: transparent;
+    border: none;
+    color: var(--tsvd-menu-icon);
+    cursor: pointer;
+}
+
+#wpadminbar .tsvd-theme-toggle:hover {
+    color: var(--tsvd-menu-submenu-hover);
+}
+
+#wpadminbar .tsvd-theme-icon svg {
+    display: block;
+}
