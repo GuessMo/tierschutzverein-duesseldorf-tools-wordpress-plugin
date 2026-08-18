@@ -1,0 +1,55 @@
+:root[data-theme="dark"] {
+    --tsvd-editor-bg: #26272b;
+    --tsvd-editor-text: #e3e5e8;
+    --tsvd-editor-heading: #f0f0f1;
+    --tsvd-editor-link: #8aa8ff;
+    --tsvd-editor-border: #3c3f43;
+    --tsvd-editor-code-bg: #18191b;
+}
+
+@media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+        --tsvd-editor-bg: #26272b;
+        --tsvd-editor-text: #e3e5e8;
+        --tsvd-editor-heading: #f0f0f1;
+        --tsvd-editor-link: #8aa8ff;
+        --tsvd-editor-border: #3c3f43;
+        --tsvd-editor-code-bg: #18191b;
+    }
+}
+
+body#tinymce {
+    background-color: var(--tsvd-editor-bg, inherit);
+    color: var(--tsvd-editor-text, inherit);
+}
+
+body#tinymce a {
+    color: var(--tsvd-editor-link, inherit);
+}
+
+body#tinymce h1,
+body#tinymce h2,
+body#tinymce h3,
+body#tinymce h4,
+body#tinymce h5,
+body#tinymce h6 {
+    color: var(--tsvd-editor-heading, inherit);
+}
+
+body#tinymce blockquote {
+    border-left-color: var(--tsvd-editor-border, inherit);
+    color: var(--tsvd-editor-text, inherit);
+}
+
+body#tinymce hr,
+body#tinymce table,
+body#tinymce td,
+body#tinymce th {
+    border-color: var(--tsvd-editor-border, inherit);
+}
+
+body#tinymce code,
+body#tinymce pre {
+    background-color: var(--tsvd-editor-code-bg, inherit);
+    color: var(--tsvd-editor-text, inherit);
+}

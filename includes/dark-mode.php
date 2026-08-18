@@ -43,6 +43,22 @@ function tsvd_dark_mode_enqueue_assets($hook_suffix) {
     wp_enqueue_style('tsvd-dark-mode-chrome', TSVD_TOOLS_URL . 'assets/dark-mode-chrome.css', array(), tsvd_dark_mode_asset_version('assets/dark-mode-chrome.css'));
     wp_enqueue_style('tsvd-dark-mode-tables', TSVD_TOOLS_URL . 'assets/dark-mode-tables.css', array('tsvd-dark-mode-chrome'), tsvd_dark_mode_asset_version('assets/dark-mode-tables.css'));
     wp_enqueue_style('tsvd-dark-mode-notices', TSVD_TOOLS_URL . 'assets/dark-mode-notices.css', array('tsvd-dark-mode-chrome'), tsvd_dark_mode_asset_version('assets/dark-mode-notices.css'));
+    wp_enqueue_style('tsvd-dark-mode-dashboard', TSVD_TOOLS_URL . 'assets/dark-mode-dashboard.css', array('tsvd-dark-mode-chrome'), tsvd_dark_mode_asset_version('assets/dark-mode-dashboard.css'));
+    wp_enqueue_style('tsvd-dark-mode-editor', TSVD_TOOLS_URL . 'assets/dark-mode-editor.css', array('tsvd-dark-mode-chrome'), tsvd_dark_mode_asset_version('assets/dark-mode-editor.css'));
+}
+
+add_filter('tiny_mce_before_init', 'tsvd_dark_mode_tinymce_content_css');
+add_filter('teeny_mce_before_init', 'tsvd_dark_mode_tinymce_content_css');
+function tsvd_dark_mode_tinymce_content_css($mce_init) {
+    $css_url = TSVD_TOOLS_URL . 'assets/dark-mode-editor-iframe.css?ver=' . tsvd_dark_mode_asset_version('assets/dark-mode-editor-iframe.css');
+
+    if (empty($mce_init['content_css'])) {
+        $mce_init['content_css'] = $css_url;
+    } else {
+        $mce_init['content_css'] .= ',' . $css_url;
+    }
+
+    return $mce_init;
 }
 
 add_action('admin_bar_menu', 'tsvd_dark_mode_admin_bar_node', 0);

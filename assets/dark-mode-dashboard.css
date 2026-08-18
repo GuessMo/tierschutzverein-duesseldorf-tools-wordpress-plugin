@@ -1,0 +1,26 @@
+.comment-item,
+.activity-block .comment-item,
+#activity-widget #the-comment-list .comment-item {
+    background: var(--tsvd-chrome-surface);
+    border-color: var(--tsvd-chrome-border);
+}
+
+#published-posts li:nth-child(2n+1),
+#future-posts li:nth-child(2n+1),
+#latest-comments li:nth-child(2n+1) {
+    background: var(--tsvd-chrome-canvas);
+}
+
+.event-icon,
+.event-city,
+.event-date,
+.ce-separator {
+    color: var(--tsvd-chrome-text-muted);
+}
+
+.activity-block,
+.community-events .activity-block.last,
+.community-events li:first-child,
+.community-events-footer {
+    border-color: var(--tsvd-chrome-border);
+}
