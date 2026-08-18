@@ -1,0 +1,248 @@
+.editor-header,
+.interface-interface-skeleton__header,
+.interface-interface-skeleton__sidebar,
+.interface-interface-skeleton__secondary-sidebar,
+.interface-interface-skeleton__footer,
+.interface-interface-skeleton__actions {
+    background: var(--tsvd-chrome-surface);
+    color: var(--tsvd-chrome-text);
+}
+
+.interface-interface-skeleton__sidebar {
+    border-top-color: var(--tsvd-chrome-border);
+}
+
+.block-editor-block-inspector__no-block-tools,
+.block-editor-block-inspector__no-blocks {
+    background: var(--tsvd-chrome-surface);
+    color: var(--tsvd-chrome-text);
+}
+
+.editor-document-bar,
+.editor-sidebar__panel-tabs,
+.interface-complementary-area.editor-sidebar,
+.editor-sidebar__panel {
+    background: var(--tsvd-chrome-surface);
+    color: var(--tsvd-chrome-text);
+}
+
+.editor-sidebar__panel-tabs button {
+    color: var(--tsvd-chrome-text);
+}
+
+.editor-sidebar__panel-tabs.components-panel__header {
+    border-bottom-color: var(--tsvd-chrome-border);
+}
+
+.editor-sidebar__panel-tabs [role="tablist"]::before {
+    border-bottom-color: var(--tsvd-link) !important;
+}
+
+.interface-complementary-area.editor-sidebar .components-panel__body {
+    border-top-color: var(--tsvd-chrome-border);
+    border-bottom-color: var(--tsvd-chrome-border);
+}
+
+.editor-sidebar__panel .components-panel__body-toggle svg,
+.editor-sidebar__panel .components-panel__body-toggle .components-panel__arrow {
+    fill: var(--tsvd-chrome-text) !important;
+    color: var(--tsvd-chrome-text) !important;
+}
+
+.editor-sidebar__panel .editor-post-card-panel__title-name,
+.editor-sidebar__panel .editor-post-featured-image__toggle,
+.editor-sidebar__panel .components-truncate.components-text,
+.editor-sidebar__panel .components-panel__body-toggle {
+    color: var(--tsvd-chrome-text);
+}
+
+.editor-document-bar__post-title,
+.editor-document-bar__post-type-label,
+.editor-document-bar__shortcut,
+.editor-document-bar .components-truncate.components-text {
+    color: var(--tsvd-chrome-text);
+}
+
+.editor-document-bar__command {
+    background: var(--tsvd-chrome-canvas) !important;
+    color: var(--tsvd-chrome-text) !important;
+    border: 1px solid var(--tsvd-chrome-border) !important;
+    transition: none !important;
+}
+
+.editor-document-bar__command:hover,
+.editor-document-bar__command:focus {
+    background: var(--tsvd-chrome-border) !important;
+    color: var(--tsvd-chrome-text) !important;
+}
+
+.editor-sidebar__panel .components-button.is-tertiary,
+.editor-sidebar__panel .components-button.is-link {
+    color: var(--tsvd-link);
+    border-color: var(--tsvd-link);
+}
+
+.editor-sidebar__panel .components-button.is-tertiary:hover,
+.editor-sidebar__panel .components-button.is-tertiary:focus,
+.editor-sidebar__panel .components-button.is-link:hover,
+.editor-sidebar__panel .components-button.is-link:focus {
+    color: var(--tsvd-chrome-heading) !important;
+    background: var(--tsvd-chrome-border) !important;
+}
+
+.editor-sidebar__panel .components-panel__body-toggle:hover,
+.editor-sidebar__panel .components-panel__body-toggle:focus {
+    color: var(--tsvd-chrome-heading) !important;
+    background: var(--tsvd-chrome-border) !important;
+    transition: none !important;
+}
+
+.editor-sidebar__panel .block-editor-block-icon {
+    fill: var(--tsvd-chrome-text) !important;
+    color: var(--tsvd-chrome-text) !important;
+}
+
+.editor-sidebar__panel .components-button.has-icon svg {
+    fill: var(--tsvd-chrome-text) !important;
+    color: var(--tsvd-chrome-text) !important;
+}
+
+.interface-interface-skeleton__footer .block-editor-block-breadcrumb {
+    background: var(--tsvd-chrome-surface) !important;
+    color: var(--tsvd-chrome-text);
+}
+
+.block-editor-block-breadcrumb__current,
+.block-editor-block-breadcrumb__button {
+    color: var(--tsvd-chrome-text);
+}
+
+.block-editor-block-breadcrumb__button:hover,
+.block-editor-block-breadcrumb__button:focus {
+    color: var(--tsvd-chrome-heading) !important;
+    background: var(--tsvd-chrome-border) !important;
+}
+
+.edit-post-fullscreen-mode-close__back-icon {
+    background-color: var(--tsvd-chrome-border) !important;
+}
+
+.edit-post-fullscreen-mode-close__back-icon.has-site-icon {
+    background-color: color-mix(in srgb, var(--tsvd-chrome-border) 60%, transparent) !important;
+}
+
+.block-editor-block-card__title {
+    color: var(--tsvd-chrome-heading) !important;
+}
+
+.block-editor-panel-color-gradient-settings__dropdown,
+.block-editor-panel-color-gradient-settings__color-name {
+    color: var(--tsvd-chrome-text);
+}
+
+.block-editor-panel-color-gradient-settings__dropdown:hover,
+.block-editor-panel-color-gradient-settings__dropdown:focus,
+.block-editor-panel-color-gradient-settings__dropdown[aria-expanded="true"] {
+    color: var(--tsvd-chrome-heading) !important;
+    background: var(--tsvd-chrome-border) !important;
+}
+
+.editor-sidebar__panel .components-toggle-group-control {
+    background: var(--tsvd-chrome-canvas) !important;
+    border-color: var(--tsvd-chrome-border) !important;
+}
+
+.editor-sidebar__panel .components-toggle-group-control-option-base {
+    color: var(--tsvd-chrome-text-muted);
+    border-color: var(--tsvd-chrome-text-muted);
+}
+
+.editor-sidebar__panel .components-toggle-group-control-option-base[aria-checked="true"],
+.editor-sidebar__panel .components-toggle-group-control-option-base[data-active-item="true"] {
+    color: var(--tsvd-chrome-heading) !important;
+}
+
+.editor-sidebar__panel .components-toggle-group-control-backdrop,
+.editor-sidebar__panel .components-toggle-group-control::before {
+    background: var(--tsvd-chrome-border) !important;
+}
+
+.editor-sidebar__panel .components-toggle-group-control-option-base:hover,
+.editor-sidebar__panel .components-toggle-group-control-option-base:focus {
+    color: var(--tsvd-chrome-text) !important;
+    border-color: var(--tsvd-chrome-text) !important;
+}
+
+.editor-preview-dropdown--desktop svg {
+    fill: var(--tsvd-chrome-text);
+    color: var(--tsvd-chrome-text);
+}
+
+.editor-post-card-panel__icon {
+    fill: currentColor;
+}
+
+.color-block-support-panel {
+    border-color: var(--tsvd-chrome-border) !important;
+}
+
+.editor-sidebar__panel .components-tools-panel-item {
+    border-color: var(--tsvd-chrome-border) !important;
+}
+
+.components-popover__content {
+    background: var(--tsvd-chrome-surface) !important;
+    color: var(--tsvd-chrome-text) !important;
+    border-color: var(--tsvd-chrome-border) !important;
+}
+
+.components-popover .components-menu-item__button,
+.components-popover [role="menuitem"],
+.components-popover [role="menuitemcheckbox"],
+.components-popover [role="menuitemradio"],
+.components-popover .components-menu-group__label {
+    color: var(--tsvd-chrome-text) !important;
+}
+
+.components-popover .components-menu-item__button:hover,
+.components-popover [role="menuitem"]:hover,
+.components-popover [role="menuitemcheckbox"]:hover,
+.components-popover [role="menuitemradio"]:hover {
+    background: var(--tsvd-chrome-border) !important;
+    color: var(--tsvd-chrome-heading) !important;
+}
+
+.components-popover .components-color-palette__custom-color-name,
+.components-popover .components-heading,
+.components-popover .components-circular-option-picker__clear {
+    color: var(--tsvd-chrome-text) !important;
+}
+
+.components-popover .components-circular-option-picker__clear:hover,
+.components-popover .components-circular-option-picker__clear:focus {
+    color: var(--tsvd-chrome-heading) !important;
+    background: var(--tsvd-chrome-border) !important;
+}
+
+.components-popover [role="tab"] {
+    color: var(--tsvd-chrome-text-muted) !important;
+}
+
+.components-popover [role="tab"][aria-selected="true"] {
+    color: var(--tsvd-chrome-heading) !important;
+}
+
+.components-popover [role="tab"]:hover,
+.components-popover [role="tab"]:focus {
+    color: var(--tsvd-link) !important;
+}
+
+.components-popover [role="tablist"]::before {
+    border-bottom-color: var(--tsvd-link) !important;
+}
+
+.components-color-palette__custom-color-text-wrapper {
+    box-shadow: var(--tsvd-chrome-border) 0px -1px 0px 0px inset,
+        var(--tsvd-chrome-border) 1px 0px 0px 0px inset,
+        var(--tsvd-chrome-border) -1px 0px 0px 0px inset !important;
+}

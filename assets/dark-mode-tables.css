@@ -61,6 +61,13 @@
     background: var(--tsvd-chrome-canvas);
 }
 
+.wp-list-table.widefat tr.inline-edit-row.quick-edit-row,
+.wp-list-table.widefat tr.inline-edit-row.bulk-edit-row,
+.wp-list-table.widefat tr.inline-edit-row.alternate.quick-edit-row,
+.wp-list-table.widefat tr.inline-edit-row.alternate.bulk-edit-row {
+    background: var(--tsvd-chrome-surface);
+}
+
 .tablenav-pages a,
 .tablenav-pages span.current {
     background: var(--tsvd-chrome-surface);
