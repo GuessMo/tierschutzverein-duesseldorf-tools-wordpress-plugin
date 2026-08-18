@@ -121,9 +121,10 @@ body {
     border-color: var(--tsvd-chrome-heading);
 }
 
-#wp-content-editor-container {
-    background-color: var(--tsvd-chrome-surface);
-    border-color: var(--tsvd-chrome-border);
+#wp-content-editor-container,
+.wp-editor-container {
+    background-color: var(--tsvd-chrome-surface) !important;
+    border-color: var(--tsvd-chrome-border) !important;
 }
 
 .quicktags-toolbar {
@@ -148,23 +149,27 @@ div.mce-toolbar-grp {
 }
 
 #content-tmce,
-#content-html {
-    background-color: var(--tsvd-chrome-canvas);
-    color: var(--tsvd-chrome-text-muted);
-    border-color: var(--tsvd-chrome-border);
+#content-html,
+.wp-switch-editor.switch-tmce,
+.wp-switch-editor.switch-html {
+    background-color: var(--tsvd-chrome-canvas) !important;
+    color: var(--tsvd-chrome-text-muted) !important;
+    border-color: var(--tsvd-chrome-border) !important;
 }
 
 #content-tmce[aria-pressed="true"],
-#content-html[aria-pressed="true"] {
-    background-color: var(--tsvd-chrome-surface);
-    color: var(--tsvd-chrome-heading);
-    border-bottom-color: var(--tsvd-chrome-surface);
+#content-html[aria-pressed="true"],
+.wp-switch-editor[aria-pressed="true"] {
+    background-color: var(--tsvd-chrome-surface) !important;
+    color: var(--tsvd-chrome-heading) !important;
+    border-bottom-color: var(--tsvd-chrome-surface) !important;
 }
 
 #content-tmce:hover,
-#content-html:hover {
-    color: var(--tsvd-chrome-heading);
-    border-color: var(--tsvd-chrome-heading);
+#content-html:hover,
+.wp-switch-editor:hover {
+    color: var(--tsvd-chrome-heading) !important;
+    border-color: var(--tsvd-chrome-heading) !important;
 }
 
 #post-status-info {
