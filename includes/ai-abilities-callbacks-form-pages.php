@@ -130,12 +130,19 @@ function tsvd_tools_ai_anfragen_dashboard_status($input) {
 
     $form_id = (int) get_option('tsvd_interessentenbogen_form', 0);
     $persist_enabled = $form_id ? (bool) get_post_meta($form_id, '_tsvd_form_persist_inquiry', true) : false;
+    $interessentenbogen_recipient = $form_id ? get_post_meta($form_id, '_tsvd_form_recipient', true) : '';
+
+    $interest_form_id = (int) get_option('tsvd_animal_interest_form', 0);
+    $animal_interest_recipient = $interest_form_id ? get_post_meta($interest_form_id, '_tsvd_form_recipient', true) : '';
 
     return array(
         'tables_exist'                 => $table_exists && $replies_table_exists,
         'anfragen_count'               => $anfragen_count,
         'administrator_has_capability' => $admin_has_cap,
         'interessentenbogen_form_id'   => $form_id,
+        'interessentenbogen_recipient' => $interessentenbogen_recipient !== '' ? $interessentenbogen_recipient : null,
+        'animal_interest_form_id'      => $interest_form_id,
+        'animal_interest_recipient'    => $animal_interest_recipient !== '' ? $animal_interest_recipient : null,
         'persist_inquiry_enabled'      => $persist_enabled,
         'dashboard_url'                => admin_url('edit.php?post_type=animals&page=tsvd-anfragen'),
     );

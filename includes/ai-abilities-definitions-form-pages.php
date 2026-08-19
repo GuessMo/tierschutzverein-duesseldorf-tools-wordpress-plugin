@@ -66,7 +66,7 @@ function tsvd_tools_ai_get_ability_definitions_form_pages() {
 
         'tsv-tools/anfragen-dashboard-status' => array(
             'label'               => __('Anfragen-Dashboard-Status abfragen', 'tsv-tools'),
-            'description'         => __('Löst die lazy auf admin_init gehookten Einmal-Migrationen aus (DB-Tabellen, Capability-Grant) und meldet den aktuellen Status des Anfragen-Dashboards zurück.', 'tsv-tools'),
+            'description'         => __('Löst die lazy auf admin_init gehookten Einmal-Migrationen aus (DB-Tabellen, Capability-Grant) und meldet den aktuellen Status des Anfragen-Dashboards zurück, inkl. der beiden zentralen Formulare (Interessentenbogen, Tierdetail-Interesse-Formular) mit ihrem jeweils aktuellen Mail-Empfänger.', 'tsv-tools'),
             'category'            => 'tsv-tools-animals',
             'input_schema'        => array(
                 'type'       => 'object',
@@ -80,6 +80,9 @@ function tsvd_tools_ai_get_ability_definitions_form_pages() {
                     'anfragen_count'               => array('type' => array('integer', 'null')),
                     'administrator_has_capability' => array('type' => 'boolean'),
                     'interessentenbogen_form_id'   => array('type' => 'integer'),
+                    'interessentenbogen_recipient' => array('type' => array('string', 'null')),
+                    'animal_interest_form_id'      => array('type' => 'integer'),
+                    'animal_interest_recipient'    => array('type' => array('string', 'null')),
                     'persist_inquiry_enabled'      => array('type' => 'boolean'),
                     'dashboard_url'                => array('type' => 'string'),
                 ),
