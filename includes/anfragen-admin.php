@@ -63,9 +63,7 @@ function tsvd_anfragen_render_list() {
 
 	$base_url = admin_url( 'edit.php?post_type=animals&page=tsvd-anfragen' );
 
-	echo '<div class="wrap"><h1>' . esc_html__( 'Anfragen', 'tsvd' )
-		. ' <a href="' . esc_url( admin_url( 'edit.php?post_type=animals&page=tsvd_animal_settings' ) ) . '" class="page-title-action">'
-		. esc_html__( 'IMAP-Einstellungen (Animals-Settings)', 'tsvd' ) . '</a></h1>';
+	echo '<div class="wrap"><h1>' . esc_html__( 'Anfragen', 'tsvd' ) . '</h1>';
 
 	if ( isset( $_GET['deleted'] ) ) {
 		echo '<div class="notice notice-success is-dismissible"><p>' . esc_html__( 'Anfrage gelöscht.', 'tsvd' ) . '</p></div>';
