@@ -138,6 +138,77 @@ function tsvd_tools_ai_delete_anfrage($input) {
     return array('deleted' => true, 'id' => $id);
 }
 
+function tsvd_tools_ai_set_form_mail_recipient($input) {
+    $recipient = sanitize_email($input['recipient'] ?? '');
+    if (!is_email($recipient)) {
+        return new WP_Error('invalid_recipient', __('recipient ist keine gültige Mailadresse.', 'tsv-tools'));
+    }
+
+    $form_id = absint($input['form_id'] ?? 0);
+    $title   = sanitize_text_field($input['title'] ?? '');
+
+    if (!$form_id && $title !== '') {
+        $found = get_posts(array(
+            'post_type'      => 'tsvd_form',
+            'title'          => $title,
+            'post_status'    => 'any',
+            'posts_per_page' => 1,
+            'fields'         => 'ids',
+        ));
+        $form_id = $found ? (int) $found[0] : 0;
+    }
+
+    if (!$form_id) {
+        return new WP_Error('missing_form', __('form_id oder ein bestehender title ist erforderlich.', 'tsv-tools'));
+    }
+    if (get_post_type($form_id) !== 'tsvd_form') {
+        return new WP_Error('invalid_form', __('form_id verweist auf kein bestehendes tsvd_form.', 'tsv-tools'));
+    }
+
+    update_post_meta($form_id, '_tsvd_form_recipient', $recipient);
+
+    return array(
+        'updated'   => true,
+        'form_id'   => $form_id,
+        'title'     => get_the_title($form_id),
+        'recipient' => $recipient,
+    );
+}
+
+function tsvd_tools_ai_set_anfragen_imap_settings($input) {
+    if (isset($input['enabled'])) {
+        update_option('tsvd_anfragen_imap_enabled', (bool) $input['enabled'] ? 1 : 0);
+    }
+    if (isset($input['host'])) {
+        update_option('tsvd_anfragen_imap_host', sanitize_text_field($input['host']));
+    }
+    if (isset($input['port'])) {
+        update_option('tsvd_anfragen_imap_port', absint($input['port']));
+    }
+    if (isset($input['username'])) {
+        $username = sanitize_email($input['username']);
+        if (!is_email($username)) {
+            return new WP_Error('invalid_username', __('username ist keine gültige Mailadresse.', 'tsv-tools'));
+        }
+        update_option('tsvd_anfragen_imap_username', $username);
+    }
+    if (isset($input['folder'])) {
+        update_option('tsvd_anfragen_imap_folder', sanitize_text_field($input['folder']));
+    }
+
+    $s = function_exists('tsvd_anfragen_imap_get_settings') ? tsvd_anfragen_imap_get_settings() : array();
+
+    return array(
+        'updated'      => true,
+        'enabled'      => (bool) ($s['enabled'] ?? false),
+        'host'         => (string) ($s['host'] ?? ''),
+        'port'         => (int) ($s['port'] ?? 0),
+        'username'     => (string) ($s['username'] ?? ''),
+        'folder'       => (string) ($s['folder'] ?? ''),
+        'password_set' => '' !== ($s['password'] ?? ''),
+    );
+}
+
 function tsvd_tools_ai_reply_to_anfrage($input) {
     $id   = absint($input['id'] ?? 0);
     $body = isset($input['body']) ? sanitize_textarea_field($input['body']) : '';
