@@ -125,6 +125,72 @@ function tsvd_tools_ai_get_ability_definitions_anfragen() {
             ),
         ),
 
+        'tsv-tools/set-form-mail-recipient' => array(
+            'label'               => __('Formular-Mail-Empfänger setzen', 'tsv-tools'),
+            'description'         => __('Setzt den Mail-Empfänger (_tsvd_form_recipient) eines bestehenden tsvd_form — entweder per form_id oder per exaktem Formular-Titel.', 'tsv-tools'),
+            'category'            => 'tsv-tools-animals',
+            'input_schema'        => array(
+                'type'       => 'object',
+                'properties' => array(
+                    'form_id'   => array('type' => 'integer', 'description' => 'ID eines bestehenden tsvd_form'),
+                    'title'     => array('type' => 'string', 'description' => 'Alternative zu form_id: exakter Formular-Titel'),
+                    'recipient' => array('type' => 'string', 'description' => 'Neue Empfänger-Mailadresse'),
+                ),
+                'required'   => array('recipient'),
+                'additionalProperties' => false,
+            ),
+            'output_schema'       => array(
+                'type'       => 'object',
+                'properties' => array(
+                    'updated'   => array('type' => 'boolean'),
+                    'form_id'   => array('type' => 'integer'),
+                    'title'     => array('type' => 'string'),
+                    'recipient' => array('type' => 'string'),
+                ),
+            ),
+            'permission_callback' => 'tsvd_tools_ai_can_manage_anfragen',
+            'execute_callback'    => 'tsvd_tools_ai_set_form_mail_recipient',
+            'meta'                => array(
+                'mcp'         => array('public' => true),
+                'annotations' => array('readonly' => false, 'destructive' => false, 'idempotent' => true),
+            ),
+        ),
+
+        'tsv-tools/set-anfragen-imap-settings' => array(
+            'label'               => __('Anfragen-IMAP-Einstellungen setzen', 'tsv-tools'),
+            'description'         => __('Aktualisiert die IMAP-Einstellungen des Anfragen-Rückkanals (Host/Port/Mailbox-Adresse/Ordner/Aktiv) — bewusst OHNE Passwort-Feld, das App-Passwort muss weiterhin manuell in wp-admin hinterlegt werden. Nicht übergebene Felder bleiben unverändert.', 'tsv-tools'),
+            'category'            => 'tsv-tools-animals',
+            'input_schema'        => array(
+                'type'       => 'object',
+                'properties' => array(
+                    'enabled'  => array('type' => 'boolean'),
+                    'host'     => array('type' => 'string'),
+                    'port'     => array('type' => 'integer'),
+                    'username' => array('type' => 'string', 'description' => 'Mailbox-Adresse, z.B. tieranfragen@tierschutzverein-duesseldorf.de'),
+                    'folder'   => array('type' => 'string'),
+                ),
+                'additionalProperties' => false,
+            ),
+            'output_schema'       => array(
+                'type'       => 'object',
+                'properties' => array(
+                    'updated'  => array('type' => 'boolean'),
+                    'enabled'  => array('type' => 'boolean'),
+                    'host'     => array('type' => 'string'),
+                    'port'     => array('type' => 'integer'),
+                    'username' => array('type' => 'string'),
+                    'folder'   => array('type' => 'string'),
+                    'password_set' => array('type' => 'boolean', 'description' => 'Ob bereits ein App-Passwort hinterlegt ist (Wert selbst wird nie zurückgegeben)'),
+                ),
+            ),
+            'permission_callback' => 'tsvd_tools_ai_can_manage_anfragen',
+            'execute_callback'    => 'tsvd_tools_ai_set_anfragen_imap_settings',
+            'meta'                => array(
+                'mcp'         => array('public' => true),
+                'annotations' => array('readonly' => false, 'destructive' => false, 'idempotent' => true),
+            ),
+        ),
+
         'tsv-tools/reply-to-anfrage' => array(
             'label'               => __('Auf Anfrage antworten', 'tsv-tools'),
             'description'         => __('Sendet eine Antwort-Mail an die interessierte Person (Reply-To = Formular-Empfänger, Betreff mit Anfragen-Nummer) und speichert sie im Verlauf; setzt Status auf "answered".', 'tsv-tools'),
