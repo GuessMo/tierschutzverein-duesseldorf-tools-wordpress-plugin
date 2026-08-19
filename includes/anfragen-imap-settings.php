@@ -59,7 +59,7 @@ function tsvd_render_anfragen_imap_settings_tab() {
 
     $s = tsvd_anfragen_imap_get_settings();
     ?>
-    <hr style="margin: 2em 0;">
+    <div id="tab-anfragen" class="tsvd-settings-tab" style="display:none;">
 
     <h2><?php esc_html_e('Anfragen — IMAP-Einstellungen (Antwort-Rückkanal)', 'tsv-tools'); ?></h2>
     <p><?php esc_html_e('Holt Antworten von Interessent:innen aus einer Mailbox (z. B. Google Workspace) automatisch per Cron ab und ordnet sie der passenden Anfrage zu.', 'tsv-tools'); ?></p>
@@ -129,6 +129,7 @@ function tsvd_render_anfragen_imap_settings_tab() {
         });
     })();
     </script>
+    </div>
     <?php
 }
 
