@@ -11,10 +11,10 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 function tsvd_anfragen_animal_adoption_label( $status ) {
 	$map = array(
-		'not_for_adoption' => __( 'Nicht zur Vermittlung', 'tsvd' ),
-		'not_adoptable'    => __( 'Nicht vermittelbar', 'tsvd' ),
-		'for_adoption'     => __( 'Zur Vermittlung', 'tsvd' ),
-		'adopted'          => __( 'Vermittelt', 'tsvd' ),
+		'not_for_adoption' => __( 'Not for adoption', 'tsvd' ),
+		'not_adoptable'    => __( 'Not adoptable', 'tsvd' ),
+		'for_adoption'     => __( 'For adoption', 'tsvd' ),
+		'adopted'          => __( 'Adopted', 'tsvd' ),
 		'deceased'         => __( 'Verstorben', 'tsvd' ),
 	);
 	return isset( $map[ $status ] ) ? $map[ $status ] : '';
@@ -27,7 +27,10 @@ function tsvd_anfragen_render_animal_card( $animal_id ) {
 	$edit_link = get_edit_post_link( $animal_id );
 	$view_link = get_permalink( $animal_id );
 	$thumb     = get_the_post_thumbnail( $animal_id, array( 64, 64 ) );
-	$title     = get_the_title( $animal_id );
+	$title     = get_post_meta( $animal_id, 'animal_name', true );
+	if ( '' === $title ) {
+		$title = get_the_title( $animal_id );
+	}
 
 	$facts = array();
 	$terms = get_the_terms( $animal_id, 'animal_breed' );
@@ -42,9 +45,7 @@ function tsvd_anfragen_render_animal_card( $animal_id ) {
 	echo '<div class="tsvd-animal-card">';
 	echo '<div class="tsvd-animal-card__thumb">' . ( $thumb ? $thumb : '<span class="dashicons dashicons-pets"></span>' ) . '</div>';
 	echo '<div class="tsvd-animal-card__body">';
-	echo '<div class="tsvd-animal-card__name">';
-	echo $edit_link ? '<a href="' . esc_url( $edit_link ) . '">' . esc_html( $title ) . '</a>' : esc_html( $title );
-	echo '</div>';
+	echo '<div class="tsvd-animal-card__name">' . esc_html( $title ) . '</div>';
 	if ( $facts ) {
 		echo '<div class="tsvd-animal-card__facts">' . esc_html( implode( '  ·  ', $facts ) ) . '</div>';
 	}
