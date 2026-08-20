@@ -9,6 +9,55 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
+function tsvd_anfragen_animal_adoption_label( $status ) {
+	$map = array(
+		'not_for_adoption' => __( 'Nicht zur Vermittlung', 'tsvd' ),
+		'not_adoptable'    => __( 'Nicht vermittelbar', 'tsvd' ),
+		'for_adoption'     => __( 'Zur Vermittlung', 'tsvd' ),
+		'adopted'          => __( 'Vermittelt', 'tsvd' ),
+		'deceased'         => __( 'Verstorben', 'tsvd' ),
+	);
+	return isset( $map[ $status ] ) ? $map[ $status ] : '';
+}
+
+function tsvd_anfragen_render_animal_card( $animal_id ) {
+	if ( ! $animal_id || 'animals' !== get_post_type( $animal_id ) ) {
+		return;
+	}
+	$edit_link = get_edit_post_link( $animal_id );
+	$view_link = get_permalink( $animal_id );
+	$thumb     = get_the_post_thumbnail( $animal_id, array( 64, 64 ) );
+	$title     = get_the_title( $animal_id );
+
+	$facts = array();
+	$terms = get_the_terms( $animal_id, 'animal_breed' );
+	if ( $terms && ! is_wp_error( $terms ) ) {
+		$facts[] = implode( ' · ', array_slice( wp_list_pluck( $terms, 'name' ), 0, 2 ) );
+	}
+	$adoption = tsvd_anfragen_animal_adoption_label( get_post_meta( $animal_id, 'animal_adoption_status', true ) );
+	if ( $adoption ) {
+		$facts[] = $adoption;
+	}
+
+	echo '<div class="tsvd-animal-card">';
+	echo '<div class="tsvd-animal-card__thumb">' . ( $thumb ? $thumb : '<span class="dashicons dashicons-pets"></span>' ) . '</div>';
+	echo '<div class="tsvd-animal-card__body">';
+	echo '<div class="tsvd-animal-card__name">';
+	echo $edit_link ? '<a href="' . esc_url( $edit_link ) . '">' . esc_html( $title ) . '</a>' : esc_html( $title );
+	echo '</div>';
+	if ( $facts ) {
+		echo '<div class="tsvd-animal-card__facts">' . esc_html( implode( '  ·  ', $facts ) ) . '</div>';
+	}
+	echo '<div class="tsvd-animal-card__links">';
+	if ( $edit_link ) {
+		echo '<a href="' . esc_url( $edit_link ) . '">' . esc_html__( 'Datensatz öffnen', 'tsvd' ) . '</a>';
+	}
+	if ( $view_link ) {
+		echo '<a href="' . esc_url( $view_link ) . '" target="_blank" rel="noopener">' . esc_html__( 'Profil ansehen', 'tsvd' ) . '</a>';
+	}
+	echo '</div></div></div>';
+}
+
 function tsvd_anfragen_render_conversation( $id ) {
 	global $wpdb;
 	$table         = tsvd_anfragen_table_name();
@@ -27,21 +76,19 @@ function tsvd_anfragen_render_conversation( $id ) {
 			. '</p></div>';
 	}
 
-	$animal        = $anfrage['animal_id'] ? get_the_title( (int) $anfrage['animal_id'] ) : '';
 	$status_labels = tsvd_anfragen_status_labels();
 	$label         = isset( $status_labels[ $anfrage['status'] ] ) ? $status_labels[ $anfrage['status'] ] : $anfrage['status'];
 
-	echo '<div class="tsvd-conv__head"><h2>' . esc_html( $anfrage['applicant_name'] );
-	if ( $animal ) {
-		echo ' <span class="tsvd-conv__animal">' . esc_html__( 'zu', 'tsvd' ) . ' ' . esc_html( $animal ) . '</span>';
-	}
-	echo '</h2><span class="tsvd-msgr__badge">' . esc_html( $label ) . '</span></div>';
+	echo '<div class="tsvd-conv__head"><h2>' . esc_html( $anfrage['applicant_name'] ) . '</h2>';
+	echo '<span class="tsvd-msgr__badge">' . esc_html( $label ) . '</span></div>';
 
 	echo '<p class="tsvd-conv__contact">' . esc_html( $anfrage['applicant_email'] );
 	if ( ! empty( $anfrage['applicant_phone'] ) ) {
 		echo ' &middot; ' . esc_html( $anfrage['applicant_phone'] );
 	}
 	echo '</p>';
+
+	tsvd_anfragen_render_animal_card( (int) $anfrage['animal_id'] );
 
 	echo '<details class="tsvd-conv__details"><summary>' . esc_html__( 'Angaben aus dem Formular', 'tsvd' ) . '</summary>';
 	tsvd_anfragen_render_payload( $anfrage );
@@ -50,6 +97,25 @@ function tsvd_anfragen_render_conversation( $id ) {
 	tsvd_anfragen_render_replies( $wpdb, $replies_table, $id, $anfrage['applicant_name'] );
 	tsvd_anfragen_render_reply_form( $id );
 	tsvd_anfragen_render_delete_form( $id );
+}
+
+function tsvd_anfragen_field_value_label( $field, $value ) {
+	$options = array();
+	if ( ! empty( $field['options'] ) && is_array( $field['options'] ) ) {
+		$options = $field['options'];
+	} elseif ( function_exists( 'tsvd_get_form_field_types' ) ) {
+		$types = tsvd_get_form_field_types();
+		$type  = isset( $field['type'] ) ? $field['type'] : '';
+		if ( isset( $types[ $type ]['default_options'] ) ) {
+			$options = $types[ $type ]['default_options'];
+		}
+	}
+	foreach ( $options as $option ) {
+		if ( isset( $option['value'] ) && (string) $option['value'] === (string) $value ) {
+			return isset( $option['label'] ) ? $option['label'] : $value;
+		}
+	}
+	return $value;
 }
 
 function tsvd_anfragen_render_payload( $anfrage ) {
@@ -64,9 +130,15 @@ function tsvd_anfragen_render_payload( $anfrage ) {
 			continue;
 		}
 		$label = ! empty( $field['label'] ) ? $field['label'] : $field_id;
-		$val   = $payload[ $field_id ];
-		if ( is_array( $val ) ) {
-			$val = implode( ', ', $val );
+		$raw   = $payload[ $field_id ];
+		if ( is_array( $raw ) ) {
+			$parts = array();
+			foreach ( $raw as $item ) {
+				$parts[] = tsvd_anfragen_field_value_label( $field, $item );
+			}
+			$val = implode( ', ', $parts );
+		} else {
+			$val = tsvd_anfragen_field_value_label( $field, $raw );
 		}
 		echo '<tr><th style="width:240px;">' . esc_html( $label ) . '</th><td>' . esc_html( $val ) . '</td></tr>';
 	}
