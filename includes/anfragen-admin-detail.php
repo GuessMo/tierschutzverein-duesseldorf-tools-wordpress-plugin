@@ -81,7 +81,9 @@ function tsvd_anfragen_render_conversation( $id ) {
 	$label         = isset( $status_labels[ $anfrage['status'] ] ) ? $status_labels[ $anfrage['status'] ] : $anfrage['status'];
 
 	echo '<div class="tsvd-conv__head"><h2>' . esc_html( $anfrage['applicant_name'] ) . '</h2>';
-	echo '<span class="tsvd-msgr__badge">' . esc_html( $label ) . '</span></div>';
+	echo '<span class="tsvd-msgr__badge">' . esc_html( $label ) . '</span>';
+	tsvd_anfragen_render_conversation_actions( $anfrage );
+	echo '</div>';
 
 	echo '<p class="tsvd-conv__contact">' . esc_html( $anfrage['applicant_email'] );
 	if ( ! empty( $anfrage['applicant_phone'] ) ) {
@@ -96,8 +98,11 @@ function tsvd_anfragen_render_conversation( $id ) {
 	echo '</details>';
 
 	tsvd_anfragen_render_replies( $wpdb, $replies_table, $id, $anfrage['applicant_name'] );
-	tsvd_anfragen_render_reply_form( $id );
-	tsvd_anfragen_render_delete_form( $id );
+	if ( ! empty( $anfrage['deleted_at'] ) ) {
+		echo '<p class="tsvd-conv__trash-note">' . esc_html__( 'Diese Anfrage liegt im Papierkorb.', 'tsvd' ) . '</p>';
+	} else {
+		tsvd_anfragen_render_reply_form( $id );
+	}
 }
 
 function tsvd_anfragen_field_value_label( $field, $value ) {
@@ -256,17 +261,29 @@ function tsvd_anfragen_render_reply_form( $id ) {
 	<?php
 }
 
-function tsvd_anfragen_render_delete_form( $id ) {
-	?>
-	<p style="margin-top:2rem;">
-		<form method="post" action="<?php echo esc_url( admin_url( 'admin-post.php' ) ); ?>" onsubmit="return confirm('<?php echo esc_js( __( 'Anfrage wirklich löschen?', 'tsvd' ) ); ?>');">
-			<input type="hidden" name="action" value="tsvd_anfrage_delete">
-			<input type="hidden" name="id" value="<?php echo (int) $id; ?>">
-			<?php wp_nonce_field( 'tsvd_anfrage_delete_' . $id ); ?>
-			<button type="submit" class="button button-link-delete"><?php esc_html_e( 'Anfrage löschen', 'tsvd' ); ?></button>
-		</form>
-	</p>
-	<?php
+function tsvd_anfragen_action_form( $id, $action, $nonce_prefix, $label, $icon = '', $classes = '', $confirm = '' ) {
+	$onsubmit = '' !== $confirm ? ' onsubmit="return confirm(\'' . esc_js( $confirm ) . '\');"' : '';
+	echo '<form method="post" action="' . esc_url( admin_url( 'admin-post.php' ) ) . '"' . $onsubmit . '>';
+	echo '<input type="hidden" name="action" value="' . esc_attr( $action ) . '">';
+	echo '<input type="hidden" name="id" value="' . (int) $id . '">';
+	wp_nonce_field( $nonce_prefix . $id );
+	echo '<button type="submit" class="button button-small ' . esc_attr( $classes ) . '">';
+	if ( '' !== $icon ) {
+		echo '<span class="dashicons ' . esc_attr( $icon ) . '"></span> ';
+	}
+	echo esc_html( $label ) . '</button></form>';
+}
+
+function tsvd_anfragen_render_conversation_actions( $anfrage ) {
+	$id = (int) $anfrage['id'];
+	echo '<span class="tsvd-conv__actions">';
+	if ( ! empty( $anfrage['deleted_at'] ) ) {
+		tsvd_anfragen_action_form( $id, 'tsvd_anfrage_restore', 'tsvd_anfrage_restore_', __( 'Wiederherstellen', 'tsvd' ), 'dashicons-undo' );
+		tsvd_anfragen_action_form( $id, 'tsvd_anfrage_delete', 'tsvd_anfrage_delete_', __( 'Endgültig löschen', 'tsvd' ), '', 'button-link-delete', __( 'Anfrage endgültig löschen? Dies kann nicht rückgängig gemacht werden.', 'tsvd' ) );
+	} else {
+		tsvd_anfragen_action_form( $id, 'tsvd_anfrage_trash', 'tsvd_anfrage_trash_', __( 'In den Papierkorb', 'tsvd' ), 'dashicons-trash', '', __( 'Anfrage in den Papierkorb verschieben?', 'tsvd' ) );
+	}
+	echo '</span>';
 }
 
 /**

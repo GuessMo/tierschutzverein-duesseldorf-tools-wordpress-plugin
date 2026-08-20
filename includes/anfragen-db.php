@@ -16,7 +16,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-const TSVD_ANFRAGEN_DB_VERSION = '1';
+const TSVD_ANFRAGEN_DB_VERSION = '2';
 
 function tsvd_anfragen_table_name() {
 	global $wpdb;
@@ -56,6 +56,7 @@ function tsvd_anfragen_create_tables() {
 		assigned_user_id BIGINT UNSIGNED NULL,
 		created_at DATETIME NOT NULL,
 		updated_at DATETIME NOT NULL,
+		deleted_at DATETIME NULL,
 		PRIMARY KEY  (id),
 		KEY status_created (status,created_at)
 	) {$charset_collate};" );

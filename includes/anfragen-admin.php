@@ -60,7 +60,10 @@ function tsvd_anfragen_render_page() {
 	echo '<div class="wrap"><h1 class="wp-heading-inline">' . esc_html__( 'Anfragen', 'tsvd' ) . '</h1>';
 
 	if ( isset( $_GET['deleted'] ) ) {
-		echo '<div class="notice notice-success is-dismissible"><p>' . esc_html__( 'Anfrage gelöscht.', 'tsvd' ) . '</p></div>';
+		echo '<div class="notice notice-success is-dismissible"><p>' . esc_html__( 'Anfrage endgültig gelöscht.', 'tsvd' ) . '</p></div>';
+	}
+	if ( isset( $_GET['trashed'] ) ) {
+		echo '<div class="notice notice-success is-dismissible"><p>' . esc_html__( 'Anfrage in den Papierkorb verschoben.', 'tsvd' ) . '</p></div>';
 	}
 
 	tsvd_anfragen_messenger_styles();
@@ -136,6 +139,10 @@ function tsvd_anfragen_messenger_styles() {
 		. '.tsvd-msgr__pager .tablenav{height:auto;margin:0;}'
 		. '.tsvd-conv__head{display:flex;align-items:center;gap:10px;flex-wrap:wrap;}'
 		. '.tsvd-conv__head h2{margin:0;}'
+		. '.tsvd-conv__actions{margin-left:auto;display:flex;gap:8px;align-items:center;}'
+		. '.tsvd-conv__actions form{margin:0;}'
+		. '.tsvd-conv__actions .button .dashicons{vertical-align:middle;margin-top:-2px;}'
+		. '.tsvd-conv__trash-note{color:var(--tsvd-chrome-text-muted,#646970);font-style:italic;}'
 		. '.tsvd-conv__animal{font-weight:400;font-size:14px;color:var(--tsvd-chrome-text-muted,#646970);}'
 		. '.tsvd-conv__contact{margin:4px 0 12px;color:var(--tsvd-chrome-text-muted,#646970);}'
 		. '.tsvd-conv__details{margin:0 0 14px;}'
@@ -166,8 +173,13 @@ function tsvd_anfragen_messenger_styles() {
 function tsvd_anfragen_list_where( $status, $search ) {
 	global $wpdb;
 	$clauses = array();
-	if ( $status ) {
-		$clauses[] = $wpdb->prepare( 'status = %s', $status );
+	if ( 'trash' === $status ) {
+		$clauses[] = 'deleted_at IS NOT NULL';
+	} else {
+		$clauses[] = 'deleted_at IS NULL';
+		if ( $status ) {
+			$clauses[] = $wpdb->prepare( 'status = %s', $status );
+		}
 	}
 	if ( '' !== $search ) {
 		$like      = '%' . $wpdb->esc_like( $search ) . '%';
@@ -181,7 +193,7 @@ function tsvd_anfragen_list_where( $status, $search ) {
 			$like
 		);
 	}
-	return $clauses ? ( 'WHERE ' . implode( ' AND ', $clauses ) ) : '';
+	return 'WHERE ' . implode( ' AND ', $clauses );
 }
 
 function tsvd_anfragen_list_base_url() {
@@ -285,6 +297,7 @@ function tsvd_anfragen_render_sidebar( $status, $search, $selected, $pos = 'righ
 		$icon = isset( $status_icons[ $key ] ) ? $status_icons[ $key ] : 'dashicons-marker';
 		echo '<a href="' . esc_url( add_query_arg( 'status', $key, $base_url ) ) . '"' . ( $status === $key ? ' class="current"' : '' ) . ' title="' . esc_attr( $label ) . '" aria-label="' . esc_attr( $label ) . '"><span class="dashicons ' . esc_attr( $icon ) . '"></span></a>';
 	}
+	echo '<a href="' . esc_url( add_query_arg( 'status', 'trash', $base_url ) ) . '"' . ( 'trash' === $status ? ' class="current"' : '' ) . ' title="' . esc_attr__( 'Papierkorb', 'tsvd' ) . '" aria-label="' . esc_attr__( 'Papierkorb', 'tsvd' ) . '"><span class="dashicons dashicons-trash"></span></a>';
 	echo '</div></div>';
 
 	echo '<div class="tsvd-msgr__list">';
@@ -322,19 +335,40 @@ function tsvd_anfragen_render_sidebar( $status, $search, $selected, $pos = 'righ
 	echo '</div>';
 }
 
+add_action( 'admin_post_tsvd_anfrage_trash', 'tsvd_anfragen_handle_trash' );
+add_action( 'admin_post_tsvd_anfrage_restore', 'tsvd_anfragen_handle_restore' );
 add_action( 'admin_post_tsvd_anfrage_delete', 'tsvd_anfragen_handle_delete' );
 
-function tsvd_anfragen_handle_delete() {
+function tsvd_anfragen_check_action( $nonce_prefix ) {
 	if ( ! current_user_can( 'manage_tsvd_anfragen' ) ) {
 		wp_die( '-1' );
 	}
 	$id = isset( $_POST['id'] ) ? absint( $_POST['id'] ) : 0;
-	check_admin_referer( 'tsvd_anfrage_delete_' . $id );
+	check_admin_referer( $nonce_prefix . $id );
+	return $id;
+}
 
+function tsvd_anfragen_handle_trash() {
+	$id = tsvd_anfragen_check_action( 'tsvd_anfrage_trash_' );
+	global $wpdb;
+	$wpdb->update( tsvd_anfragen_table_name(), array( 'deleted_at' => current_time( 'mysql' ) ), array( 'id' => $id ), array( '%s' ), array( '%d' ) );
+	wp_safe_redirect( add_query_arg( 'trashed', '1', tsvd_anfragen_list_base_url() ) );
+	exit;
+}
+
+function tsvd_anfragen_handle_restore() {
+	$id = tsvd_anfragen_check_action( 'tsvd_anfrage_restore_' );
+	global $wpdb;
+	$wpdb->update( tsvd_anfragen_table_name(), array( 'deleted_at' => null ), array( 'id' => $id ), array( '%s' ), array( '%d' ) );
+	wp_safe_redirect( add_query_arg( 'view', $id, tsvd_anfragen_list_base_url() ) );
+	exit;
+}
+
+function tsvd_anfragen_handle_delete() {
+	$id = tsvd_anfragen_check_action( 'tsvd_anfrage_delete_' );
 	global $wpdb;
 	$wpdb->delete( tsvd_anfragen_replies_table_name(), array( 'anfrage_id' => $id ), array( '%d' ) );
 	$wpdb->delete( tsvd_anfragen_table_name(), array( 'id' => $id ), array( '%d' ) );
-
-	wp_safe_redirect( add_query_arg( 'deleted', '1', admin_url( 'edit.php?post_type=animals&page=tsvd-anfragen' ) ) );
+	wp_safe_redirect( add_query_arg( array( 'status' => 'trash', 'deleted' => '1' ), tsvd_anfragen_list_base_url() ) );
 	exit;
 }
