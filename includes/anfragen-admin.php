@@ -9,6 +9,8 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
+const TSVD_ANFRAGEN_PER_PAGE = 25;
+
 add_action( 'admin_menu', 'tsvd_anfragen_admin_menu' );
 
 function tsvd_anfragen_admin_menu() {
@@ -50,18 +52,91 @@ function tsvd_anfragen_render_page() {
 	tsvd_anfragen_render_list();
 }
 
+function tsvd_anfragen_list_where( $status, $search ) {
+	global $wpdb;
+	$clauses = array();
+	if ( $status ) {
+		$clauses[] = $wpdb->prepare( 'status = %s', $status );
+	}
+	if ( '' !== $search ) {
+		$like      = '%' . $wpdb->esc_like( $search ) . '%';
+		$clauses[] = $wpdb->prepare(
+			'( applicant_name LIKE %s OR applicant_email LIKE %s OR applicant_phone LIKE %s'
+			. ' OR animal_id IN ( SELECT ID FROM ' . $wpdb->posts . ' WHERE post_type = %s AND post_title LIKE %s ) )',
+			$like,
+			$like,
+			$like,
+			'animals',
+			$like
+		);
+	}
+	return $clauses ? ( 'WHERE ' . implode( ' AND ', $clauses ) ) : '';
+}
+
+function tsvd_anfragen_list_base_url() {
+	return admin_url( 'edit.php?post_type=animals&page=tsvd-anfragen' );
+}
+
+function tsvd_anfragen_render_search_box( $status, $search ) {
+	echo '<form method="get" class="search-form">';
+	echo '<input type="hidden" name="post_type" value="animals" />';
+	echo '<input type="hidden" name="page" value="tsvd-anfragen" />';
+	if ( $status ) {
+		echo '<input type="hidden" name="status" value="' . esc_attr( $status ) . '" />';
+	}
+	echo '<p class="search-box">';
+	echo '<label class="screen-reader-text" for="tsvd-anfrage-search">' . esc_html__( 'Anfragen durchsuchen', 'tsvd' ) . '</label>';
+	echo '<input type="search" id="tsvd-anfrage-search" name="s" value="' . esc_attr( $search ) . '" placeholder="' . esc_attr__( 'Name, E-Mail, Telefon, Tier', 'tsvd' ) . '" />';
+	echo ' <input type="submit" class="button" value="' . esc_attr__( 'Anfragen durchsuchen', 'tsvd' ) . '" />';
+	echo '</p></form>';
+}
+
+function tsvd_anfragen_render_pagination( $total, $paged, $status, $search ) {
+	$pages = (int) ceil( $total / TSVD_ANFRAGEN_PER_PAGE );
+	$args  = array( 'post_type' => 'animals', 'page' => 'tsvd-anfragen' );
+	if ( $status ) {
+		$args['status'] = $status;
+	}
+	if ( '' !== $search ) {
+		$args['s'] = $search;
+	}
+	$links = paginate_links( array(
+		'base'      => add_query_arg( 'paged', '%#%', add_query_arg( $args, admin_url( 'edit.php' ) ) ),
+		'format'    => '',
+		'prev_text' => '‹',
+		'next_text' => '›',
+		'total'     => max( 1, $pages ),
+		'current'   => $paged,
+	) );
+
+	echo '<div class="tablenav"><div class="tablenav-pages">';
+	echo '<span class="displaying-num">' . esc_html( sprintf( _n( '%s Anfrage', '%s Anfragen', $total, 'tsvd' ), number_format_i18n( $total ) ) ) . '</span>';
+	if ( $links ) {
+		echo '<span class="pagination-links">' . wp_kses_post( $links ) . '</span>';
+	}
+	echo '</div></div>';
+}
+
 function tsvd_anfragen_render_list() {
 	global $wpdb;
 	$table  = tsvd_anfragen_table_name();
 	$status = isset( $_GET['status'] ) ? sanitize_key( $_GET['status'] ) : '';
+	$search = isset( $_GET['s'] ) ? sanitize_text_field( wp_unslash( $_GET['s'] ) ) : '';
 
-	$where = '';
-	if ( $status ) {
-		$where = $wpdb->prepare( 'WHERE status = %s', $status );
+	$where  = tsvd_anfragen_list_where( $status, $search );
+	$total  = (int) $wpdb->get_var( "SELECT COUNT(*) FROM {$table} {$where}" );
+	$pages  = max( 1, (int) ceil( $total / TSVD_ANFRAGEN_PER_PAGE ) );
+	$paged  = max( 1, isset( $_GET['paged'] ) ? absint( $_GET['paged'] ) : 1 );
+	if ( $paged > $pages ) {
+		$paged = $pages;
 	}
-	$rows = $wpdb->get_results( "SELECT * FROM {$table} {$where} ORDER BY created_at DESC LIMIT 200", ARRAY_A );
+	$offset = ( $paged - 1 ) * TSVD_ANFRAGEN_PER_PAGE;
+	$rows   = $wpdb->get_results(
+		$wpdb->prepare( "SELECT * FROM {$table} {$where} ORDER BY created_at DESC LIMIT %d OFFSET %d", TSVD_ANFRAGEN_PER_PAGE, $offset ),
+		ARRAY_A
+	);
 
-	$base_url = admin_url( 'edit.php?post_type=animals&page=tsvd-anfragen' );
+	$base_url = tsvd_anfragen_list_base_url();
 
 	echo '<div class="wrap"><h1>' . esc_html__( 'Anfragen', 'tsvd' ) . '</h1>';
 
@@ -80,10 +155,13 @@ function tsvd_anfragen_render_list() {
 		$is_last = ( $i === $status_count );
 		echo '<li><a href="' . esc_url( add_query_arg( 'status', $key, $base_url ) ) . '"' . ( $status === $key ? ' class="current"' : '' ) . '>' . esc_html( $label ) . '</a>' . ( $is_last ? '' : ' |' ) . '</li>';
 	}
-	echo '</ul><div class="clear"></div>';
+	echo '</ul>';
+
+	tsvd_anfragen_render_search_box( $status, $search );
+	echo '<div class="clear"></div>';
 
 	if ( empty( $rows ) ) {
-		echo '<p>' . esc_html__( 'Keine Anfragen vorhanden.', 'tsvd' ) . '</p></div>';
+		echo '<p>' . esc_html__( 'Keine Anfragen gefunden.', 'tsvd' ) . '</p></div>';
 		return;
 	}
 
@@ -113,7 +191,9 @@ function tsvd_anfragen_render_list() {
 			. '</tr>';
 	}
 
-	echo '</tbody></table></div>';
+	echo '</tbody></table>';
+	tsvd_anfragen_render_pagination( $total, $paged, $status, $search );
+	echo '</div>';
 }
 
 add_action( 'admin_post_tsvd_anfrage_delete', 'tsvd_anfragen_handle_delete' );
