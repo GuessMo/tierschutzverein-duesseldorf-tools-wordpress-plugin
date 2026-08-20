@@ -61,28 +61,64 @@ function tsvd_anfragen_render_payload( $anfrage ) {
 	echo '</tbody></table>';
 }
 
+function tsvd_anfragen_chat_styles() {
+	static $done = false;
+	if ( $done ) {
+		return;
+	}
+	$done = true;
+	echo '<style>'
+		. '.tsvd-chat{display:flex;flex-direction:column;gap:10px;max-width:820px;margin:0 0 16px;}'
+		. '.tsvd-chat__msg{display:flex;}'
+		. '.tsvd-chat__msg--out{justify-content:flex-end;}'
+		. '.tsvd-chat__msg--in{justify-content:flex-start;}'
+		. '.tsvd-chat__msg--note{justify-content:center;}'
+		. '.tsvd-chat__bubble{max-width:78%;padding:8px 12px;border-radius:12px;'
+		. 'border:1px solid var(--tsvd-chrome-border,#c3c4c7);'
+		. 'background:var(--tsvd-chrome-surface,#fff);color:var(--tsvd-chrome-text,#3c434a);}'
+		. '.tsvd-chat__msg--out .tsvd-chat__bubble{background:var(--wp-admin-theme-color,#2271b1);'
+		. 'border-color:var(--wp-admin-theme-color,#2271b1);color:#fff;border-bottom-right-radius:3px;}'
+		. '.tsvd-chat__msg--in .tsvd-chat__bubble{border-bottom-left-radius:3px;}'
+		. '.tsvd-chat__msg--note .tsvd-chat__bubble{max-width:90%;background:transparent;'
+		. 'border-style:dashed;color:var(--tsvd-chrome-text-muted,#646970);font-style:italic;}'
+		. '.tsvd-chat__meta{font-size:11px;opacity:.75;margin-bottom:3px;}'
+		. '.tsvd-chat__body{white-space:pre-wrap;word-wrap:break-word;}'
+		. '.tsvd-chat__empty{color:var(--tsvd-chrome-text-muted,#646970);}'
+		. '</style>';
+}
+
+function tsvd_anfragen_reply_author( $reply, $applicant_name ) {
+	$direction = $reply['direction'];
+	if ( 'in' === $direction ) {
+		return '' !== $applicant_name ? $applicant_name : __( 'Interessent:in', 'tsvd' );
+	}
+	$name = $reply['user_id'] ? get_the_author_meta( 'display_name', $reply['user_id'] ) : __( 'Unbekannt', 'tsvd' );
+	if ( 'note' === $direction ) {
+		return sprintf( __( 'Interne Notiz · %s', 'tsvd' ), $name );
+	}
+	return $name;
+}
+
 function tsvd_anfragen_render_replies( $wpdb, $replies_table, $id, $applicant_name = '' ) {
-	echo '<h2>' . esc_html__( 'Verlauf', 'tsvd' ) . '</h2>';
+	echo '<h2>' . esc_html__( 'Konversation', 'tsvd' ) . '</h2>';
+	tsvd_anfragen_chat_styles();
 	$replies = $wpdb->get_results( $wpdb->prepare( "SELECT * FROM {$replies_table} WHERE anfrage_id = %d ORDER BY sent_at ASC", $id ), ARRAY_A );
 
+	echo '<div class="tsvd-chat">';
 	if ( empty( $replies ) ) {
-		echo '<p>' . esc_html__( 'Noch keine Antworten.', 'tsvd' ) . '</p>';
+		echo '<p class="tsvd-chat__empty">' . esc_html__( 'Noch keine Nachrichten.', 'tsvd' ) . '</p></div>';
 		return;
 	}
 
 	foreach ( $replies as $reply ) {
-		if ( 'in' === $reply['direction'] ) {
-			// Per IMAP-Abruf eingegangene Antwort der interessierten Person (siehe
-			// anfragen-imap-poll.php) — kein WP-Benutzer, applicant_name statt Autor.
-			$author = $applicant_name !== '' ? $applicant_name : __( 'Interessent:in', 'tsvd' );
-		} else {
-			$author = $reply['user_id'] ? get_the_author_meta( 'display_name', $reply['user_id'] ) : __( 'Unbekannt', 'tsvd' );
-		}
-		echo '<div style="border:1px solid #ccd0d4;padding:10px 14px;margin-bottom:10px;background:#fff;' . ( 'in' === $reply['direction'] ? 'border-left:4px solid #2271b1;' : '' ) . '">';
-		echo '<p style="margin:0 0 6px;color:#666;font-size:12px;">' . esc_html( $author ) . ' &middot; ' . esc_html( get_date_from_gmt( $reply['sent_at'], 'Y-m-d H:i' ) ) . '</p>';
-		echo '<p style="margin:0;white-space:pre-wrap;">' . esc_html( $reply['body'] ) . '</p>';
-		echo '</div>';
+		$author = tsvd_anfragen_reply_author( $reply, $applicant_name );
+		$css    = 'tsvd-chat__msg tsvd-chat__msg--' . sanitize_html_class( $reply['direction'] );
+		echo '<div class="' . esc_attr( $css ) . '"><div class="tsvd-chat__bubble">';
+		echo '<div class="tsvd-chat__meta">' . esc_html( $author ) . ' &middot; ' . esc_html( get_date_from_gmt( $reply['sent_at'], 'Y-m-d H:i' ) ) . '</div>';
+		echo '<div class="tsvd-chat__body">' . esc_html( $reply['body'] ) . '</div>';
+		echo '</div></div>';
 	}
+	echo '</div>';
 }
 
 function tsvd_anfragen_render_reply_form( $id ) {
