@@ -179,6 +179,11 @@ function tsvd_anfragen_chat_styles() {
 		. '.tsvd-chat__meta{font-size:11px;opacity:.75;margin-bottom:3px;}'
 		. '.tsvd-chat__body{white-space:pre-wrap;word-wrap:break-word;}'
 		. '.tsvd-chat__empty{color:var(--tsvd-chrome-text-muted,#646970);}'
+		. '.tsvd-composer__modes{display:flex;gap:6px;margin:0 0 8px;}'
+		. '.tsvd-composer__modes .tsvd-composer__mode.is-active{'
+		. 'background:var(--wp-admin-theme-color,#2271b1);'
+		. 'border-color:var(--wp-admin-theme-color,#2271b1);color:#fff;}'
+		. '.tsvd-composer__hint{font-size:12px;color:var(--tsvd-chrome-text-muted,#646970);margin:6px 0;}'
 		. '</style>';
 }
 
@@ -219,8 +224,13 @@ function tsvd_anfragen_render_replies( $wpdb, $replies_table, $id, $applicant_na
 function tsvd_anfragen_render_reply_form( $id ) {
 	$nonce = wp_create_nonce( 'tsvd_anfrage_reply_' . $id );
 	?>
-	<h2><?php esc_html_e( 'Antworten', 'tsvd' ); ?></h2>
+	<h2><?php esc_html_e( 'Nachricht', 'tsvd' ); ?></h2>
+	<div class="tsvd-composer__modes">
+		<button type="button" class="button tsvd-composer__mode is-active" data-mode="reply"><?php esc_html_e( 'Antwort', 'tsvd' ); ?></button>
+		<button type="button" class="button tsvd-composer__mode" data-mode="note"><?php esc_html_e( 'Interne Notiz', 'tsvd' ); ?></button>
+	</div>
 	<textarea id="tsvd-anfrage-reply-body" class="widefat" rows="6"></textarea>
+	<p class="tsvd-composer__hint" id="tsvd-anfrage-hint"><?php esc_html_e( 'Wird per E-Mail an den Interessenten gesendet.', 'tsvd' ); ?></p>
 	<p>
 		<button type="button" class="button button-primary" id="tsvd-anfrage-reply-send" data-id="<?php echo esc_attr( $id ); ?>" data-nonce="<?php echo esc_attr( $nonce ); ?>">
 			<?php esc_html_e( 'Antwort senden', 'tsvd' ); ?>
@@ -232,15 +242,35 @@ function tsvd_anfragen_render_reply_form( $id ) {
 		var btn = document.getElementById( 'tsvd-anfrage-reply-send' );
 		var result = document.getElementById( 'tsvd-anfrage-reply-result' );
 		var body = document.getElementById( 'tsvd-anfrage-reply-body' );
+		var hint = document.getElementById( 'tsvd-anfrage-hint' );
+		var modes = document.querySelectorAll( '.tsvd-composer__mode' );
 		if ( ! btn ) return;
+		var mode = 'reply';
+		var labels = {
+			reply: '<?php echo esc_js( __( 'Antwort senden', 'tsvd' ) ); ?>',
+			note: '<?php echo esc_js( __( 'Notiz speichern', 'tsvd' ) ); ?>'
+		};
+		var hints = {
+			reply: '<?php echo esc_js( __( 'Wird per E-Mail an den Interessenten gesendet.', 'tsvd' ) ); ?>',
+			note: '<?php echo esc_js( __( 'Nur intern sichtbar, wird nicht an den Interessenten gesendet.', 'tsvd' ) ); ?>'
+		};
+		modes.forEach( function ( b ) {
+			b.addEventListener( 'click', function () {
+				mode = b.getAttribute( 'data-mode' );
+				modes.forEach( function ( x ) { x.classList.toggle( 'is-active', x === b ); } );
+				btn.textContent = labels[ mode ];
+				hint.textContent = hints[ mode ];
+			} );
+		} );
 		btn.addEventListener( 'click', function () {
 			btn.disabled = true;
 			result.textContent = '...';
-			result.style.color = '#666';
+			result.style.color = '#646970';
 			jQuery.post( ajaxurl, {
 				action: 'tsvd_anfrage_reply',
 				id: btn.getAttribute( 'data-id' ),
 				nonce: btn.getAttribute( 'data-nonce' ),
+				mode: mode,
 				body: body.value
 			}, function ( response ) {
 				btn.disabled = false;
@@ -363,12 +393,43 @@ function tsvd_ajax_anfrage_reply() {
 		wp_send_json_error( array( 'message' => __( 'Sicherheitsfehler.', 'tsvd' ) ) );
 	}
 
-	$body   = isset( $_POST['body'] ) ? sanitize_textarea_field( wp_unslash( $_POST['body'] ) ) : '';
-	$result = tsvd_anfragen_send_reply( $id, $body, get_current_user_id() );
+	$body = isset( $_POST['body'] ) ? sanitize_textarea_field( wp_unslash( $_POST['body'] ) ) : '';
+	$mode = ( isset( $_POST['mode'] ) && 'note' === $_POST['mode'] ) ? 'note' : 'reply';
+
+	if ( 'note' === $mode ) {
+		$result  = tsvd_anfragen_add_note( $id, $body, get_current_user_id() );
+		$success = __( 'Notiz gespeichert.', 'tsvd' );
+	} else {
+		$result  = tsvd_anfragen_send_reply( $id, $body, get_current_user_id() );
+		$success = __( 'Antwort gesendet.', 'tsvd' );
+	}
 
 	if ( is_wp_error( $result ) ) {
 		wp_send_json_error( array( 'message' => $result->get_error_message() ) );
 	}
 
-	wp_send_json_success( array( 'message' => __( 'Antwort gesendet.', 'tsvd' ) ) );
+	wp_send_json_success( array( 'message' => $success ) );
+}
+
+function tsvd_anfragen_add_note( $id, $body, $user_id = 0 ) {
+	if ( '' === trim( $body ) ) {
+		return new WP_Error( 'empty_body', __( 'Notiz darf nicht leer sein.', 'tsvd' ) );
+	}
+	global $wpdb;
+	$exists = $wpdb->get_var( $wpdb->prepare( 'SELECT id FROM ' . tsvd_anfragen_table_name() . ' WHERE id = %d', $id ) );
+	if ( ! $exists ) {
+		return new WP_Error( 'not_found', __( 'Anfrage nicht gefunden.', 'tsvd' ) );
+	}
+	$wpdb->insert(
+		tsvd_anfragen_replies_table_name(),
+		array(
+			'anfrage_id' => $id,
+			'user_id'    => $user_id ?: null,
+			'direction'  => 'note',
+			'body'       => $body,
+			'sent_at'    => current_time( 'mysql' ),
+		),
+		array( '%d', '%d', '%s', '%s', '%s' )
+	);
+	return true;
 }
