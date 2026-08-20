@@ -5,6 +5,8 @@
     --tsvd-chrome-border: #c3c4c7;
     --tsvd-chrome-heading: #1d2327;
     --tsvd-chrome-text-muted: #646970;
+    --tsvd-chrome-badge-bg: #e5f0fb;
+    --tsvd-chrome-badge-text: #135e96;
     --tsvd-link: #2145e6;
     --tsvd-number-spin-filter: none;
 }
@@ -16,6 +18,8 @@
     --tsvd-chrome-border: #3c3f43;
     --tsvd-chrome-heading: #f0f0f1;
     --tsvd-chrome-text-muted: #9a9ea6;
+    --tsvd-chrome-badge-bg: #1d3a5c;
+    --tsvd-chrome-badge-text: #7cb8f2;
     --tsvd-link: #8aa8ff;
     --tsvd-number-spin-filter: invert(1);
 }
@@ -28,6 +32,8 @@
         --tsvd-chrome-border: #3c3f43;
         --tsvd-chrome-heading: #f0f0f1;
         --tsvd-chrome-text-muted: #9a9ea6;
+        --tsvd-chrome-badge-bg: #1d3a5c;
+        --tsvd-chrome-badge-text: #7cb8f2;
         --tsvd-link: #8aa8ff;
         --tsvd-number-spin-filter: invert(1);
     }
