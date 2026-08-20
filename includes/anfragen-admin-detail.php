@@ -9,19 +9,14 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-function tsvd_anfragen_render_detail( $id ) {
+function tsvd_anfragen_render_conversation( $id ) {
 	global $wpdb;
 	$table         = tsvd_anfragen_table_name();
 	$replies_table = tsvd_anfragen_replies_table_name();
-	$list_url      = admin_url( 'edit.php?post_type=animals&page=tsvd-anfragen' );
 
 	$anfrage = $wpdb->get_row( $wpdb->prepare( "SELECT * FROM {$table} WHERE id = %d", $id ), ARRAY_A );
-
-	echo '<div class="wrap"><h1>' . esc_html__( 'Anfrage', 'tsvd' ) . '</h1>';
-	echo '<p><a href="' . esc_url( $list_url ) . '">&laquo; ' . esc_html__( 'Zurück zur Liste', 'tsvd' ) . '</a></p>';
-
 	if ( ! $anfrage ) {
-		echo '<p>' . esc_html__( 'Anfrage nicht gefunden.', 'tsvd' ) . '</p></div>';
+		echo '<div class="tsvd-msgr__empty"><p>' . esc_html__( 'Anfrage nicht gefunden.', 'tsvd' ) . '</p></div>';
 		return;
 	}
 
@@ -32,12 +27,29 @@ function tsvd_anfragen_render_detail( $id ) {
 			. '</p></div>';
 	}
 
+	$animal        = $anfrage['animal_id'] ? get_the_title( (int) $anfrage['animal_id'] ) : '';
+	$status_labels = tsvd_anfragen_status_labels();
+	$label         = isset( $status_labels[ $anfrage['status'] ] ) ? $status_labels[ $anfrage['status'] ] : $anfrage['status'];
+
+	echo '<div class="tsvd-conv__head"><h2>' . esc_html( $anfrage['applicant_name'] );
+	if ( $animal ) {
+		echo ' <span class="tsvd-conv__animal">' . esc_html__( 'zu', 'tsvd' ) . ' ' . esc_html( $animal ) . '</span>';
+	}
+	echo '</h2><span class="tsvd-msgr__badge">' . esc_html( $label ) . '</span></div>';
+
+	echo '<p class="tsvd-conv__contact">' . esc_html( $anfrage['applicant_email'] );
+	if ( ! empty( $anfrage['applicant_phone'] ) ) {
+		echo ' &middot; ' . esc_html( $anfrage['applicant_phone'] );
+	}
+	echo '</p>';
+
+	echo '<details class="tsvd-conv__details"><summary>' . esc_html__( 'Angaben aus dem Formular', 'tsvd' ) . '</summary>';
 	tsvd_anfragen_render_payload( $anfrage );
+	echo '</details>';
+
 	tsvd_anfragen_render_replies( $wpdb, $replies_table, $id, $anfrage['applicant_name'] );
 	tsvd_anfragen_render_reply_form( $id );
 	tsvd_anfragen_render_delete_form( $id );
-
-	echo '</div>';
 }
 
 function tsvd_anfragen_render_payload( $anfrage ) {

@@ -41,15 +41,74 @@ function tsvd_anfragen_render_page() {
 		return;
 	}
 
-	$view_raw = isset( $_GET['view'] ) ? sanitize_key( $_GET['view'] ) : '';
+	$selected = absint( isset( $_GET['view'] ) ? $_GET['view'] : 0 );
+	$status   = isset( $_GET['status'] ) ? sanitize_key( $_GET['status'] ) : '';
+	$search   = isset( $_GET['s'] ) ? sanitize_text_field( wp_unslash( $_GET['s'] ) ) : '';
 
-	$view = absint( $view_raw );
-	if ( $view ) {
-		tsvd_anfragen_render_detail( $view );
-		return;
+	echo '<div class="wrap"><h1 class="wp-heading-inline">' . esc_html__( 'Anfragen', 'tsvd' ) . '</h1>';
+
+	if ( isset( $_GET['deleted'] ) ) {
+		echo '<div class="notice notice-success is-dismissible"><p>' . esc_html__( 'Anfrage gelöscht.', 'tsvd' ) . '</p></div>';
 	}
 
-	tsvd_anfragen_render_list();
+	tsvd_anfragen_messenger_styles();
+
+	echo '<div class="tsvd-msgr">';
+	tsvd_anfragen_render_sidebar( $status, $search, $selected );
+	echo '<div class="tsvd-msgr__main">';
+	if ( $selected ) {
+		tsvd_anfragen_render_conversation( $selected );
+	} else {
+		echo '<div class="tsvd-msgr__empty"><p>' . esc_html__( 'Wähle links eine Konversation aus.', 'tsvd' ) . '</p></div>';
+	}
+	echo '</div></div></div>';
+}
+
+function tsvd_anfragen_messenger_styles() {
+	static $done = false;
+	if ( $done ) {
+		return;
+	}
+	$done = true;
+	echo '<style>'
+		. '.tsvd-msgr{display:flex;border:1px solid var(--tsvd-chrome-border,#c3c4c7);'
+		. 'background:var(--tsvd-chrome-surface,#fff);border-radius:4px;overflow:hidden;'
+		. 'height:calc(100vh - 200px);min-height:440px;margin-top:12px;}'
+		. '.tsvd-msgr__side{width:340px;flex:0 0 340px;display:flex;flex-direction:column;'
+		. 'border-right:1px solid var(--tsvd-chrome-border,#c3c4c7);background:var(--tsvd-chrome-canvas,#f0f0f0);}'
+		. '.tsvd-msgr__side-head{padding:10px;border-bottom:1px solid var(--tsvd-chrome-border,#c3c4c7);}'
+		. '.tsvd-msgr__side-head .search-box{display:flex;gap:6px;margin:0;}'
+		. '.tsvd-msgr__side-head input[type=search]{flex:1;}'
+		. '.tsvd-msgr__filters{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px;font-size:12px;}'
+		. '.tsvd-msgr__filters a{text-decoration:none;padding:2px 8px;border-radius:10px;'
+		. 'color:var(--tsvd-chrome-text-muted,#646970);}'
+		. '.tsvd-msgr__filters a.current{background:var(--wp-admin-theme-color,#2271b1);color:#fff;}'
+		. '.tsvd-msgr__list{overflow-y:auto;flex:1;}'
+		. '.tsvd-msgr__item{display:block;text-decoration:none;padding:10px 12px;'
+		. 'border-bottom:1px solid var(--tsvd-chrome-border,#c3c4c7);color:var(--tsvd-chrome-text,#3c434a);}'
+		. '.tsvd-msgr__item:hover{background:var(--tsvd-chrome-surface,#fff);}'
+		. '.tsvd-msgr__item.is-active{background:var(--tsvd-chrome-surface,#fff);'
+		. 'box-shadow:inset 3px 0 0 var(--wp-admin-theme-color,#2271b1);}'
+		. '.tsvd-msgr__item-top{display:flex;justify-content:space-between;gap:8px;}'
+		. '.tsvd-msgr__name{font-weight:600;}'
+		. '.tsvd-msgr__time{font-size:11px;color:var(--tsvd-chrome-text-muted,#646970);white-space:nowrap;}'
+		. '.tsvd-msgr__sub{font-size:12px;color:var(--tsvd-chrome-text-muted,#646970);'
+		. 'margin-top:2px;display:flex;justify-content:space-between;gap:8px;}'
+		. '.tsvd-msgr__badge{font-size:11px;padding:1px 7px;border-radius:9px;'
+		. 'background:var(--tsvd-chrome-canvas,#f0f0f0);border:1px solid var(--tsvd-chrome-border,#c3c4c7);}'
+		. '.tsvd-msgr__main{flex:1;display:flex;flex-direction:column;overflow-y:auto;padding:16px;min-width:0;}'
+		. '.tsvd-msgr__empty{margin:auto;color:var(--tsvd-chrome-text-muted,#646970);}'
+		. '.tsvd-msgr__pager{padding:6px;border-top:1px solid var(--tsvd-chrome-border,#c3c4c7);}'
+		. '.tsvd-msgr__pager .tablenav{height:auto;margin:0;}'
+		. '.tsvd-conv__head{display:flex;align-items:center;gap:10px;flex-wrap:wrap;}'
+		. '.tsvd-conv__head h2{margin:0;}'
+		. '.tsvd-conv__animal{font-weight:400;font-size:14px;color:var(--tsvd-chrome-text-muted,#646970);}'
+		. '.tsvd-conv__contact{margin:4px 0 12px;color:var(--tsvd-chrome-text-muted,#646970);}'
+		. '.tsvd-conv__details{margin:0 0 14px;}'
+		. '.tsvd-conv__details summary{cursor:pointer;color:var(--wp-admin-theme-color,#2271b1);}'
+		. '@media(max-width:782px){.tsvd-msgr{flex-direction:column;height:auto;}'
+		. '.tsvd-msgr__side{width:auto;flex:none;max-height:320px;}}'
+		. '</style>';
 }
 
 function tsvd_anfragen_list_where( $status, $search ) {
@@ -87,7 +146,7 @@ function tsvd_anfragen_render_search_box( $status, $search ) {
 	echo '<p class="search-box">';
 	echo '<label class="screen-reader-text" for="tsvd-anfrage-search">' . esc_html__( 'Anfragen durchsuchen', 'tsvd' ) . '</label>';
 	echo '<input type="search" id="tsvd-anfrage-search" name="s" value="' . esc_attr( $search ) . '" placeholder="' . esc_attr__( 'Name, E-Mail, Telefon, Tier', 'tsvd' ) . '" />';
-	echo ' <input type="submit" class="button" value="' . esc_attr__( 'Anfragen durchsuchen', 'tsvd' ) . '" />';
+	echo ' <input type="submit" class="button" value="' . esc_attr__( 'Suchen', 'tsvd' ) . '" />';
 	echo '</p></form>';
 }
 
@@ -117,12 +176,9 @@ function tsvd_anfragen_render_pagination( $total, $paged, $status, $search ) {
 	echo '</div></div>';
 }
 
-function tsvd_anfragen_render_list() {
+function tsvd_anfragen_render_sidebar( $status, $search, $selected ) {
 	global $wpdb;
 	$table  = tsvd_anfragen_table_name();
-	$status = isset( $_GET['status'] ) ? sanitize_key( $_GET['status'] ) : '';
-	$search = isset( $_GET['s'] ) ? sanitize_text_field( wp_unslash( $_GET['s'] ) ) : '';
-
 	$where  = tsvd_anfragen_list_where( $status, $search );
 	$total  = (int) $wpdb->get_var( "SELECT COUNT(*) FROM {$table} {$where}" );
 	$pages  = max( 1, (int) ceil( $total / TSVD_ANFRAGEN_PER_PAGE ) );
@@ -136,63 +192,51 @@ function tsvd_anfragen_render_list() {
 		ARRAY_A
 	);
 
-	$base_url = tsvd_anfragen_list_base_url();
-
-	echo '<div class="wrap"><h1>' . esc_html__( 'Anfragen', 'tsvd' ) . '</h1>';
-
-	if ( isset( $_GET['deleted'] ) ) {
-		echo '<div class="notice notice-success is-dismissible"><p>' . esc_html__( 'Anfrage gelöscht.', 'tsvd' ) . '</p></div>';
-	}
-
+	$base_url      = tsvd_anfragen_list_base_url();
 	$status_labels = tsvd_anfragen_status_labels();
-	$status_count  = count( $status_labels );
 
-	echo '<ul class="subsubsub">';
-	echo '<li><a href="' . esc_url( $base_url ) . '"' . ( '' === $status ? ' class="current"' : '' ) . '>' . esc_html__( 'Alle', 'tsvd' ) . '</a> |</li>';
-	$i = 0;
-	foreach ( $status_labels as $key => $label ) {
-		$i++;
-		$is_last = ( $i === $status_count );
-		echo '<li><a href="' . esc_url( add_query_arg( 'status', $key, $base_url ) ) . '"' . ( $status === $key ? ' class="current"' : '' ) . '>' . esc_html( $label ) . '</a>' . ( $is_last ? '' : ' |' ) . '</li>';
-	}
-	echo '</ul>';
-
+	echo '<div class="tsvd-msgr__side">';
+	echo '<div class="tsvd-msgr__side-head">';
 	tsvd_anfragen_render_search_box( $status, $search );
-	echo '<div class="clear"></div>';
+	echo '<div class="tsvd-msgr__filters">';
+	echo '<a href="' . esc_url( $base_url ) . '"' . ( '' === $status ? ' class="current"' : '' ) . '>' . esc_html__( 'Alle', 'tsvd' ) . '</a>';
+	foreach ( $status_labels as $key => $label ) {
+		echo '<a href="' . esc_url( add_query_arg( 'status', $key, $base_url ) ) . '"' . ( $status === $key ? ' class="current"' : '' ) . '>' . esc_html( $label ) . '</a>';
+	}
+	echo '</div></div>';
 
+	echo '<div class="tsvd-msgr__list">';
 	if ( empty( $rows ) ) {
-		echo '<p>' . esc_html__( 'Keine Anfragen gefunden.', 'tsvd' ) . '</p></div>';
-		return;
+		echo '<p class="tsvd-msgr__empty" style="padding:12px;">' . esc_html__( 'Keine Anfragen gefunden.', 'tsvd' ) . '</p>';
+	} else {
+		foreach ( $rows as $row ) {
+			$args = array( 'view' => (int) $row['id'] );
+			if ( $status ) {
+				$args['status'] = $status;
+			}
+			if ( '' !== $search ) {
+				$args['s'] = $search;
+			}
+			$url    = add_query_arg( $args, $base_url );
+			$active = ( (int) $row['id'] === $selected ) ? ' is-active' : '';
+			$animal = $row['animal_id'] ? get_the_title( (int) $row['animal_id'] ) : '';
+			$label  = isset( $status_labels[ $row['status'] ] ) ? $status_labels[ $row['status'] ] : $row['status'];
+
+			echo '<a class="tsvd-msgr__item' . $active . '" href="' . esc_url( $url ) . '">';
+			echo '<div class="tsvd-msgr__item-top"><span class="tsvd-msgr__name">' . esc_html( $row['applicant_name'] ) . '</span>';
+			echo '<span class="tsvd-msgr__time">' . esc_html( get_date_from_gmt( $row['created_at'], 'd.m.Y' ) ) . '</span></div>';
+			echo '<div class="tsvd-msgr__sub"><span>' . esc_html( $animal ? $animal : '—' ) . '</span>';
+			echo '<span class="tsvd-msgr__badge">' . esc_html( $label ) . '</span></div>';
+			echo '</a>';
+		}
 	}
+	echo '</div>';
 
-	echo '<table class="wp-list-table widefat fixed striped"><thead><tr>'
-		. '<th>' . esc_html__( 'Datum', 'tsvd' ) . '</th>'
-		. '<th>' . esc_html__( 'Formular', 'tsvd' ) . '</th>'
-		. '<th>' . esc_html__( 'Tier', 'tsvd' ) . '</th>'
-		. '<th>' . esc_html__( 'Name', 'tsvd' ) . '</th>'
-		. '<th>' . esc_html__( 'E-Mail', 'tsvd' ) . '</th>'
-		. '<th>' . esc_html__( 'Status', 'tsvd' ) . '</th>'
-		. '<th></th></tr></thead><tbody>';
-
-	foreach ( $rows as $row ) {
-		$detail_url  = add_query_arg( 'view', $row['id'], $base_url );
-		$form_title  = get_the_title( (int) $row['form_id'] );
-		$animal_name = $row['animal_id'] ? get_the_title( (int) $row['animal_id'] ) : '';
-		$label       = isset( $status_labels[ $row['status'] ] ) ? $status_labels[ $row['status'] ] : $row['status'];
-
-		echo '<tr>'
-			. '<td>' . esc_html( get_date_from_gmt( $row['created_at'], 'Y-m-d H:i' ) ) . '</td>'
-			. '<td>' . esc_html( $form_title ? $form_title : '#' . $row['form_id'] ) . '</td>'
-			. '<td>' . esc_html( $animal_name ) . '</td>'
-			. '<td>' . esc_html( $row['applicant_name'] ) . '</td>'
-			. '<td>' . esc_html( $row['applicant_email'] ) . '</td>'
-			. '<td>' . esc_html( $label ) . '</td>'
-			. '<td><a href="' . esc_url( $detail_url ) . '" class="button button-small">' . esc_html__( 'Ansehen', 'tsvd' ) . '</a></td>'
-			. '</tr>';
+	if ( $pages > 1 ) {
+		echo '<div class="tsvd-msgr__pager">';
+		tsvd_anfragen_render_pagination( $total, $paged, $status, $search );
+		echo '</div>';
 	}
-
-	echo '</tbody></table>';
-	tsvd_anfragen_render_pagination( $total, $paged, $status, $search );
 	echo '</div>';
 }
 
