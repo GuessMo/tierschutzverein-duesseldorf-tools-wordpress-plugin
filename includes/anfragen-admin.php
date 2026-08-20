@@ -36,6 +36,17 @@ function tsvd_anfragen_status_labels() {
 	);
 }
 
+function tsvd_anfragen_sidebar_pos() {
+	$user_id = get_current_user_id();
+	if ( isset( $_GET['msgr_side'] ) ) {
+		$new = 'left' === $_GET['msgr_side'] ? 'left' : 'right';
+		update_user_meta( $user_id, 'tsvd_anfragen_sidebar_pos', $new );
+		return $new;
+	}
+	$pos = get_user_meta( $user_id, 'tsvd_anfragen_sidebar_pos', true );
+	return 'left' === $pos ? 'left' : 'right';
+}
+
 function tsvd_anfragen_render_page() {
 	if ( ! current_user_can( 'manage_tsvd_anfragen' ) ) {
 		return;
@@ -44,6 +55,7 @@ function tsvd_anfragen_render_page() {
 	$selected = absint( isset( $_GET['view'] ) ? $_GET['view'] : 0 );
 	$status   = isset( $_GET['status'] ) ? sanitize_key( $_GET['status'] ) : '';
 	$search   = isset( $_GET['s'] ) ? sanitize_text_field( wp_unslash( $_GET['s'] ) ) : '';
+	$pos      = tsvd_anfragen_sidebar_pos();
 
 	echo '<div class="wrap"><h1 class="wp-heading-inline">' . esc_html__( 'Anfragen', 'tsvd' ) . '</h1>';
 
@@ -53,8 +65,8 @@ function tsvd_anfragen_render_page() {
 
 	tsvd_anfragen_messenger_styles();
 
-	echo '<div class="tsvd-msgr">';
-	tsvd_anfragen_render_sidebar( $status, $search, $selected );
+	echo '<div class="tsvd-msgr tsvd-msgr--' . esc_attr( $pos ) . '">';
+	tsvd_anfragen_render_sidebar( $status, $search, $selected, $pos );
 	echo '<div class="tsvd-msgr__main">';
 	if ( $selected ) {
 		tsvd_anfragen_render_conversation( $selected );
@@ -73,16 +85,35 @@ function tsvd_anfragen_messenger_styles() {
 	echo '<style>'
 		. '.tsvd-msgr{display:flex;border:1px solid var(--tsvd-chrome-border,#c3c4c7);'
 		. 'background:var(--tsvd-chrome-surface,#fff);border-radius:4px;overflow:hidden;'
-		. 'height:calc(100vh - 200px);min-height:440px;margin-top:12px;}'
+		. 'height:calc(100vh - 150px);min-height:480px;margin:10px -20px 0 -20px;}'
+		. '.tsvd-msgr--right{flex-direction:row-reverse;}'
+		. '.tsvd-msgr--left{flex-direction:row;}'
 		. '.tsvd-msgr__side{width:340px;flex:0 0 340px;display:flex;flex-direction:column;'
 		. 'border-right:1px solid var(--tsvd-chrome-border,#c3c4c7);background:var(--tsvd-chrome-canvas,#f0f0f0);}'
+		. '.tsvd-msgr--right .tsvd-msgr__side{border-right:0;'
+		. 'border-left:1px solid var(--tsvd-chrome-border,#c3c4c7);}'
 		. '.tsvd-msgr__side-head{padding:10px;border-bottom:1px solid var(--tsvd-chrome-border,#c3c4c7);}'
-		. '.tsvd-msgr__side-head .search-box{display:flex;gap:6px;margin:0;}'
-		. '.tsvd-msgr__side-head input[type=search]{flex:1;}'
-		. '.tsvd-msgr__filters{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px;font-size:12px;}'
-		. '.tsvd-msgr__filters a{text-decoration:none;padding:2px 8px;border-radius:10px;'
-		. 'color:var(--tsvd-chrome-text-muted,#646970);}'
-		. '.tsvd-msgr__filters a.current{background:var(--wp-admin-theme-color,#2271b1);color:#fff;}'
+		. '.tsvd-msgr__side-bar{display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;}'
+		. '.tsvd-msgr__side-title{font-weight:600;font-size:11px;text-transform:uppercase;'
+		. 'letter-spacing:.03em;color:var(--tsvd-chrome-text-muted,#646970);}'
+		. '.tsvd-msgr__pos{display:inline-flex;align-items:center;justify-content:center;width:30px;'
+		. 'height:28px;border:1px solid var(--tsvd-chrome-border,#c3c4c7);border-radius:4px;'
+		. 'color:var(--tsvd-chrome-text-muted,#646970);text-decoration:none;}'
+		. '.tsvd-msgr__side-head .search-box{display:flex;gap:6px;margin:0;align-items:stretch;'
+		. 'float:none;width:100%;box-sizing:border-box;}'
+		. '.tsvd-msgr__side-head .search-box input[type=search]{flex:1;min-width:0;}'
+		. '.tsvd-msgr__search-btn{flex:0 0 auto;display:inline-flex;align-items:center;'
+		. 'justify-content:center;width:36px;padding:0;}'
+		. '.tsvd-msgr__filters{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px;'
+		. 'width:100%;box-sizing:border-box;}'
+		. '.tsvd-msgr__filters a{display:inline-flex;align-items:center;justify-content:center;'
+		. 'width:36px;height:30px;border:1px solid var(--tsvd-chrome-border,#c3c4c7);'
+		. 'border-radius:4px;color:var(--tsvd-chrome-text-muted,#646970);text-decoration:none;}'
+		. '.tsvd-msgr__filters a.current{background:var(--wp-admin-theme-color,#2271b1);'
+		. 'border-color:var(--wp-admin-theme-color,#2271b1);color:#fff;}'
+		. '.tsvd-msgr__filters .dashicons,.tsvd-msgr__pos .dashicons,'
+		. '.tsvd-msgr__search-btn .dashicons{display:block;width:18px;height:18px;'
+		. 'font-size:18px;line-height:18px;}'
 		. '.tsvd-msgr__list{overflow-y:auto;flex:1;}'
 		. '.tsvd-msgr__item{display:block;text-decoration:none;padding:10px 12px;'
 		. 'border-bottom:1px solid var(--tsvd-chrome-border,#c3c4c7);color:var(--tsvd-chrome-text,#3c434a);}'
@@ -146,7 +177,7 @@ function tsvd_anfragen_render_search_box( $status, $search ) {
 	echo '<p class="search-box">';
 	echo '<label class="screen-reader-text" for="tsvd-anfrage-search">' . esc_html__( 'Anfragen durchsuchen', 'tsvd' ) . '</label>';
 	echo '<input type="search" id="tsvd-anfrage-search" name="s" value="' . esc_attr( $search ) . '" placeholder="' . esc_attr__( 'Name, E-Mail, Telefon, Tier', 'tsvd' ) . '" />';
-	echo ' <input type="submit" class="button" value="' . esc_attr__( 'Suchen', 'tsvd' ) . '" />';
+	echo '<button type="submit" class="button tsvd-msgr__search-btn" title="' . esc_attr__( 'Anfragen durchsuchen', 'tsvd' ) . '" aria-label="' . esc_attr__( 'Anfragen durchsuchen', 'tsvd' ) . '"><span class="dashicons dashicons-search"></span></button>';
 	echo '</p></form>';
 }
 
@@ -176,7 +207,7 @@ function tsvd_anfragen_render_pagination( $total, $paged, $status, $search ) {
 	echo '</div></div>';
 }
 
-function tsvd_anfragen_render_sidebar( $status, $search, $selected ) {
+function tsvd_anfragen_render_sidebar( $status, $search, $selected, $pos = 'right' ) {
 	global $wpdb;
 	$table  = tsvd_anfragen_table_name();
 	$where  = tsvd_anfragen_list_where( $status, $search );
@@ -195,13 +226,43 @@ function tsvd_anfragen_render_sidebar( $status, $search, $selected ) {
 	$base_url      = tsvd_anfragen_list_base_url();
 	$status_labels = tsvd_anfragen_status_labels();
 
+	$keep = array();
+	if ( $selected ) {
+		$keep['view'] = $selected;
+	}
+	if ( $status ) {
+		$keep['status'] = $status;
+	}
+	if ( '' !== $search ) {
+		$keep['s'] = $search;
+	}
+	$opposite    = 'right' === $pos ? 'left' : 'right';
+	$toggle_url  = add_query_arg( array_merge( $keep, array( 'msgr_side' => $opposite ) ), $base_url );
+	$toggle_icon = 'right' === $pos ? 'dashicons-align-pull-left' : 'dashicons-align-pull-right';
+	$toggle_lbl  = 'right' === $pos ? __( 'Seitenleiste nach links', 'tsvd' ) : __( 'Seitenleiste nach rechts', 'tsvd' );
+
+	$status_icons = array(
+		'new'         => 'dashicons-marker',
+		'in_progress' => 'dashicons-update',
+		'answered'    => 'dashicons-yes',
+		'closed'      => 'dashicons-lock',
+	);
+
 	echo '<div class="tsvd-msgr__side">';
 	echo '<div class="tsvd-msgr__side-head">';
+
+	echo '<div class="tsvd-msgr__side-bar">';
+	echo '<span class="tsvd-msgr__side-title">' . esc_html__( 'Konversationen', 'tsvd' ) . '</span>';
+	echo '<a class="tsvd-msgr__pos" href="' . esc_url( $toggle_url ) . '" title="' . esc_attr( $toggle_lbl ) . '" aria-label="' . esc_attr( $toggle_lbl ) . '"><span class="dashicons ' . esc_attr( $toggle_icon ) . '"></span></a>';
+	echo '</div>';
+
 	tsvd_anfragen_render_search_box( $status, $search );
+
 	echo '<div class="tsvd-msgr__filters">';
-	echo '<a href="' . esc_url( $base_url ) . '"' . ( '' === $status ? ' class="current"' : '' ) . '>' . esc_html__( 'Alle', 'tsvd' ) . '</a>';
+	echo '<a href="' . esc_url( $base_url ) . '"' . ( '' === $status ? ' class="current"' : '' ) . ' title="' . esc_attr__( 'Alle', 'tsvd' ) . '" aria-label="' . esc_attr__( 'Alle', 'tsvd' ) . '"><span class="dashicons dashicons-menu-alt"></span></a>';
 	foreach ( $status_labels as $key => $label ) {
-		echo '<a href="' . esc_url( add_query_arg( 'status', $key, $base_url ) ) . '"' . ( $status === $key ? ' class="current"' : '' ) . '>' . esc_html( $label ) . '</a>';
+		$icon = isset( $status_icons[ $key ] ) ? $status_icons[ $key ] : 'dashicons-marker';
+		echo '<a href="' . esc_url( add_query_arg( 'status', $key, $base_url ) ) . '"' . ( $status === $key ? ' class="current"' : '' ) . ' title="' . esc_attr( $label ) . '" aria-label="' . esc_attr( $label ) . '"><span class="dashicons ' . esc_attr( $icon ) . '"></span></a>';
 	}
 	echo '</div></div>';
 
