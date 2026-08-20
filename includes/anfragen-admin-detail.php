@@ -129,7 +129,7 @@ function tsvd_anfragen_render_payload( $anfrage ) {
 	$payload = json_decode( $anfrage['payload'], true );
 	$fields  = tsvd_get_form_fields( (int) $anfrage['form_id'] );
 
-	echo '<h2>' . esc_html__( 'Angaben', 'tsvd' ) . '</h2><table class="widefat striped"><tbody>';
+	echo '<table class="widefat striped"><tbody>';
 	foreach ( $fields as $field ) {
 		$field_id = $field['id'];
 		if ( ! isset( $payload[ $field_id ] ) || '' === $payload[ $field_id ] ) {
