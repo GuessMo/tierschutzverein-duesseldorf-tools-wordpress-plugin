@@ -80,7 +80,7 @@ function tsvd_anfragen_chat_styles() {
 	}
 	$done = true;
 	echo '<style>'
-		. '.tsvd-chat{display:flex;flex-direction:column;gap:10px;max-width:820px;margin:0 0 16px;}'
+		. '.tsvd-chat{display:flex;flex-direction:column;gap:10px;width:100%;margin:0 0 16px;}'
 		. '.tsvd-chat__msg{display:flex;}'
 		. '.tsvd-chat__msg--out{justify-content:flex-end;}'
 		. '.tsvd-chat__msg--in{justify-content:flex-start;}'
