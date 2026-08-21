@@ -433,11 +433,9 @@ function tsvd_anfragen_action_form( $id, $action, $nonce_prefix, $label, $icon =
 	echo '<input type="hidden" name="action" value="' . esc_attr( $action ) . '">';
 	echo '<input type="hidden" name="id" value="' . (int) $id . '">';
 	wp_nonce_field( $nonce_prefix . $id );
-	echo '<button type="submit" class="button button-small ' . esc_attr( $classes ) . '">';
-	if ( '' !== $icon ) {
-		echo '<span class="dashicons ' . esc_attr( $icon ) . '"></span> ';
-	}
-	echo esc_html( $label ) . '</button></form>';
+	echo '<button type="submit" class="tsvd-conv__act-btn ' . esc_attr( $classes ) . '" title="' . esc_attr( $label ) . '" aria-label="' . esc_attr( $label ) . '">';
+	echo '<span class="dashicons ' . esc_attr( $icon ? $icon : 'dashicons-marker' ) . '"></span>';
+	echo '</button></form>';
 }
 
 function tsvd_anfragen_render_conversation_actions( $anfrage ) {
@@ -445,7 +443,7 @@ function tsvd_anfragen_render_conversation_actions( $anfrage ) {
 	echo '<span class="tsvd-conv__actions">';
 	if ( ! empty( $anfrage['deleted_at'] ) ) {
 		tsvd_anfragen_action_form( $id, 'tsvd_anfrage_restore', 'tsvd_anfrage_restore_', __( 'Wiederherstellen', 'tsvd' ), 'dashicons-undo' );
-		tsvd_anfragen_action_form( $id, 'tsvd_anfrage_delete', 'tsvd_anfrage_delete_', __( 'Endgültig löschen', 'tsvd' ), '', 'button-link-delete', __( 'Anfrage endgültig löschen? Dies kann nicht rückgängig gemacht werden.', 'tsvd' ) );
+		tsvd_anfragen_action_form( $id, 'tsvd_anfrage_delete', 'tsvd_anfrage_delete_', __( 'Endgültig löschen', 'tsvd' ), 'dashicons-trash', 'is-danger', __( 'Anfrage endgültig löschen? Dies kann nicht rückgängig gemacht werden.', 'tsvd' ) );
 	} else {
 		tsvd_anfragen_render_assign_control( $anfrage );
 		tsvd_anfragen_action_form( $id, 'tsvd_anfrage_trash', 'tsvd_anfrage_trash_', __( 'In den Papierkorb', 'tsvd' ), 'dashicons-trash', '', __( 'Anfrage in den Papierkorb verschieben?', 'tsvd' ) );
