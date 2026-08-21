@@ -93,11 +93,7 @@ function tsvd_anfragen_render_conversation( $id ) {
 
 	tsvd_anfragen_render_animal_card( (int) $anfrage['animal_id'] );
 
-	echo '<details class="tsvd-conv__details"><summary>' . esc_html__( 'Angaben aus dem Formular', 'tsvd' ) . '</summary>';
-	tsvd_anfragen_render_payload( $anfrage );
-	echo '</details>';
-
-	tsvd_anfragen_render_replies( $wpdb, $replies_table, $id, $anfrage['applicant_name'] );
+	tsvd_anfragen_render_replies( $wpdb, $replies_table, $anfrage );
 	if ( ! empty( $anfrage['deleted_at'] ) ) {
 		echo '<p class="tsvd-conv__trash-note">' . esc_html__( 'Diese Anfrage liegt im Papierkorb.', 'tsvd' ) . '</p>';
 	} else {
@@ -124,12 +120,10 @@ function tsvd_anfragen_field_value_label( $field, $value ) {
 	return $value;
 }
 
-function tsvd_anfragen_render_payload( $anfrage ) {
-	// Label:Wert-Aufbereitung analog zur Mail-Body-Erstellung in forms-ajax.php.
+function tsvd_anfragen_payload_facts( $anfrage ) {
 	$payload = json_decode( $anfrage['payload'], true );
 	$fields  = tsvd_get_form_fields( (int) $anfrage['form_id'] );
-
-	echo '<table class="widefat striped"><tbody>';
+	$facts   = array();
 	foreach ( $fields as $field ) {
 		$field_id = $field['id'];
 		if ( ! isset( $payload[ $field_id ] ) || '' === $payload[ $field_id ] ) {
@@ -142,13 +136,13 @@ function tsvd_anfragen_render_payload( $anfrage ) {
 			foreach ( $raw as $item ) {
 				$parts[] = tsvd_anfragen_field_value_label( $field, $item );
 			}
-			$val = implode( ', ', $parts );
+			$value = implode( ', ', $parts );
 		} else {
-			$val = tsvd_anfragen_field_value_label( $field, $raw );
+			$value = tsvd_anfragen_field_value_label( $field, $raw );
 		}
-		echo '<tr><th style="width:240px;">' . esc_html( $label ) . '</th><td>' . esc_html( $val ) . '</td></tr>';
+		$facts[] = array( 'label' => $label, 'value' => $value );
 	}
-	echo '</tbody></table>';
+	return $facts;
 }
 
 function tsvd_anfragen_chat_styles() {
@@ -192,10 +186,27 @@ function tsvd_anfragen_chat_styles() {
 		. '.tsvd-chat__edit{margin-top:6px;}'
 		. '.tsvd-chat__body{white-space:pre-wrap;word-wrap:break-word;}'
 		. '.tsvd-chat__empty{color:var(--tsvd-chrome-text-muted,#646970);}'
+		. '.tsvd-conv__participants{font-size:12px;color:var(--tsvd-chrome-text-muted,#646970);'
+		. 'margin:0 0 12px;padding-bottom:8px;'
+		. 'border-bottom:1px solid var(--tsvd-chrome-border,#c3c4c7);}'
+		. '.tsvd-conv__participants-label{font-weight:600;}'
+		. '.tsvd-chat__facts{margin:0;display:flex;flex-direction:column;gap:3px;}'
+		. '.tsvd-chat__fact{display:flex;gap:8px;}'
+		. '.tsvd-chat__fact dt{flex:0 0 auto;min-width:120px;'
+		. 'color:var(--tsvd-chrome-text-muted,#646970);}'
+		. '.tsvd-chat__fact dd{margin:0;}'
 		. '.tsvd-composer__modes{display:flex;gap:6px;margin:0 0 8px;}'
-		. '.tsvd-composer__modes .tsvd-composer__mode.is-active{'
-		. 'background:var(--wp-admin-theme-color,#2271b1);'
+		. '.tsvd-composer__mode{display:inline-flex;align-items:center;justify-content:center;'
+		. 'width:36px;height:36px;padding:0;box-sizing:border-box;cursor:pointer;border-radius:3px;'
+		. 'border:1px solid var(--tsvd-chrome-border,#c3c4c7);'
+		. 'background:var(--tsvd-chrome-surface,#fff);color:var(--tsvd-chrome-text-muted,#646970);}'
+		. '.tsvd-composer__mode .dashicons{display:flex;align-items:center;justify-content:center;'
+		. 'width:18px;height:18px;font-size:18px;line-height:1;}'
+		. '.tsvd-composer__mode.is-active{background:var(--wp-admin-theme-color,#2271b1);'
 		. 'border-color:var(--wp-admin-theme-color,#2271b1);color:#fff;}'
+		. '.tsvd-composer__mode.is-active .dashicons{color:#fff;}'
+		. '.tsvd-composer__mode:focus-visible{outline:none;'
+		. 'border-color:var(--tsvd-link,#2271b1);box-shadow:0 0 0 1px var(--tsvd-link,#2271b1);}'
 		. '.tsvd-composer__hint{font-size:12px;color:var(--tsvd-chrome-text-muted,#646970);margin:6px 0;}'
 		. '</style>';
 }
@@ -212,22 +223,65 @@ function tsvd_anfragen_reply_author( $reply, $applicant_name ) {
 	return $name;
 }
 
-function tsvd_anfragen_render_replies( $wpdb, $replies_table, $id, $applicant_name = '' ) {
+function tsvd_anfragen_render_replies( $wpdb, $replies_table, $anfrage ) {
+	$id             = (int) $anfrage['id'];
+	$applicant_name = $anfrage['applicant_name'];
 	echo '<h2>' . esc_html__( 'Konversation', 'tsvd' ) . '</h2>';
 	tsvd_anfragen_chat_styles();
 	$replies = $wpdb->get_results( $wpdb->prepare( "SELECT * FROM {$replies_table} WHERE anfrage_id = %d ORDER BY COALESCE(sent_at, scheduled_at) ASC, id ASC", $id ), ARRAY_A );
 	$nonce   = wp_create_nonce( 'tsvd_anfrage_reply_' . $id );
 
+	tsvd_anfragen_render_participants( $replies );
+
 	echo '<div class="tsvd-chat" data-anfrage="' . esc_attr( $id ) . '" data-nonce="' . esc_attr( $nonce ) . '">';
-	if ( empty( $replies ) ) {
-		echo '<p class="tsvd-chat__empty">' . esc_html__( 'Noch keine Nachrichten.', 'tsvd' ) . '</p>';
-	} else {
-		foreach ( $replies as $reply ) {
-			tsvd_anfragen_render_reply_bubble( $reply, $applicant_name );
-		}
+	tsvd_anfragen_render_angaben_bubble( $anfrage );
+	foreach ( $replies as $reply ) {
+		tsvd_anfragen_render_reply_bubble( $reply, $applicant_name );
 	}
 	echo '</div>';
 	tsvd_anfragen_chat_script();
+}
+
+function tsvd_anfragen_render_participants( $replies ) {
+	$names = array();
+	foreach ( $replies as $reply ) {
+		if ( 'in' === $reply['direction'] ) {
+			continue;
+		}
+		$uid = (int) $reply['user_id'];
+		$key = $uid ? 'u' . $uid : 'system';
+		if ( isset( $names[ $key ] ) ) {
+			continue;
+		}
+		$names[ $key ] = $uid ? get_the_author_meta( 'display_name', $uid ) : __( 'System', 'tsvd' );
+	}
+	if ( empty( $names ) ) {
+		return;
+	}
+	echo '<div class="tsvd-conv__participants"><span class="tsvd-conv__participants-label">'
+		. esc_html__( 'Beteiligt', 'tsvd' ) . ':</span> '
+		. esc_html( implode( ' → ', $names ) ) . '</div>';
+}
+
+function tsvd_anfragen_render_angaben_bubble( $anfrage ) {
+	$facts = tsvd_anfragen_payload_facts( $anfrage );
+	if ( empty( $facts ) ) {
+		return;
+	}
+	$name  = '' !== $anfrage['applicant_name'] ? $anfrage['applicant_name'] : __( 'Interessent:in', 'tsvd' );
+	$stamp = get_date_from_gmt( $anfrage['created_at'], 'Y-m-d H:i' );
+
+	echo '<div class="tsvd-chat__msg tsvd-chat__msg--in">';
+	echo '<div class="tsvd-chat__bubble">';
+	echo '<div class="tsvd-chat__meta"><span class="tsvd-chat__author">' . esc_html( $name )
+		. ' &middot; ' . esc_html( $stamp ) . '</span></div>';
+	echo '<dl class="tsvd-chat__facts">';
+	foreach ( $facts as $fact ) {
+		echo '<div class="tsvd-chat__fact"><dt>' . esc_html( $fact['label'] ) . '</dt>'
+			. '<dd>' . esc_html( $fact['value'] ) . '</dd></div>';
+	}
+	echo '</dl>';
+	echo '</div></div>';
 }
 
 function tsvd_anfragen_render_reply_bubble( $reply, $applicant_name ) {
@@ -362,8 +416,8 @@ function tsvd_anfragen_render_reply_form( $id ) {
 	?>
 	<h2><?php esc_html_e( 'Nachricht', 'tsvd' ); ?></h2>
 	<div class="tsvd-composer__modes">
-		<button type="button" class="button tsvd-composer__mode is-active" data-mode="reply"><?php esc_html_e( 'Antwort', 'tsvd' ); ?></button>
-		<button type="button" class="button tsvd-composer__mode" data-mode="note"><?php esc_html_e( 'Interne Notiz', 'tsvd' ); ?></button>
+		<button type="button" class="tsvd-composer__mode is-active" data-mode="reply" title="<?php esc_attr_e( 'Antwort', 'tsvd' ); ?>" aria-label="<?php esc_attr_e( 'Antwort', 'tsvd' ); ?>"><span class="dashicons dashicons-email"></span></button>
+		<button type="button" class="tsvd-composer__mode" data-mode="note" title="<?php esc_attr_e( 'Interne Notiz', 'tsvd' ); ?>" aria-label="<?php esc_attr_e( 'Interne Notiz', 'tsvd' ); ?>"><span class="dashicons dashicons-edit"></span></button>
 	</div>
 	<textarea id="tsvd-anfrage-reply-body" class="widefat" rows="6"></textarea>
 	<p class="tsvd-composer__hint" id="tsvd-anfrage-hint"><?php esc_html_e( 'Wird per E-Mail an den Interessenten gesendet.', 'tsvd' ); ?></p>
