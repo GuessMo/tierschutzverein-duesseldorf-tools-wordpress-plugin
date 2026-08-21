@@ -141,6 +141,7 @@ function tsvd_anfragen_messenger_styles() {
 		. '.tsvd-conv__head h2{margin:0;}'
 		. '.tsvd-conv__actions{margin-left:auto;display:flex;gap:8px;align-items:center;}'
 		. '.tsvd-conv__actions form{margin:0;}'
+		. '.tsvd-conv__assign select{max-width:190px;}'
 		. '.tsvd-conv__actions .button .dashicons{vertical-align:middle;margin-top:-2px;}'
 		. '.tsvd-conv__trash-note{color:var(--tsvd-chrome-text-muted,#646970);font-style:italic;}'
 		. '.tsvd-conv__animal{font-weight:400;font-size:14px;color:var(--tsvd-chrome-text-muted,#646970);}'
@@ -175,6 +176,9 @@ function tsvd_anfragen_list_where( $status, $search ) {
 	$clauses = array();
 	if ( 'trash' === $status ) {
 		$clauses[] = 'deleted_at IS NOT NULL';
+	} elseif ( 'mine' === $status ) {
+		$clauses[] = 'deleted_at IS NULL';
+		$clauses[] = $wpdb->prepare( 'assigned_user_id = %d', get_current_user_id() );
 	} else {
 		$clauses[] = 'deleted_at IS NULL';
 		if ( $status ) {
@@ -292,6 +296,7 @@ function tsvd_anfragen_render_sidebar( $status, $search, $selected, $pos = 'righ
 	tsvd_anfragen_render_search_box( $status, $search );
 
 	echo '<div class="tsvd-msgr__filters">';
+	echo '<a href="' . esc_url( add_query_arg( 'status', 'mine', $base_url ) ) . '"' . ( 'mine' === $status ? ' class="current"' : '' ) . ' title="' . esc_attr__( 'Meine Anfragen', 'tsvd' ) . '" aria-label="' . esc_attr__( 'Meine Anfragen', 'tsvd' ) . '"><span class="dashicons dashicons-admin-users"></span></a>';
 	echo '<a href="' . esc_url( $base_url ) . '"' . ( '' === $status ? ' class="current"' : '' ) . ' title="' . esc_attr__( 'Alle', 'tsvd' ) . '" aria-label="' . esc_attr__( 'Alle', 'tsvd' ) . '"><span class="dashicons dashicons-menu-alt"></span></a>';
 	foreach ( $status_labels as $key => $label ) {
 		$icon = isset( $status_icons[ $key ] ) ? $status_icons[ $key ] : 'dashicons-marker';
@@ -338,6 +343,7 @@ function tsvd_anfragen_render_sidebar( $status, $search, $selected, $pos = 'righ
 add_action( 'admin_post_tsvd_anfrage_trash', 'tsvd_anfragen_handle_trash' );
 add_action( 'admin_post_tsvd_anfrage_restore', 'tsvd_anfragen_handle_restore' );
 add_action( 'admin_post_tsvd_anfrage_delete', 'tsvd_anfragen_handle_delete' );
+add_action( 'admin_post_tsvd_anfrage_assign', 'tsvd_anfragen_handle_assign' );
 
 function tsvd_anfragen_check_action( $nonce_prefix ) {
 	if ( ! current_user_can( 'manage_tsvd_anfragen' ) ) {
@@ -371,4 +377,24 @@ function tsvd_anfragen_handle_delete() {
 	$wpdb->delete( tsvd_anfragen_table_name(), array( 'id' => $id ), array( '%d' ) );
 	wp_safe_redirect( add_query_arg( array( 'status' => 'trash', 'deleted' => '1' ), tsvd_anfragen_list_base_url() ) );
 	exit;
+}
+
+function tsvd_anfragen_handle_assign() {
+	$id  = tsvd_anfragen_check_action( 'tsvd_anfrage_assign_' );
+	$uid = isset( $_POST['assigned_user_id'] ) ? absint( $_POST['assigned_user_id'] ) : 0;
+	if ( $uid && ! user_can( $uid, 'manage_tsvd_anfragen' ) ) {
+		$uid = 0;
+	}
+	global $wpdb;
+	$wpdb->update( tsvd_anfragen_table_name(), array( 'assigned_user_id' => $uid ?: null ), array( 'id' => $id ), array( '%d' ), array( '%d' ) );
+	wp_safe_redirect( add_query_arg( 'view', $id, tsvd_anfragen_list_base_url() ) );
+	exit;
+}
+
+function tsvd_anfragen_eligible_assignees() {
+	return get_users( array(
+		'capability' => 'manage_tsvd_anfragen',
+		'orderby'    => 'display_name',
+		'fields'     => array( 'ID', 'display_name' ),
+	) );
 }

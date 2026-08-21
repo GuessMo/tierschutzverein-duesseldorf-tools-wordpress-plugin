@@ -311,9 +311,30 @@ function tsvd_anfragen_render_conversation_actions( $anfrage ) {
 		tsvd_anfragen_action_form( $id, 'tsvd_anfrage_restore', 'tsvd_anfrage_restore_', __( 'Wiederherstellen', 'tsvd' ), 'dashicons-undo' );
 		tsvd_anfragen_action_form( $id, 'tsvd_anfrage_delete', 'tsvd_anfrage_delete_', __( 'Endgültig löschen', 'tsvd' ), '', 'button-link-delete', __( 'Anfrage endgültig löschen? Dies kann nicht rückgängig gemacht werden.', 'tsvd' ) );
 	} else {
+		tsvd_anfragen_render_assign_control( $anfrage );
 		tsvd_anfragen_action_form( $id, 'tsvd_anfrage_trash', 'tsvd_anfrage_trash_', __( 'In den Papierkorb', 'tsvd' ), 'dashicons-trash', '', __( 'Anfrage in den Papierkorb verschieben?', 'tsvd' ) );
 	}
 	echo '</span>';
+}
+
+function tsvd_anfragen_render_assign_control( $anfrage ) {
+	$id      = (int) $anfrage['id'];
+	$current = isset( $anfrage['assigned_user_id'] ) ? (int) $anfrage['assigned_user_id'] : 0;
+	$users   = function_exists( 'tsvd_anfragen_eligible_assignees' ) ? tsvd_anfragen_eligible_assignees() : array();
+
+	echo '<form method="post" action="' . esc_url( admin_url( 'admin-post.php' ) ) . '" class="tsvd-conv__assign">';
+	echo '<input type="hidden" name="action" value="tsvd_anfrage_assign">';
+	echo '<input type="hidden" name="id" value="' . $id . '">';
+	wp_nonce_field( 'tsvd_anfrage_assign_' . $id );
+	echo '<label class="screen-reader-text" for="tsvd-anfrage-assign-' . $id . '">' . esc_html__( 'Zuweisen', 'tsvd' ) . '</label>';
+	echo '<select id="tsvd-anfrage-assign-' . $id . '" name="assigned_user_id" onchange="this.form.submit()">';
+	echo '<option value="0">' . esc_html__( 'Nicht zugewiesen', 'tsvd' ) . '</option>';
+	foreach ( $users as $user ) {
+		echo '<option value="' . (int) $user->ID . '"' . selected( $current, (int) $user->ID, false ) . '>' . esc_html( $user->display_name ) . '</option>';
+	}
+	echo '</select>';
+	echo '<noscript><button type="submit" class="button button-small">' . esc_html__( 'Zuweisen', 'tsvd' ) . '</button></noscript>';
+	echo '</form>';
 }
 
 /**
