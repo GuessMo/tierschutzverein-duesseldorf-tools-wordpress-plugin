@@ -477,14 +477,13 @@ function tsvd_anfragen_render_assign_control( $anfrage ) {
 }
 
 /**
- * Sendet eine Antwort auf eine Anfrage und protokolliert sie im Verlauf —
- * gemeinsame Logik für die AJAX-Aktion im Dashboard UND die MCP-Ability
- * tsv-tools/reply-to-anfrage (siehe anfragen-mcp-callbacks.php).
+ * Versendet die Antwort-Mail an die interessierte Person (Reply-To =
+ * Formular-Empfänger, Betreff mit Anfragen-Nummer). Reine Mail-Logik ohne
+ * Verlauf-/Status-Update — genutzt von send_reply und dispatch_reply.
  *
- * @param int    $id      Anfragen-ID.
+ * @param array  $anfrage Anfragen-Datensatz (ARRAY_A).
  * @param string $body    Antworttext (bereits sanitiert erwartet).
- * @param int    $user_id WP-Benutzer-ID des Absenders (0 = kein WP-Benutzer, z. B. MCP).
- * @return true|WP_Error
+ * @return bool Ob wp_mail den Versand angenommen hat.
  */
 function tsvd_anfragen_mail_reply( $anfrage, $body ) {
 	$reply_to = get_post_meta( (int) $anfrage['form_id'], '_tsvd_form_recipient', true );
