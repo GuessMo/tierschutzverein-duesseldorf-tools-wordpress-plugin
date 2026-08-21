@@ -229,3 +229,53 @@ function tsvd_tools_ai_reply_to_anfrage($input) {
 
     return array('sent' => true, 'id' => $id);
 }
+
+function tsvd_tools_ai_assign_anfrage($input) {
+    $id = absint($input['id'] ?? 0);
+    if (!$id) {
+        return new WP_Error('missing_id', __('id ist erforderlich.', 'tsv-tools'));
+    }
+    if (!isset($input['user_id'])) {
+        return new WP_Error('missing_user_id', __('user_id ist erforderlich (0 = Zuweisung aufheben).', 'tsv-tools'));
+    }
+    $uid = absint($input['user_id']);
+    if ($uid && !user_can($uid, 'manage_tsvd_anfragen')) {
+        return new WP_Error('invalid_user', __('user_id besitzt nicht die Fähigkeit manage_tsvd_anfragen.', 'tsv-tools'));
+    }
+
+    global $wpdb;
+    $table = tsvd_anfragen_table_name();
+    $existing = $wpdb->get_var($wpdb->prepare("SELECT id FROM {$table} WHERE id = %d", $id));
+    if (!$existing) {
+        return new WP_Error('not_found', __('Anfrage nicht gefunden.', 'tsv-tools'));
+    }
+
+    $wpdb->update(
+        $table,
+        array('assigned_user_id' => $uid ?: null, 'updated_at' => current_time('mysql')),
+        array('id' => $id),
+        array('%d', '%s'),
+        array('%d')
+    );
+
+    return array('assigned' => true, 'id' => $id, 'assigned_user_id' => $uid ?: null);
+}
+
+function tsvd_tools_ai_add_anfrage_note($input) {
+    $id   = absint($input['id'] ?? 0);
+    $body = isset($input['body']) ? sanitize_textarea_field($input['body']) : '';
+
+    if (!$id) {
+        return new WP_Error('missing_id', __('id ist erforderlich.', 'tsv-tools'));
+    }
+    if (!function_exists('tsvd_anfragen_add_note')) {
+        return new WP_Error('missing_function', __('Notiz-Funktion nicht geladen.', 'tsv-tools'));
+    }
+
+    $result = tsvd_anfragen_add_note($id, $body, 0);
+    if (is_wp_error($result)) {
+        return $result;
+    }
+
+    return array('added' => true, 'id' => $id);
+}

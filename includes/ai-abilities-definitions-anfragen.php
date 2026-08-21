@@ -218,5 +218,62 @@ function tsvd_tools_ai_get_ability_definitions_anfragen() {
                 'annotations' => array('readonly' => false, 'destructive' => false, 'idempotent' => false),
             ),
         ),
+
+        'tsv-tools/assign-anfrage' => array(
+            'label'               => __('Anfrage zuweisen', 'tsv-tools'),
+            'description'         => __('Weist eine Anfrage einem Redakteur zu (user_id) oder hebt die Zuweisung auf (user_id = 0). Der Benutzer muss die Fähigkeit manage_tsvd_anfragen besitzen.', 'tsv-tools'),
+            'category'            => 'tsv-tools-animals',
+            'input_schema'        => array(
+                'type'       => 'object',
+                'properties' => array(
+                    'id'      => array('type' => 'integer'),
+                    'user_id' => array('type' => 'integer', 'description' => '0 = Zuweisung aufheben'),
+                ),
+                'required'   => array('id', 'user_id'),
+                'additionalProperties' => false,
+            ),
+            'output_schema'       => array(
+                'type'       => 'object',
+                'properties' => array(
+                    'assigned'         => array('type' => 'boolean'),
+                    'id'               => array('type' => 'integer'),
+                    'assigned_user_id' => array('type' => array('integer', 'null')),
+                ),
+            ),
+            'permission_callback' => 'tsvd_tools_ai_can_manage_anfragen',
+            'execute_callback'    => 'tsvd_tools_ai_assign_anfrage',
+            'meta'                => array(
+                'mcp'         => array('public' => true),
+                'annotations' => array('readonly' => false, 'destructive' => false, 'idempotent' => true),
+            ),
+        ),
+
+        'tsv-tools/add-anfrage-note' => array(
+            'label'               => __('Interne Notiz hinzufügen', 'tsv-tools'),
+            'description'         => __('Fügt eine interne Notiz zum Anfragen-Verlauf hinzu (nur intern sichtbar, wird nicht an die interessierte Person gesendet).', 'tsv-tools'),
+            'category'            => 'tsv-tools-animals',
+            'input_schema'        => array(
+                'type'       => 'object',
+                'properties' => array(
+                    'id'   => array('type' => 'integer'),
+                    'body' => array('type' => 'string'),
+                ),
+                'required'   => array('id', 'body'),
+                'additionalProperties' => false,
+            ),
+            'output_schema'       => array(
+                'type'       => 'object',
+                'properties' => array(
+                    'added' => array('type' => 'boolean'),
+                    'id'    => array('type' => 'integer'),
+                ),
+            ),
+            'permission_callback' => 'tsvd_tools_ai_can_manage_anfragen',
+            'execute_callback'    => 'tsvd_tools_ai_add_anfrage_note',
+            'meta'                => array(
+                'mcp'         => array('public' => true),
+                'annotations' => array('readonly' => false, 'destructive' => false, 'idempotent' => false),
+            ),
+        ),
     );
 }
