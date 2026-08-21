@@ -29,7 +29,7 @@ function tsvd_anfragen_capture_submission( $form_id, $submitted_data, $normalize
 			'applicant_email' => isset( $normalized_data['email'] ) ? sanitize_email( $normalized_data['email'] ) : '',
 			'applicant_phone' => isset( $normalized_data['tel'] ) ? sanitize_text_field( $normalized_data['tel'] ) : '',
 			'payload'         => wp_json_encode( $submitted_data ),
-			'status'          => 'new',
+			'status'          => 'open',
 			'created_at'      => $now,
 			'updated_at'      => $now,
 		),

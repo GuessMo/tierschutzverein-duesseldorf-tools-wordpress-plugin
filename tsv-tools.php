@@ -48,3 +48,4 @@ require_once TSVD_TOOLS_DIR . 'includes/anfragen-imap-settings.php';
 require_once TSVD_TOOLS_DIR . 'includes/anfragen-imap-poll.php';
 require_once TSVD_TOOLS_DIR . 'includes/anfragen-admin.php';
 require_once TSVD_TOOLS_DIR . 'includes/anfragen-admin-detail.php';
+require_once TSVD_TOOLS_DIR . 'includes/anfragen-replies.php';
