@@ -9,6 +9,7 @@
     --tsvd-chrome-badge-text: #135e96;
     --tsvd-link: #2145e6;
     --tsvd-number-spin-filter: none;
+    --tsvd-select-arrow: url("data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%2020%2020'%3E%3Cpath%20fill='%233c434a'%20d='M5%207l5%205%205-5z'/%3E%3C/svg%3E");
 }
 
 :root[data-theme="dark"] {
@@ -22,6 +23,7 @@
     --tsvd-chrome-badge-text: #7cb8f2;
     --tsvd-link: #8aa8ff;
     --tsvd-number-spin-filter: invert(1);
+    --tsvd-select-arrow: url("data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%2020%2020'%3E%3Cpath%20fill='%23e3e5e8'%20d='M5%207l5%205%205-5z'/%3E%3C/svg%3E");
 }
 
 @media (prefers-color-scheme: dark) {
@@ -36,6 +38,7 @@
         --tsvd-chrome-badge-text: #7cb8f2;
         --tsvd-link: #8aa8ff;
         --tsvd-number-spin-filter: invert(1);
+        --tsvd-select-arrow: url("data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%2020%2020'%3E%3Cpath%20fill='%23e3e5e8'%20d='M5%207l5%205%205-5z'/%3E%3C/svg%3E");
     }
 }
 
