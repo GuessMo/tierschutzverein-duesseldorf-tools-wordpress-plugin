@@ -205,6 +205,8 @@ function tsvd_anfragen_chat_styles() {
 		. '.tsvd-composer__mode.is-active{background:var(--wp-admin-theme-color,#2271b1);'
 		. 'border-color:var(--wp-admin-theme-color,#2271b1);color:#fff;}'
 		. '.tsvd-composer__mode.is-active .dashicons{color:#fff;}'
+		. '.tsvd-composer__mode:focus-visible{outline:none;'
+		. 'border-color:var(--tsvd-link,#2271b1);box-shadow:0 0 0 1px var(--tsvd-link,#2271b1);}'
 		. '.tsvd-composer__hint{font-size:12px;color:var(--tsvd-chrome-text-muted,#646970);margin:6px 0;}'
 		. '</style>';
 }
