@@ -16,7 +16,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-const TSVD_ANFRAGEN_DB_VERSION = '2';
+const TSVD_ANFRAGEN_DB_VERSION = '3';
 
 function tsvd_anfragen_table_name() {
 	global $wpdb;
@@ -68,8 +68,12 @@ function tsvd_anfragen_create_tables() {
 		user_id BIGINT UNSIGNED NULL,
 		direction VARCHAR(10) NOT NULL DEFAULT 'out',
 		body LONGTEXT NOT NULL,
-		sent_at DATETIME NOT NULL,
+		sent_at DATETIME NULL,
+		scheduled_at DATETIME NULL,
+		edited_at DATETIME NULL,
 		PRIMARY KEY  (id),
 		KEY anfrage_id (anfrage_id)
 	) {$charset_collate};" );
+
+	$wpdb->query( "ALTER TABLE {$replies_table} MODIFY sent_at DATETIME NULL" );
 }

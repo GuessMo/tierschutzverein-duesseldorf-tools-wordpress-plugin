@@ -41,6 +41,7 @@ function tsvd_anfragen_imap_save_settings() {
     update_option('tsvd_anfragen_imap_port', absint($_POST['tsvd_anfragen_imap_port'] ?? 993));
     update_option('tsvd_anfragen_imap_username', sanitize_text_field($_POST['tsvd_anfragen_imap_username'] ?? ''));
     update_option('tsvd_anfragen_imap_folder', sanitize_text_field($_POST['tsvd_anfragen_imap_folder'] ?? 'INBOX'));
+    update_option('tsvd_anfragen_send_delay', absint($_POST['tsvd_anfragen_send_delay'] ?? 120));
     // Passwort nur überschreiben, wenn tatsächlich ein neuer Wert eingegeben wurde
     // (Feld wird beim Anzeigen nie mit dem echten Wert vorbefüllt).
     if (!empty($_POST['tsvd_anfragen_imap_password'])) {
@@ -91,6 +92,13 @@ function tsvd_render_anfragen_imap_settings_tab() {
         <tr>
             <th><label for="tsvd_anfragen_imap_folder"><?php esc_html_e('Ordner', 'tsv-tools'); ?></label></th>
             <td><input type="text" id="tsvd_anfragen_imap_folder" name="tsvd_anfragen_imap_folder" value="<?php echo esc_attr($s['folder']); ?>" /></td>
+        </tr>
+        <tr>
+            <th><label for="tsvd_anfragen_send_delay"><?php esc_html_e('Verzögerung Mailversand (Sekunden)', 'tsv-tools'); ?></label></th>
+            <td>
+                <input type="number" min="0" step="10" id="tsvd_anfragen_send_delay" name="tsvd_anfragen_send_delay" value="<?php echo esc_attr((int) get_option('tsvd_anfragen_send_delay', 120)); ?>" />
+                <p class="description"><?php esc_html_e('Zeitfenster, in dem eine gesendete Antwort noch bearbeitet oder abgebrochen werden kann, bevor die Mail wirklich rausgeht. 0 = sofort senden. Empfohlen: 120.', 'tsv-tools'); ?></p>
+            </td>
         </tr>
     </table>
 

@@ -162,7 +162,7 @@ function tsvd_anfragen_chat_styles() {
 		. '.tsvd-chat__msg{display:flex;}'
 		. '.tsvd-chat__msg--out{justify-content:flex-end;}'
 		. '.tsvd-chat__msg--in{justify-content:flex-start;}'
-		. '.tsvd-chat__msg--note{justify-content:center;}'
+		. '.tsvd-chat__msg--note{justify-content:stretch;}'
 		. '.tsvd-chat__bubble{position:relative;max-width:78%;padding:8px 12px;border-radius:3px;'
 		. 'border:1px solid var(--tsvd-chrome-border,#c3c4c7);'
 		. 'background:var(--tsvd-chrome-surface,#fff);color:var(--tsvd-chrome-text,#3c434a);}'
@@ -174,9 +174,22 @@ function tsvd_anfragen_chat_styles() {
 		. '.tsvd-chat__msg--in .tsvd-chat__bubble::after{content:"";position:absolute;bottom:-1px;'
 		. 'left:-7px;border:7px solid transparent;border-bottom:0;border-left:0;'
 		. 'border-right-color:var(--tsvd-chrome-border,#c3c4c7);}'
-		. '.tsvd-chat__msg--note .tsvd-chat__bubble{max-width:90%;background:transparent;'
-		. 'border-style:dashed;color:var(--tsvd-chrome-text-muted,#646970);font-style:italic;}'
-		. '.tsvd-chat__meta{font-size:11px;opacity:.75;margin-bottom:3px;}'
+		. '.tsvd-chat__msg--note .tsvd-chat__bubble{max-width:100%;width:100%;background:transparent;'
+		. 'border-style:dashed;color:var(--tsvd-chrome-text-muted,#646970);}'
+		. '.tsvd-chat__meta{font-size:11px;opacity:.75;margin-bottom:3px;display:flex;'
+		. 'align-items:center;justify-content:space-between;gap:8px;}'
+		. '.tsvd-chat__edited{font-style:italic;}'
+		. '.tsvd-chat__tools{display:inline-flex;gap:2px;opacity:0;transition:opacity .1s;}'
+		. '.tsvd-chat__msg:hover .tsvd-chat__tools{opacity:1;}'
+		. '.tsvd-chat__tool{background:none;border:0;cursor:pointer;padding:2px;color:inherit;'
+		. 'opacity:.8;display:inline-flex;}'
+		. '.tsvd-chat__tool:hover{opacity:1;}'
+		. '.tsvd-chat__tool .dashicons{font-size:16px;width:16px;height:16px;}'
+		. '.tsvd-chat__timer{margin-top:6px;font-size:12px;opacity:.9;display:flex;'
+		. 'align-items:center;gap:4px;}'
+		. '.tsvd-chat__timer .dashicons{font-size:15px;width:15px;height:15px;}'
+		. '.tsvd-chat__msg.is-pending .tsvd-chat__bubble{opacity:.9;border-style:dashed;}'
+		. '.tsvd-chat__edit{margin-top:6px;}'
 		. '.tsvd-chat__body{white-space:pre-wrap;word-wrap:break-word;}'
 		. '.tsvd-chat__empty{color:var(--tsvd-chrome-text-muted,#646970);}'
 		. '.tsvd-composer__modes{display:flex;gap:6px;margin:0 0 8px;}'
@@ -202,23 +215,146 @@ function tsvd_anfragen_reply_author( $reply, $applicant_name ) {
 function tsvd_anfragen_render_replies( $wpdb, $replies_table, $id, $applicant_name = '' ) {
 	echo '<h2>' . esc_html__( 'Konversation', 'tsvd' ) . '</h2>';
 	tsvd_anfragen_chat_styles();
-	$replies = $wpdb->get_results( $wpdb->prepare( "SELECT * FROM {$replies_table} WHERE anfrage_id = %d ORDER BY sent_at ASC", $id ), ARRAY_A );
+	$replies = $wpdb->get_results( $wpdb->prepare( "SELECT * FROM {$replies_table} WHERE anfrage_id = %d ORDER BY COALESCE(sent_at, scheduled_at) ASC, id ASC", $id ), ARRAY_A );
+	$nonce   = wp_create_nonce( 'tsvd_anfrage_reply_' . $id );
 
-	echo '<div class="tsvd-chat">';
+	echo '<div class="tsvd-chat" data-anfrage="' . esc_attr( $id ) . '" data-nonce="' . esc_attr( $nonce ) . '">';
 	if ( empty( $replies ) ) {
-		echo '<p class="tsvd-chat__empty">' . esc_html__( 'Noch keine Nachrichten.', 'tsvd' ) . '</p></div>';
-		return;
-	}
-
-	foreach ( $replies as $reply ) {
-		$author = tsvd_anfragen_reply_author( $reply, $applicant_name );
-		$css    = 'tsvd-chat__msg tsvd-chat__msg--' . sanitize_html_class( $reply['direction'] );
-		echo '<div class="' . esc_attr( $css ) . '"><div class="tsvd-chat__bubble">';
-		echo '<div class="tsvd-chat__meta">' . esc_html( $author ) . ' &middot; ' . esc_html( get_date_from_gmt( $reply['sent_at'], 'Y-m-d H:i' ) ) . '</div>';
-		echo '<div class="tsvd-chat__body">' . esc_html( $reply['body'] ) . '</div>';
-		echo '</div></div>';
+		echo '<p class="tsvd-chat__empty">' . esc_html__( 'Noch keine Nachrichten.', 'tsvd' ) . '</p>';
+	} else {
+		foreach ( $replies as $reply ) {
+			tsvd_anfragen_render_reply_bubble( $reply, $applicant_name );
+		}
 	}
 	echo '</div>';
+	tsvd_anfragen_chat_script();
+}
+
+function tsvd_anfragen_render_reply_bubble( $reply, $applicant_name ) {
+	$dir     = $reply['direction'];
+	$rid     = (int) $reply['id'];
+	$pending = ( 'out' === $dir && empty( $reply['sent_at'] ) && ! empty( $reply['scheduled_at'] ) );
+	$author  = tsvd_anfragen_reply_author( $reply, $applicant_name );
+	$stamp   = ! empty( $reply['sent_at'] ) ? get_date_from_gmt( $reply['sent_at'], 'Y-m-d H:i' ) : '';
+	$css     = 'tsvd-chat__msg tsvd-chat__msg--' . sanitize_html_class( $dir ) . ( $pending ? ' is-pending' : '' );
+
+	echo '<div class="' . esc_attr( $css ) . '" data-reply="' . $rid . '">';
+	echo '<div class="tsvd-chat__bubble">';
+	echo '<div class="tsvd-chat__meta"><span class="tsvd-chat__author">' . esc_html( $author );
+	if ( '' !== $stamp ) {
+		echo ' &middot; ' . esc_html( $stamp );
+	}
+	if ( ! empty( $reply['edited_at'] ) ) {
+		echo ' &middot; <em>' . esc_html__( 'bearbeitet', 'tsvd' ) . '</em>';
+	}
+	echo '</span>' . tsvd_anfragen_reply_tools( $reply, $pending ) . '</div>';
+	echo '<div class="tsvd-chat__body">' . esc_html( $reply['body'] ) . '</div>';
+	if ( $pending ) {
+		$remaining = strtotime( $reply['scheduled_at'] . ' UTC' ) - time();
+		echo '<div class="tsvd-chat__timer" data-remaining="' . max( 0, (int) $remaining ) . '">';
+		echo '<span class="dashicons dashicons-clock"></span> <span class="tsvd-chat__timer-text"></span>';
+		echo '</div>';
+	}
+	echo '</div></div>';
+}
+
+function tsvd_anfragen_reply_tools( $reply, $pending ) {
+	if ( 'note' !== $reply['direction'] && ! $pending ) {
+		return '';
+	}
+	$html = '<span class="tsvd-chat__tools">';
+	if ( $pending ) {
+		$html .= '<button type="button" class="tsvd-chat__tool" data-act="sendnow" title="' . esc_attr__( 'Jetzt senden', 'tsvd' ) . '"><span class="dashicons dashicons-yes-alt"></span></button>';
+	}
+	$html .= '<button type="button" class="tsvd-chat__tool" data-act="edit" title="' . esc_attr__( 'Bearbeiten', 'tsvd' ) . '"><span class="dashicons dashicons-edit"></span></button>';
+	$del   = $pending ? __( 'Abbrechen', 'tsvd' ) : __( 'Löschen', 'tsvd' );
+	$html .= '<button type="button" class="tsvd-chat__tool" data-act="delete" title="' . esc_attr( $del ) . '"><span class="dashicons dashicons-trash"></span></button>';
+	return $html . '</span>';
+}
+
+function tsvd_anfragen_chat_script() {
+	static $done = false;
+	if ( $done ) {
+		return;
+	}
+	$done    = true;
+	$strings = array(
+		'confirmDelete' => __( 'Diese Nachricht löschen?', 'tsvd' ),
+		'confirmCancel' => __( 'Geplanten Versand abbrechen und Entwurf löschen?', 'tsvd' ),
+		'save'          => __( 'Speichern', 'tsvd' ),
+		'cancel'        => __( 'Abbrechen', 'tsvd' ),
+		'sendsIn'       => __( 'wird in %s gesendet', 'tsvd' ),
+		'sendingNow'    => __( 'wird gesendet …', 'tsvd' ),
+		'error'         => __( 'Fehler', 'tsvd' ),
+	);
+	?>
+	<script>
+	(function () {
+		var chat = document.querySelector( '.tsvd-chat' );
+		if ( ! chat ) return;
+		var S = <?php echo wp_json_encode( $strings ); ?>;
+		var anfrage = chat.getAttribute( 'data-anfrage' );
+		var nonce = chat.getAttribute( 'data-nonce' );
+
+		function post( action, data ) {
+			data.action = action; data.anfrage = anfrage; data.nonce = nonce;
+			jQuery.post( ajaxurl, data, function () { location.reload(); } ).fail( function () { alert( S.error ); } );
+		}
+
+		chat.addEventListener( 'click', function ( e ) {
+			var tool = e.target.closest( '.tsvd-chat__tool' );
+			if ( ! tool ) return;
+			var msg = tool.closest( '.tsvd-chat__msg' );
+			var rid = msg.getAttribute( 'data-reply' );
+			var act = tool.getAttribute( 'data-act' );
+			if ( 'delete' === act ) {
+				var isPending = msg.classList.contains( 'is-pending' );
+				if ( confirm( isPending ? S.confirmCancel : S.confirmDelete ) ) { post( 'tsvd_anfrage_reply_delete', { reply: rid } ); }
+			} else if ( 'sendnow' === act ) {
+				post( 'tsvd_anfrage_reply_sendnow', { reply: rid } );
+			} else if ( 'edit' === act ) {
+				startEdit( msg, rid );
+			}
+		} );
+
+		function startEdit( msg, rid ) {
+			if ( msg.querySelector( '.tsvd-chat__edit' ) ) return;
+			var bodyEl = msg.querySelector( '.tsvd-chat__body' );
+			var box = document.createElement( 'div' );
+			box.className = 'tsvd-chat__edit';
+			var ta = document.createElement( 'textarea' );
+			ta.className = 'widefat'; ta.rows = 4; ta.value = bodyEl.textContent;
+			var save = document.createElement( 'button' ); save.className = 'button button-primary button-small'; save.textContent = S.save;
+			var cancel = document.createElement( 'button' ); cancel.className = 'button button-small'; cancel.textContent = S.cancel;
+			var bar = document.createElement( 'p' ); bar.appendChild( save ); bar.appendChild( document.createTextNode( ' ' ) ); bar.appendChild( cancel );
+			box.appendChild( ta ); box.appendChild( bar );
+			bodyEl.style.display = 'none';
+			bodyEl.parentNode.insertBefore( box, bodyEl.nextSibling );
+			ta.focus();
+			cancel.addEventListener( 'click', function () { box.remove(); bodyEl.style.display = ''; } );
+			save.addEventListener( 'click', function () { save.disabled = true; post( 'tsvd_anfrage_reply_edit', { reply: rid, body: ta.value } ); } );
+		}
+
+		function fmt( s ) {
+			if ( s <= 0 ) return null;
+			var m = Math.floor( s / 60 ), sec = s % 60;
+			return m + ':' + ( sec < 10 ? '0' : '' ) + sec;
+		}
+		chat.querySelectorAll( '.tsvd-chat__timer' ).forEach( function ( t ) {
+			var rem = parseInt( t.getAttribute( 'data-remaining' ), 10 ) || 0;
+			var txt = t.querySelector( '.tsvd-chat__timer-text' );
+			var iv = setInterval( tick, 1000 );
+			function tick() {
+				var f = fmt( rem );
+				txt.textContent = f ? S.sendsIn.replace( '%s', f ) : S.sendingNow;
+				if ( rem <= 0 ) { clearInterval( iv ); return; }
+				rem--;
+			}
+			tick();
+		} );
+	})();
+	</script>
+	<?php
 }
 
 function tsvd_anfragen_render_reply_form( $id ) {
@@ -347,6 +483,14 @@ function tsvd_anfragen_render_assign_control( $anfrage ) {
  * @param int    $user_id WP-Benutzer-ID des Absenders (0 = kein WP-Benutzer, z. B. MCP).
  * @return true|WP_Error
  */
+function tsvd_anfragen_mail_reply( $anfrage, $body ) {
+	$reply_to = get_post_meta( (int) $anfrage['form_id'], '_tsvd_form_recipient', true );
+	$reply_to = is_email( $reply_to ) ? $reply_to : get_option( 'admin_email' );
+	$headers  = array( 'Reply-To: ' . $reply_to );
+	$subject  = sprintf( __( 'Antwort auf Ihre Anfrage #%d', 'tsvd' ), (int) $anfrage['id'] );
+	return wp_mail( $anfrage['applicant_email'], $subject, $body, $headers );
+}
+
 function tsvd_anfragen_send_reply( $id, $body, $user_id = 0 ) {
 	if ( '' === trim( $body ) ) {
 		return new WP_Error( 'empty_body', __( 'Antworttext darf nicht leer sein.', 'tsvd' ) );
@@ -362,20 +506,7 @@ function tsvd_anfragen_send_reply( $id, $body, $user_id = 0 ) {
 		return new WP_Error( 'invalid_email', __( 'Keine gültige E-Mail-Adresse hinterlegt.', 'tsvd' ) );
 	}
 
-	// Reply-To = derselbe Empfänger, der im Formular für neue Anfragen hinterlegt ist
-	// (_tsvd_form_recipient) — Antworten der interessierten Person landen dadurch in
-	// derselben Mailbox, die auch die ursprüngliche Anfrage bekommen hat, statt im
-	// technischen WordPress-Standardabsender zu verschwinden.
-	$reply_to = get_post_meta( (int) $anfrage['form_id'], '_tsvd_form_recipient', true );
-	$reply_to = is_email( $reply_to ) ? $reply_to : get_option( 'admin_email' );
-	$headers  = array( 'Reply-To: ' . $reply_to );
-
-	// Anfragen-Nummer im Betreff, damit ein späterer IMAP-Abruf die Antwort der
-	// richtigen Anfrage zuordnen kann (Referenz-Token).
-	$subject = sprintf( __( 'Antwort auf Ihre Anfrage #%d', 'tsvd' ), $id );
-
-	$sent = wp_mail( $anfrage['applicant_email'], $subject, $body, $headers );
-	if ( ! $sent ) {
+	if ( ! tsvd_anfragen_mail_reply( $anfrage, $body ) ) {
 		return new WP_Error( 'mail_failed', __( 'E-Mail konnte nicht gesendet werden.', 'tsvd' ) );
 	}
 
@@ -421,8 +552,8 @@ function tsvd_ajax_anfrage_reply() {
 		$result  = tsvd_anfragen_add_note( $id, $body, get_current_user_id() );
 		$success = __( 'Notiz gespeichert.', 'tsvd' );
 	} else {
-		$result  = tsvd_anfragen_send_reply( $id, $body, get_current_user_id() );
-		$success = __( 'Antwort gesendet.', 'tsvd' );
+		$result  = tsvd_anfragen_schedule_reply( $id, $body, get_current_user_id() );
+		$success = tsvd_anfragen_send_delay() > 0 ? __( 'Antwort geplant.', 'tsvd' ) : __( 'Antwort gesendet.', 'tsvd' );
 	}
 
 	if ( is_wp_error( $result ) ) {
