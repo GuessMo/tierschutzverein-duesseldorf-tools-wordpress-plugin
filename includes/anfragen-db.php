@@ -16,7 +16,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-const TSVD_ANFRAGEN_DB_VERSION = '3';
+const TSVD_ANFRAGEN_DB_VERSION = '4';
 
 function tsvd_anfragen_table_name() {
 	global $wpdb;
@@ -52,7 +52,7 @@ function tsvd_anfragen_create_tables() {
 		applicant_email VARCHAR(255) NOT NULL DEFAULT '',
 		applicant_phone VARCHAR(64) NOT NULL DEFAULT '',
 		payload LONGTEXT NOT NULL,
-		status VARCHAR(20) NOT NULL DEFAULT 'new',
+		status VARCHAR(20) NOT NULL DEFAULT 'open',
 		assigned_user_id BIGINT UNSIGNED NULL,
 		created_at DATETIME NOT NULL,
 		updated_at DATETIME NOT NULL,
@@ -76,4 +76,12 @@ function tsvd_anfragen_create_tables() {
 	) {$charset_collate};" );
 
 	$wpdb->query( "ALTER TABLE {$replies_table} MODIFY sent_at DATETIME NULL" );
+
+	tsvd_anfragen_migrate_status_values( $table );
+}
+
+function tsvd_anfragen_migrate_status_values( $table ) {
+	global $wpdb;
+	$wpdb->query( "UPDATE {$table} SET status = 'open' WHERE status IN ( 'new', 'in_progress' )" );
+	$wpdb->query( "UPDATE {$table} SET status = 'answered' WHERE status = 'closed'" );
 }

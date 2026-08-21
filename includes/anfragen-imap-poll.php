@@ -172,7 +172,7 @@ function tsvd_anfragen_imap_poll() {
 
             $wpdb->update(
                 $table,
-                array('status' => 'in_progress', 'updated_at' => $now),
+                array('status' => 'open', 'updated_at' => $now),
                 array('id' => $anfrage_id),
                 array('%s', '%s'),
                 array('%d')

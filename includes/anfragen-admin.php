@@ -29,10 +29,9 @@ function tsvd_anfragen_admin_menu() {
 
 function tsvd_anfragen_status_labels() {
 	return array(
-		'new'         => __( 'Neu', 'tsvd' ),
-		'in_progress' => __( 'In Bearbeitung', 'tsvd' ),
-		'answered'    => __( 'Beantwortet', 'tsvd' ),
-		'closed'      => __( 'Geschlossen', 'tsvd' ),
+		'open'     => __( 'Offen', 'tsvd' ),
+		'answered' => __( 'Beantwortet', 'tsvd' ),
+		'spam'     => __( 'Spam', 'tsvd' ),
 	);
 }
 
@@ -64,6 +63,9 @@ function tsvd_anfragen_render_page() {
 	}
 	if ( isset( $_GET['trashed'] ) ) {
 		echo '<div class="notice notice-success is-dismissible"><p>' . esc_html__( 'Anfrage in den Papierkorb verschoben.', 'tsvd' ) . '</p></div>';
+	}
+	if ( isset( $_GET['spammed'] ) ) {
+		echo '<div class="notice notice-success is-dismissible"><p>' . esc_html__( 'Anfrage als Spam markiert.', 'tsvd' ) . '</p></div>';
 	}
 
 	tsvd_anfragen_messenger_styles();
@@ -185,11 +187,14 @@ function tsvd_anfragen_list_where( $status, $search ) {
 		$clauses[] = 'deleted_at IS NOT NULL';
 	} elseif ( 'mine' === $status ) {
 		$clauses[] = 'deleted_at IS NULL';
+		$clauses[] = "status != 'spam'";
 		$clauses[] = $wpdb->prepare( 'assigned_user_id = %d', get_current_user_id() );
 	} else {
 		$clauses[] = 'deleted_at IS NULL';
 		if ( $status ) {
 			$clauses[] = $wpdb->prepare( 'status = %s', $status );
+		} else {
+			$clauses[] = "status != 'spam'";
 		}
 	}
 	if ( '' !== $search ) {
@@ -286,10 +291,9 @@ function tsvd_anfragen_render_sidebar( $status, $search, $selected, $pos = 'righ
 	$toggle_lbl  = 'right' === $pos ? __( 'Seitenleiste nach links', 'tsvd' ) : __( 'Seitenleiste nach rechts', 'tsvd' );
 
 	$status_icons = array(
-		'new'         => 'dashicons-marker',
-		'in_progress' => 'dashicons-update',
-		'answered'    => 'dashicons-yes',
-		'closed'      => 'dashicons-lock',
+		'open'     => 'dashicons-marker',
+		'answered' => 'dashicons-yes',
+		'spam'     => 'dashicons-warning',
 	);
 
 	echo '<div class="tsvd-msgr__side">';
@@ -306,9 +310,13 @@ function tsvd_anfragen_render_sidebar( $status, $search, $selected, $pos = 'righ
 	echo '<a href="' . esc_url( add_query_arg( 'status', 'mine', $base_url ) ) . '"' . ( 'mine' === $status ? ' class="current"' : '' ) . ' title="' . esc_attr__( 'Meine Anfragen', 'tsvd' ) . '" aria-label="' . esc_attr__( 'Meine Anfragen', 'tsvd' ) . '"><span class="dashicons dashicons-admin-users"></span></a>';
 	echo '<a href="' . esc_url( $base_url ) . '"' . ( '' === $status ? ' class="current"' : '' ) . ' title="' . esc_attr__( 'Alle', 'tsvd' ) . '" aria-label="' . esc_attr__( 'Alle', 'tsvd' ) . '"><span class="dashicons dashicons-menu-alt"></span></a>';
 	foreach ( $status_labels as $key => $label ) {
+		if ( 'spam' === $key ) {
+			continue;
+		}
 		$icon = isset( $status_icons[ $key ] ) ? $status_icons[ $key ] : 'dashicons-marker';
 		echo '<a href="' . esc_url( add_query_arg( 'status', $key, $base_url ) ) . '"' . ( $status === $key ? ' class="current"' : '' ) . ' title="' . esc_attr( $label ) . '" aria-label="' . esc_attr( $label ) . '"><span class="dashicons ' . esc_attr( $icon ) . '"></span></a>';
 	}
+	echo '<a href="' . esc_url( add_query_arg( 'status', 'spam', $base_url ) ) . '"' . ( 'spam' === $status ? ' class="current"' : '' ) . ' title="' . esc_attr__( 'Spam', 'tsvd' ) . '" aria-label="' . esc_attr__( 'Spam', 'tsvd' ) . '"><span class="dashicons dashicons-warning"></span></a>';
 	echo '<a href="' . esc_url( add_query_arg( 'status', 'trash', $base_url ) ) . '"' . ( 'trash' === $status ? ' class="current"' : '' ) . ' title="' . esc_attr__( 'Papierkorb', 'tsvd' ) . '" aria-label="' . esc_attr__( 'Papierkorb', 'tsvd' ) . '"><span class="dashicons dashicons-trash"></span></a>';
 	echo '</div></div>';
 
@@ -351,6 +359,8 @@ add_action( 'admin_post_tsvd_anfrage_trash', 'tsvd_anfragen_handle_trash' );
 add_action( 'admin_post_tsvd_anfrage_restore', 'tsvd_anfragen_handle_restore' );
 add_action( 'admin_post_tsvd_anfrage_delete', 'tsvd_anfragen_handle_delete' );
 add_action( 'admin_post_tsvd_anfrage_assign', 'tsvd_anfragen_handle_assign' );
+add_action( 'admin_post_tsvd_anfrage_spam', 'tsvd_anfragen_handle_spam' );
+add_action( 'admin_post_tsvd_anfrage_unspam', 'tsvd_anfragen_handle_unspam' );
 
 function tsvd_anfragen_check_action( $nonce_prefix ) {
 	if ( ! current_user_can( 'manage_tsvd_anfragen' ) ) {
@@ -383,6 +393,22 @@ function tsvd_anfragen_handle_delete() {
 	$wpdb->delete( tsvd_anfragen_replies_table_name(), array( 'anfrage_id' => $id ), array( '%d' ) );
 	$wpdb->delete( tsvd_anfragen_table_name(), array( 'id' => $id ), array( '%d' ) );
 	wp_safe_redirect( add_query_arg( array( 'status' => 'trash', 'deleted' => '1' ), tsvd_anfragen_list_base_url() ) );
+	exit;
+}
+
+function tsvd_anfragen_handle_spam() {
+	$id = tsvd_anfragen_check_action( 'tsvd_anfrage_spam_' );
+	global $wpdb;
+	$wpdb->update( tsvd_anfragen_table_name(), array( 'status' => 'spam', 'updated_at' => current_time( 'mysql' ) ), array( 'id' => $id ), array( '%s', '%s' ), array( '%d' ) );
+	wp_safe_redirect( add_query_arg( array( 'status' => 'spam', 'spammed' => '1' ), tsvd_anfragen_list_base_url() ) );
+	exit;
+}
+
+function tsvd_anfragen_handle_unspam() {
+	$id = tsvd_anfragen_check_action( 'tsvd_anfrage_unspam_' );
+	global $wpdb;
+	$wpdb->update( tsvd_anfragen_table_name(), array( 'status' => 'open', 'updated_at' => current_time( 'mysql' ) ), array( 'id' => $id ), array( '%s', '%s' ), array( '%d' ) );
+	wp_safe_redirect( add_query_arg( 'view', $id, tsvd_anfragen_list_base_url() ) );
 	exit;
 }
 

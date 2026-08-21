@@ -27,12 +27,12 @@ function tsvd_tools_ai_get_ability_definitions_anfragen() {
     return array(
         'tsv-tools/list-anfragen' => array(
             'label'               => __('Anfragen auflisten', 'tsv-tools'),
-            'description'         => __('Listet Anfragen aus dem Anfragen-Dashboard, optional gefiltert nach Status (new|in_progress|answered|closed).', 'tsv-tools'),
+            'description'         => __('Listet Anfragen aus dem Anfragen-Dashboard, optional gefiltert nach Status (open|answered|spam).', 'tsv-tools'),
             'category'            => 'tsv-tools-animals',
             'input_schema'        => array(
                 'type'       => 'object',
                 'properties' => array(
-                    'status' => array('type' => 'string', 'description' => 'new|in_progress|answered|closed, leer = alle'),
+                    'status' => array('type' => 'string', 'description' => 'open|answered|spam, leer = alle'),
                     'limit'  => array('type' => 'integer', 'default' => 50, 'description' => 'max. 200'),
                 ),
                 'additionalProperties' => false,
@@ -73,13 +73,13 @@ function tsvd_tools_ai_get_ability_definitions_anfragen() {
 
         'tsv-tools/update-anfrage-status' => array(
             'label'               => __('Anfragen-Status ändern', 'tsv-tools'),
-            'description'         => __('Setzt den Status einer Anfrage (new|in_progress|answered|closed).', 'tsv-tools'),
+            'description'         => __('Setzt den Status einer Anfrage (open|answered|spam).', 'tsv-tools'),
             'category'            => 'tsv-tools-animals',
             'input_schema'        => array(
                 'type'       => 'object',
                 'properties' => array(
                     'id'     => array('type' => 'integer'),
-                    'status' => array('type' => 'string', 'enum' => array('new', 'in_progress', 'answered', 'closed')),
+                    'status' => array('type' => 'string', 'enum' => array('open', 'answered', 'spam')),
                 ),
                 'required'   => array('id', 'status'),
                 'additionalProperties' => false,

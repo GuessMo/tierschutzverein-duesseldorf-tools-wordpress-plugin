@@ -92,7 +92,7 @@ function tsvd_tools_ai_get_anfrage($input) {
 function tsvd_tools_ai_update_anfrage_status($input) {
     $id     = absint($input['id'] ?? 0);
     $status = sanitize_key($input['status'] ?? '');
-    $valid  = array('new', 'in_progress', 'answered', 'closed');
+    $valid  = array('open', 'answered', 'spam');
 
     if (!$id) {
         return new WP_Error('missing_id', __('id ist erforderlich.', 'tsv-tools'));

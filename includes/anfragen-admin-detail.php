@@ -446,6 +446,11 @@ function tsvd_anfragen_render_conversation_actions( $anfrage ) {
 		tsvd_anfragen_action_form( $id, 'tsvd_anfrage_delete', 'tsvd_anfrage_delete_', __( 'Endgültig löschen', 'tsvd' ), 'dashicons-trash', 'is-danger', __( 'Anfrage endgültig löschen? Dies kann nicht rückgängig gemacht werden.', 'tsvd' ) );
 	} else {
 		tsvd_anfragen_render_assign_control( $anfrage );
+		if ( 'spam' === $anfrage['status'] ) {
+			tsvd_anfragen_action_form( $id, 'tsvd_anfrage_unspam', 'tsvd_anfrage_unspam_', __( 'Kein Spam', 'tsvd' ), 'dashicons-email' );
+		} else {
+			tsvd_anfragen_action_form( $id, 'tsvd_anfrage_spam', 'tsvd_anfrage_spam_', __( 'Als Spam markieren', 'tsvd' ), 'dashicons-warning', '', __( 'Anfrage als Spam markieren?', 'tsvd' ) );
+		}
 		tsvd_anfragen_action_form( $id, 'tsvd_anfrage_trash', 'tsvd_anfrage_trash_', __( 'In den Papierkorb', 'tsvd' ), 'dashicons-trash', '', __( 'Anfrage in den Papierkorb verschieben?', 'tsvd' ) );
 	}
 	echo '</span>';
