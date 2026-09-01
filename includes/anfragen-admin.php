@@ -124,8 +124,17 @@ function tsvd_anfragen_messenger_styles() {
 		. '.tsvd-msgr__filters .dashicons,.tsvd-msgr__pos .dashicons,'
 		. '.tsvd-msgr__search-btn .dashicons{display:flex;align-items:center;'
 		. 'justify-content:center;width:18px;height:18px;font-size:18px;line-height:1;}'
-		. '.tsvd-msgr__breed{width:100%;margin-top:8px;box-sizing:border-box;height:36px;border:1px solid'
-		. ' var(--tsvd-chrome-border,#c3c4c7);border-radius:3px;padding:0 8px;color:var(--tsvd-chrome-text,#3c434a);}'
+		. '.tsvd-msgr__breed{width:100%;margin-top:8px;box-sizing:border-box;height:36px;'
+		. 'appearance:none;-webkit-appearance:none;-moz-appearance:none;'
+		. 'padding:0 1.75rem 0 0.5rem;'
+		. 'background-color:var(--tsvd-chrome-surface,#fff);color:var(--tsvd-chrome-text,#3c434a);'
+		. 'border:1px solid var(--tsvd-chrome-border,#c3c4c7);border-radius:3px;'
+		. 'background-image:var(--tsvd-select-arrow);background-repeat:no-repeat;'
+		. 'background-position:right 0.5rem center;background-size:1rem;}'
+		. '.tsvd-msgr__breed:hover{border-color:var(--tsvd-chrome-heading,#1d2327);}'
+		. '.tsvd-msgr__breed:focus{color:var(--tsvd-chrome-text,#3c434a);'
+		. 'border-color:var(--tsvd-link,#2271b1);outline:none;'
+		. 'box-shadow:0 0 0 1px var(--tsvd-link,#2271b1);}'
 		. '.tsvd-msgr__list{overflow-y:auto;flex:1;}'
 		. '.tsvd-msgr__item{display:block;text-decoration:none;padding:10px 12px;'
 		. 'border-bottom:1px solid var(--tsvd-chrome-border,#c3c4c7);color:var(--tsvd-chrome-text,#3c434a);}'
@@ -184,6 +193,55 @@ function tsvd_anfragen_messenger_styles() {
 		. '@media(max-width:782px){.tsvd-msgr{flex-direction:column;height:auto;}'
 		. '.tsvd-msgr__side{width:auto;flex:none;max-height:320px;}}'
 		. '</style>';
+}
+
+/**
+ * Alle animal_breed-Terme, gruppiert nach Haussortierung (Hund, Katze, Kleintier, Vogel),
+ * innerhalb der Gruppe alphabetisch.
+ *
+ * @return WP_Term[]
+ */
+function tsvd_anfragen_breed_terms() {
+	$terms = get_terms(
+		array(
+			'taxonomy'   => 'animal_breed',
+			'hide_empty' => false,
+		)
+	);
+	if ( is_wp_error( $terms ) || empty( $terms ) ) {
+		return $terms;
+	}
+
+	$parent_names = array();
+	$group_name   = array();
+	foreach ( $terms as $term ) {
+		$parent_names[ $term->term_id ] = $term->name;
+	}
+	foreach ( $terms as $term ) {
+		if ( $term->parent && isset( $parent_names[ $term->parent ] ) ) {
+			$group_name[ $term->term_id ] = $parent_names[ $term->parent ];
+		}
+	}
+
+	$priority = array( 'Hund' => 0, 'Katze' => 1, 'Kleintier' => 2, 'Vogel' => 3 );
+
+	usort( $terms, function ( $a, $b ) use ( $group_name, $priority ) {
+		$group_a = isset( $group_name[ $a->term_id ] ) ? $group_name[ $a->term_id ] : $a->name;
+		$group_b = isset( $group_name[ $b->term_id ] ) ? $group_name[ $b->term_id ] : $b->name;
+		$prio_a  = isset( $priority[ $group_a ] ) ? $priority[ $group_a ] : count( $priority );
+		$prio_b  = isset( $priority[ $group_b ] ) ? $priority[ $group_b ] : count( $priority );
+		if ( $prio_a !== $prio_b ) {
+			return $prio_a <=> $prio_b;
+		}
+		$root_a = $a->parent ? 1 : 0;
+		$root_b = $b->parent ? 1 : 0;
+		if ( $root_a !== $root_b ) {
+			return $root_a <=> $root_b;
+		}
+		return strcmp( $a->name, $b->name );
+	} );
+
+	return $terms;
 }
 
 function tsvd_anfragen_list_where( $status, $search, $breed = 0 ) {
@@ -341,13 +399,7 @@ function tsvd_anfragen_render_sidebar( $status, $search, $selected, $pos = 'righ
 	}
 	echo '<select name="breed" class="tsvd-msgr__breed" aria-label="' . esc_attr__( 'Nach Tierart filtern', 'tsvd' ) . '" onchange="this.form.submit()">';
 	echo '<option value="">' . esc_html__( 'Alle Tierarten', 'tsvd' ) . '</option>';
-	$terms = get_terms(
-		array(
-			'taxonomy'   => 'animal_breed',
-			'hide_empty' => false,
-			'orderby'    => 'name',
-		)
-	);
+	$terms = tsvd_anfragen_breed_terms();
 	if ( ! is_wp_error( $terms ) ) {
 		foreach ( $terms as $term ) {
 			echo '<option value="' . esc_attr( $term->term_id ) . '"' . selected( $breed, $term->term_id, false ) . '>' . esc_html( $term->name ) . '</option>';
