@@ -24,6 +24,7 @@ function tsvd_anfragen_admin_menu() {
 	);
 	add_action( 'admin_print_scripts-' . $hook, function () {
 		wp_enqueue_script( 'jquery' );
+		wp_enqueue_style( 'tsvd-tools-anfragen', TSVD_TOOLS_URL . 'assets/anfragen-admin.css', array(), TSVD_TOOLS_VERSION );
 	} );
 }
 
@@ -36,14 +37,38 @@ function tsvd_anfragen_status_labels() {
 	);
 }
 
+function tsvd_anfragen_user_settings() {
+	$defaults = array(
+		'sidebar_pos' => 'right',
+		'breed'       => 0,
+		'status'      => '',
+	);
+	$user_id  = get_current_user_id();
+	$stored   = get_user_meta( $user_id, 'tsvd_anfragen_user_settings', true );
+	if ( ! is_array( $stored ) ) {
+		$stored = array();
+	}
+	return array_merge( $defaults, $stored );
+}
+
+function tsvd_anfragen_user_setting( $key, $default = null ) {
+	$settings = tsvd_anfragen_user_settings();
+	return isset( $settings[ $key ] ) ? $settings[ $key ] : $default;
+}
+
+function tsvd_anfragen_update_user_setting( $key, $value ) {
+	$settings = tsvd_anfragen_user_settings();
+	$settings[ $key ] = $value;
+	update_user_meta( get_current_user_id(), 'tsvd_anfragen_user_settings', $settings );
+}
+
 function tsvd_anfragen_sidebar_pos() {
-	$user_id = get_current_user_id();
 	if ( isset( $_GET['msgr_side'] ) ) {
 		$new = 'left' === $_GET['msgr_side'] ? 'left' : 'right';
-		update_user_meta( $user_id, 'tsvd_anfragen_sidebar_pos', $new );
+		tsvd_anfragen_update_user_setting( 'sidebar_pos', $new );
 		return $new;
 	}
-	$pos = get_user_meta( $user_id, 'tsvd_anfragen_sidebar_pos', true );
+	$pos = tsvd_anfragen_user_setting( 'sidebar_pos', 'right' );
 	return 'left' === $pos ? 'left' : 'right';
 }
 
@@ -53,10 +78,23 @@ function tsvd_anfragen_render_page() {
 	}
 
 	$selected = absint( isset( $_GET['view'] ) ? $_GET['view'] : 0 );
-	$status   = isset( $_GET['status'] ) ? sanitize_key( $_GET['status'] ) : '';
 	$search   = isset( $_GET['s'] ) ? sanitize_text_field( wp_unslash( $_GET['s'] ) ) : '';
-	$breed    = isset( $_GET['breed'] ) ? absint( $_GET['breed'] ) : 0;
-	$pos      = tsvd_anfragen_sidebar_pos();
+
+	if ( isset( $_GET['status'] ) ) {
+		$status = sanitize_key( $_GET['status'] );
+		tsvd_anfragen_update_user_setting( 'status', $status );
+	} else {
+		$status = (string) tsvd_anfragen_user_setting( 'status', '' );
+	}
+
+	if ( isset( $_GET['breed'] ) ) {
+		$breed = absint( $_GET['breed'] );
+		tsvd_anfragen_update_user_setting( 'breed', $breed );
+	} else {
+		$breed = (int) tsvd_anfragen_user_setting( 'breed', 0 );
+	}
+
+	$pos = tsvd_anfragen_sidebar_pos();
 
 	echo '<div class="wrap"><h1 class="wp-heading-inline">' . esc_html__( 'Anfragen', 'tsvd' ) . '</h1>';
 
@@ -70,8 +108,6 @@ function tsvd_anfragen_render_page() {
 		echo '<div class="notice notice-success is-dismissible"><p>' . esc_html__( 'Anfrage als Spam markiert.', 'tsvd' ) . '</p></div>';
 	}
 
-	tsvd_anfragen_messenger_styles();
-
 	echo '<div class="tsvd-msgr tsvd-msgr--' . esc_attr( $pos ) . '">';
 	tsvd_anfragen_render_sidebar( $status, $search, $selected, $pos, $breed );
 	echo '<div class="tsvd-msgr__main">';
@@ -83,128 +119,16 @@ function tsvd_anfragen_render_page() {
 	echo '</div></div></div>';
 }
 
-function tsvd_anfragen_messenger_styles() {
-	static $done = false;
-	if ( $done ) {
-		return;
-	}
-	$done = true;
-	echo '<style>'
-		. '.tsvd-msgr{display:flex;border:1px solid var(--tsvd-chrome-border,#c3c4c7);'
-		. 'background:var(--tsvd-chrome-surface,#fff);border-radius:4px;overflow:hidden;'
-		. 'height:calc(100vh - 150px);min-height:480px;margin-top:12px;}'
-		. '.tsvd-msgr--right{flex-direction:row-reverse;}'
-		. '.tsvd-msgr--left{flex-direction:row;}'
-		. '.tsvd-msgr__side{width:340px;flex:0 0 340px;display:flex;flex-direction:column;'
-		. 'border-right:1px solid var(--tsvd-chrome-border,#c3c4c7);background:var(--tsvd-chrome-canvas,#f0f0f0);}'
-		. '.tsvd-msgr--right .tsvd-msgr__side{border-right:0;'
-		. 'border-left:1px solid var(--tsvd-chrome-border,#c3c4c7);}'
-		. '.tsvd-msgr__side-head{padding:10px;border-bottom:1px solid var(--tsvd-chrome-border,#c3c4c7);}'
-		. '.tsvd-msgr__side-bar{display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;}'
-		. '.tsvd-msgr__side-title{font-weight:600;font-size:11px;text-transform:uppercase;'
-		. 'letter-spacing:.03em;color:var(--tsvd-chrome-text-muted,#646970);}'
-		. '.tsvd-msgr__pos{display:inline-flex;align-items:center;justify-content:center;width:36px;'
-		. 'height:36px;border:1px solid var(--tsvd-chrome-border,#c3c4c7);border-radius:3px;'
-		. 'color:var(--tsvd-chrome-text-muted,#646970);text-decoration:none;box-sizing:border-box;}'
-		. '.tsvd-msgr__side-head .search-box{display:flex;gap:6px;margin:0;align-items:center;'
-		. 'float:none;width:100%;box-sizing:border-box;}'
-		. '.tsvd-msgr__side-head .search-box input[type=search]{flex:1;min-width:0;}'
-		. '.tsvd-msgr__side-head .tsvd-msgr__search-btn{flex:0 0 auto;display:inline-flex;'
-		. 'align-items:center;justify-content:center;width:36px;height:36px;min-height:36px;'
-		. 'padding:0;line-height:1;border-radius:3px;box-sizing:border-box;}'
-		. '.tsvd-msgr__filters{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px;'
-		. 'width:100%;box-sizing:border-box;}'
-		. '.tsvd-msgr__filters a{display:inline-flex;align-items:center;justify-content:center;'
-		. 'width:36px;height:36px;border:1px solid var(--tsvd-chrome-border,#c3c4c7);'
-		. 'border-radius:3px;color:var(--tsvd-chrome-text-muted,#646970);text-decoration:none;'
-		. 'box-sizing:border-box;}'
-		. '.tsvd-msgr__filters a.current{background:var(--wp-admin-theme-color,#2271b1);'
-		. 'border-color:var(--wp-admin-theme-color,#2271b1);color:#fff;}'
-		. '.tsvd-msgr__filters a.current .dashicons{color:#fff;}'
-		. '.tsvd-msgr__filters .dashicons,.tsvd-msgr__pos .dashicons,'
-		. '.tsvd-msgr__search-btn .dashicons{display:flex;align-items:center;'
-		. 'justify-content:center;width:18px;height:18px;font-size:18px;line-height:1;}'
-		. '.tsvd-msgr__breed{width:100%;margin-top:8px;box-sizing:border-box;height:36px;'
-		. 'appearance:none;-webkit-appearance:none;-moz-appearance:none;'
-		. 'padding:0 1.75rem 0 0.5rem;'
-		. 'background-color:var(--tsvd-chrome-surface,#fff);color:var(--tsvd-chrome-text,#3c434a);'
-		. 'border:1px solid var(--tsvd-chrome-border,#c3c4c7);border-radius:3px;'
-		. 'background-image:var(--tsvd-select-arrow);background-repeat:no-repeat;'
-		. 'background-position:right 0.5rem center;background-size:1rem;}'
-		. '.tsvd-msgr__breed:hover{border-color:var(--tsvd-chrome-heading,#1d2327);}'
-		. '.tsvd-msgr__breed:focus{color:var(--tsvd-chrome-text,#3c434a);'
-		. 'border-color:var(--tsvd-link,#2271b1);outline:none;'
-		. 'box-shadow:0 0 0 1px var(--tsvd-link,#2271b1);}'
-		. '.tsvd-msgr__list{overflow-y:auto;flex:1;}'
-		. '.tsvd-msgr__item{display:block;text-decoration:none;padding:10px 12px;'
-		. 'border-bottom:1px solid var(--tsvd-chrome-border,#c3c4c7);color:var(--tsvd-chrome-text,#3c434a);}'
-		. '.tsvd-msgr__item:hover{background:var(--tsvd-chrome-surface,#fff);}'
-		. '.tsvd-msgr__item.is-active{background:var(--tsvd-chrome-surface,#fff);'
-		. 'box-shadow:inset 3px 0 0 var(--wp-admin-theme-color,#2271b1);}'
-		. '.tsvd-msgr__item-top{display:flex;justify-content:space-between;gap:8px;}'
-		. '.tsvd-msgr__name{font-weight:600;}'
-		. '.tsvd-msgr__time{font-size:11px;color:var(--tsvd-chrome-text-muted,#646970);white-space:nowrap;}'
-		. '.tsvd-msgr__sub{font-size:12px;color:var(--tsvd-chrome-text-muted,#646970);'
-		. 'margin-top:2px;display:flex;justify-content:space-between;gap:8px;align-items:flex-start;}'
-		. '.tsvd-msgr__badge{font-size:11px;padding:2px 8px;border-radius:9px;border:0;white-space:nowrap;'
-		. 'background:var(--tsvd-chrome-badge-bg,#e5f0fb);color:var(--tsvd-chrome-badge-text,#135e96);}'
-		. '.tsvd-msgr__main{flex:1;display:flex;flex-direction:column;overflow-y:auto;padding:16px;min-width:0;}'
-		. '.tsvd-msgr__empty{margin:auto;color:var(--tsvd-chrome-text-muted,#646970);}'
-		. '.tsvd-msgr__pager{padding:6px;border-top:1px solid var(--tsvd-chrome-border,#c3c4c7);}'
-		. '.tsvd-msgr__pager .tablenav{height:auto;margin:0;}'
-		. '.tsvd-conv__head{display:flex;align-items:center;gap:10px;flex-wrap:wrap;}'
-		. '.tsvd-conv__head h2{margin:0;}'
-		. '.tsvd-conv__actions{margin-left:auto;display:flex;gap:8px;align-items:center;}'
-		. '.tsvd-conv__actions form{margin:0;display:flex;}'
-		. '.tsvd-conv__act-btn{display:inline-flex;align-items:center;justify-content:center;'
-		. 'width:36px;height:36px;padding:0;box-sizing:border-box;cursor:pointer;border-radius:3px;'
-		. 'border:1px solid var(--tsvd-chrome-border,#c3c4c7);'
-		. 'background:var(--tsvd-chrome-surface,#fff);color:var(--tsvd-chrome-text-muted,#646970);}'
-		. '.tsvd-conv__act-btn:hover{color:var(--tsvd-chrome-heading,#1d2327);}'
-		. '.tsvd-conv__act-btn.is-danger{color:#d63638;border-color:#d63638;}'
-		. '.tsvd-conv__act-btn .dashicons{display:flex;align-items:center;justify-content:center;'
-		. 'width:18px;height:18px;font-size:18px;line-height:1;}'
-		. '.tsvd-conv__assign select{max-width:190px;height:36px;box-sizing:border-box;'
-		. 'appearance:none;-webkit-appearance:none;-moz-appearance:none;'
-		. 'padding:0 1.75rem 0 0.5rem;'
-		. 'background-color:var(--tsvd-chrome-surface,#fff);color:var(--tsvd-chrome-text,#3c434a);'
-		. 'border:1px solid var(--tsvd-chrome-border,#c3c4c7);border-radius:3px;'
-		. 'background-image:var(--tsvd-select-arrow);background-repeat:no-repeat;'
-		. 'background-position:right 0.5rem center;background-size:1rem;}'
-		. '.tsvd-conv__assign select:hover{border-color:var(--tsvd-chrome-heading,#1d2327);}'
-		. '.tsvd-conv__assign select:focus{color:var(--tsvd-chrome-text,#3c434a);'
-		. 'border-color:var(--tsvd-link,#2271b1);outline:none;'
-		. 'box-shadow:0 0 0 1px var(--tsvd-link,#2271b1);}'
-		. '.tsvd-conv__trash-note{color:var(--tsvd-chrome-text-muted,#646970);font-style:italic;}'
-		. '.tsvd-conv__animal{font-weight:400;font-size:14px;color:var(--tsvd-chrome-text-muted,#646970);}'
-		. '.tsvd-conv__contact{margin:4px 0 12px;color:var(--tsvd-chrome-text-muted,#646970);}'
-		. '.tsvd-animal-card{display:flex;gap:12px;align-items:center;padding:10px 12px;'
-		. 'margin:0 0 14px;border:1px solid var(--tsvd-chrome-border,#c3c4c7);border-radius:3px;'
-		. 'background:var(--tsvd-chrome-canvas,#f0f0f0);}'
-		. '.tsvd-animal-card__thumb{flex:0 0 64px;width:64px;height:64px;border-radius:3px;'
-		. 'overflow:hidden;display:flex;align-items:center;justify-content:center;'
-		. 'background:var(--tsvd-chrome-surface,#fff);border:1px solid var(--tsvd-chrome-border,#c3c4c7);}'
-		. '.tsvd-animal-card__thumb img{width:64px;height:64px;object-fit:cover;display:block;}'
-		. '.tsvd-animal-card__thumb .dashicons{color:var(--tsvd-chrome-text-muted,#646970);'
-		. 'font-size:30px;width:30px;height:30px;}'
-		. '.tsvd-animal-card__name{font-weight:600;font-size:14px;}'
-		. '.tsvd-animal-card__facts{font-size:12px;color:var(--tsvd-chrome-text-muted,#646970);margin-top:2px;}'
-		. '.tsvd-animal-card__links{display:flex;gap:14px;font-size:12px;margin-top:5px;}'
-		. '@media(max-width:782px){.tsvd-msgr{flex-direction:column;height:auto;}'
-		. '.tsvd-msgr__side{width:auto;flex:none;max-height:320px;}}'
-		. '</style>';
-}
-
 /**
- * Alle animal_breed-Terme, gruppiert nach Haussortierung (Hund, Katze, Kleintier, Vogel),
- * innerhalb der Gruppe alphabetisch.
+ * Alle animal_breed-Eltern-Terme (Häuser) in fester Reihenfolge.
  *
  * @return WP_Term[]
  */
-function tsvd_anfragen_breed_terms() {
+function tsvd_anfragen_breed_houses() {
 	$terms = get_terms(
 		array(
 			'taxonomy'   => 'animal_breed',
+			'parent'     => 0,
 			'hide_empty' => false,
 		)
 	);
@@ -212,37 +136,90 @@ function tsvd_anfragen_breed_terms() {
 		return $terms;
 	}
 
-	$parent_names = array();
-	$group_name   = array();
-	foreach ( $terms as $term ) {
-		$parent_names[ $term->term_id ] = $term->name;
-	}
-	foreach ( $terms as $term ) {
-		if ( $term->parent && isset( $parent_names[ $term->parent ] ) ) {
-			$group_name[ $term->term_id ] = $parent_names[ $term->parent ];
-		}
-	}
+	$order = array( 'Hund', 'Katze', 'Kleintier', 'Vogel', 'Insekt', 'Spinne', 'Amphibie', 'Reptil' );
+	$rank  = array_flip( $order );
 
-	$priority = array( 'Hund' => 0, 'Katze' => 1, 'Kleintier' => 2, 'Vogel' => 3 );
-
-	usort( $terms, function ( $a, $b ) use ( $group_name, $priority ) {
-		$group_a = isset( $group_name[ $a->term_id ] ) ? $group_name[ $a->term_id ] : $a->name;
-		$group_b = isset( $group_name[ $b->term_id ] ) ? $group_name[ $b->term_id ] : $b->name;
-		$prio_a  = isset( $priority[ $group_a ] ) ? $priority[ $group_a ] : count( $priority );
-		$prio_b  = isset( $priority[ $group_b ] ) ? $priority[ $group_b ] : count( $priority );
-		if ( $prio_a !== $prio_b ) {
-			return $prio_a <=> $prio_b;
-		}
-		$root_a = $a->parent ? 1 : 0;
-		$root_b = $b->parent ? 1 : 0;
-		if ( $root_a !== $root_b ) {
-			return $root_a <=> $root_b;
+	usort( $terms, function ( $a, $b ) use ( $rank ) {
+		$ra = isset( $rank[ $a->name ] ) ? $rank[ $a->name ] : count( $rank );
+		$rb = isset( $rank[ $b->name ] ) ? $rank[ $b->name ] : count( $rank );
+		if ( $ra !== $rb ) {
+			return $ra <=> $rb;
 		}
 		return strcmp( $a->name, $b->name );
 	} );
 
 	return $terms;
 }
+
+/**
+ * Nur Häuser mit veröffentlichten Tieren oder offenen Anfragen, in fester Reihenfolge.
+ *
+ * @return WP_Term[]
+ */
+function tsvd_anfragen_breed_houses_visible() {
+	$houses = tsvd_anfragen_breed_houses();
+	if ( is_wp_error( $houses ) || empty( $houses ) ) {
+		return $houses;
+	}
+
+	global $wpdb;
+	$table = tsvd_anfragen_table_name();
+	$ids   = array_map( 'absint', wp_list_pluck( $houses, 'term_id' ) );
+	$in    = implode( ',', $ids );
+
+	$has_animals = $wpdb->get_col(
+		"SELECT DISTINCT CASE WHEN tt.parent = 0 THEN tt.term_id ELSE tt.parent END
+		 FROM {$wpdb->term_relationships} tr
+		 INNER JOIN {$wpdb->term_taxonomy} tt ON tt.term_taxonomy_id = tr.term_taxonomy_id
+		 INNER JOIN {$wpdb->posts} p ON p.ID = tr.object_id
+		 WHERE tt.taxonomy = 'animal_breed'
+		 AND ( tt.term_id IN ( {$in} ) OR tt.parent IN ( {$in} ) )
+		 AND p.post_type = 'animals' AND p.post_status = 'publish'"
+	);
+	$has_requests = $wpdb->get_col(
+		"SELECT DISTINCT CASE WHEN tt.parent = 0 THEN tt.term_id ELSE tt.parent END
+		 FROM {$table} a
+		 INNER JOIN {$wpdb->posts} p ON p.ID = a.animal_id AND p.post_type = 'animals'
+		 INNER JOIN {$wpdb->term_relationships} tr ON tr.object_id = p.ID
+		 INNER JOIN {$wpdb->term_taxonomy} tt ON tt.term_taxonomy_id = tr.term_taxonomy_id
+		 WHERE tt.taxonomy = 'animal_breed'
+		 AND ( tt.term_id IN ( {$in} ) OR tt.parent IN ( {$in} ) )
+		 AND a.deleted_at IS NULL AND a.status NOT IN ( 'spam', 'blocked' )"
+	);
+	$visible = array_flip( array_map( 'intval', array_merge( $has_animals, $has_requests ) ) );
+
+	return array_values( array_filter( $houses, function ( $term ) use ( $visible ) {
+		return isset( $visible[ (int) $term->term_id ] );
+	} ) );
+}
+
+function tsvd_anfragen_breed_icon( $term_id ) {
+	$name = get_term_field( 'name', $term_id, 'animal_breed' );
+	$map  = array(
+		'Hund'     => 'dog',
+		'Katze'    => 'cat',
+		'Kleintier' => 'paw',
+		'Vogel'    => 'canary',
+		'Insekt'   => 'bug',
+		'Spinne'   => 'spider',
+	);
+	return isset( $map[ $name ] ) ? $map[ $name ] : 'paw';
+}
+
+function tsvd_anfragen_breed_icon_svg( $icon ) {
+	$paths = array(
+		'dog'    => '<path d="M11 5h2" /><path d="M19 12c-.667 5.333 -2.333 8 -5 8h-4c-2.667 0 -4.333 -2.667 -5 -8" /><path d="M11 16c0 .667 .333 1 1 1s1 -.333 1 -1h-2" /><path d="M12 18v2" /><path d="M10 11v.01" /><path d="M14 11v.01" /><path d="M5 4l6 .97l-6.238 6.688a1.021 1.021 0 0 1 -1.41 .111a.953 .953 0 0 1 -.327 -.954l1.975 -6.815" /><path d="M19 4l-6 .97l6.238 6.688c.358 .408 .989 .458 1.41 .111a.953 .953 0 0 0 .327 -.954l-1.975 -6.815" />',
+		'cat'    => '<path d="M20 3v10a8 8 0 1 1 -16 0v-10l3.432 3.432a7.963 7.963 0 0 1 4.568 -1.432c1.769 0 3.403 .574 4.728 1.546l3.272 -3.546" /><path d="M2 16h5l-4 4" /><path d="M22 16h-5l4 4" /><path d="M11 16a1 1 0 1 0 2 0a1 1 0 1 0 -2 0" /><path d="M9 11v.01" /><path d="M15 11v.01" />',
+		'paw'    => '<path d="M14.7 13.5c-1.1 -2 -1.441 -2.5 -2.7 -2.5c-1.259 0 -1.736 .755 -2.836 2.747c-.942 1.703 -2.846 1.845 -3.321 3.291c-.097 .265 -.145 .677 -.143 .962c0 1.176 .787 2 1.8 2c1.259 0 3 -1 4.5 -1s3.241 1 4.5 1c1.013 0 1.8 -.823 1.8 -2c0 -.285 -.049 -.697 -.146 -.962c-.475 -1.451 -2.512 -1.835 -3.454 -3.538" /><path d="M20.188 8.082a1.039 1.039 0 0 0 -.406 -.082h-.015c-.735 .012 -1.56 .75 -1.993 1.866c-.519 1.335 -.28 2.7 .538 3.052c.129 .055 .267 .082 .406 .082c.739 0 1.575 -.742 2.011 -1.866c.516 -1.335 .273 -2.7 -.54 -3.052l-.001 0" /><path d="M9.474 9c.055 0 .109 0 .163 -.011c.944 -.128 1.533 -1.346 1.32 -2.722c-.203 -1.297 -1.047 -2.267 -1.932 -2.267c-.055 0 -.109 0 -.163 .011c-.944 .128 -1.533 1.346 -1.32 2.722c.204 1.293 1.048 2.267 1.933 2.267" /><path d="M16.456 6.733c.214 -1.376 -.375 -2.594 -1.32 -2.722a1.164 1.164 0 0 0 -.162 -.011c-.885 0 -1.728 .97 -1.93 2.267c-.214 1.376 .375 2.594 1.32 2.722c.054 .007 .108 .011 .162 .011c.885 0 1.73 -.974 1.93 -2.267" /><path d="M5.69 12.918c.816 -.352 1.054 -1.719 .536 -3.052c-.436 -1.124 -1.271 -1.866 -2.009 -1.866c-.14 0 -.277 .027 -.407 .082c-.816 .352 -1.054 1.719 -.536 3.052c.436 1.124 1.271 1.866 2.009 1.866c.14 0 .277 -.027 .407 -.082" />',
+		'canary' => '<path d="M12 20v-2" /><path d="M15 8.01v.01" /><path d="M3 17l8 -8v-1a4 4 0 1 1 8 0h2l-2 2v1a7 7 0 0 1 -13.215 3.223" />',
+		'bug'    => '<path d="M9 9v-1a3 3 0 0 1 6 0v1" /><path d="M8 9h8a6 6 0 0 1 1 3v3a5 5 0 0 1 -10 0v-3a6 6 0 0 1 1 -3" /><path d="M3 13l4 0" /><path d="M17 13l4 0" /><path d="M12 20l0 -6" /><path d="M4 19l3.35 -2" /><path d="M20 19l-3.35 -2" /><path d="M4 7l3.75 2.4" /><path d="M20 7l-3.75 2.4" />',
+		'spider' => '<path d="M5 4v2l5 5" /><path d="M2.5 9.5l1.5 1.5h6" /><path d="M4 19v-2l6 -6" /><path d="M19 4v2l-5 5" /><path d="M21.5 9.5l-1.5 1.5h-6" /><path d="M20 19v-2l-6 -6" /><path d="M8 15a4 4 0 1 0 8 0a4 4 0 1 0 -8 0" /><path d="M10 9a2 2 0 1 0 4 0a2 2 0 1 0 -4 0" />',
+	);
+	$body = isset( $paths[ $icon ] ) ? $paths[ $icon ] : $paths['paw'];
+	return '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"'
+		. ' stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">' . $body . '</svg>';
+}
+
 
 function tsvd_anfragen_list_where( $status, $search, $breed = 0 ) {
 	global $wpdb;
@@ -387,39 +364,39 @@ function tsvd_anfragen_render_sidebar( $status, $search, $selected, $pos = 'righ
 
 	tsvd_anfragen_render_search_box( $status, $search, $breed );
 
-	$breed_terms = $breed ? get_term( $breed ) : null;
-	echo '<form method="get" class="tsvd-msgr__breed-form">';
-	echo '<input type="hidden" name="post_type" value="animals" />';
-	echo '<input type="hidden" name="page" value="tsvd-anfragen" />';
+	$status_args = array();
 	if ( $status ) {
-		echo '<input type="hidden" name="status" value="' . esc_attr( $status ) . '" />';
+		$status_args['status'] = $status;
 	}
 	if ( '' !== $search ) {
-		echo '<input type="hidden" name="s" value="' . esc_attr( $search ) . '" />';
+		$status_args['s'] = $search;
 	}
-	echo '<select name="breed" class="tsvd-msgr__breed" aria-label="' . esc_attr__( 'Nach Tierart filtern', 'tsvd' ) . '" onchange="this.form.submit()">';
-	echo '<option value="">' . esc_html__( 'Alle Tierarten', 'tsvd' ) . '</option>';
-	$terms = tsvd_anfragen_breed_terms();
-	if ( ! is_wp_error( $terms ) ) {
-		foreach ( $terms as $term ) {
-			echo '<option value="' . esc_attr( $term->term_id ) . '"' . selected( $breed, $term->term_id, false ) . '>' . esc_html( $term->name ) . '</option>';
+
+	$houses = tsvd_anfragen_breed_houses_visible();
+	echo '<div class="tsvd-msgr__filters tsvd-msgr__filters--breed">';
+	echo '<a class="tsvd-msgr__filter-btn' . ( $breed ? '' : ' is-current' ) . '" href="' . esc_url( add_query_arg( array_merge( $status_args, array( 'breed' => 0 ) ), $base_url ) ) . '" title="' . esc_attr__( 'Alle Tierarten', 'tsvd' ) . '" aria-label="' . esc_attr__( 'Alle Tierarten', 'tsvd' ) . '">' . tsvd_anfragen_breed_icon_svg( 'paw' ) . '</a>';
+	if ( ! is_wp_error( $houses ) ) {
+		foreach ( $houses as $term ) {
+			$icon   = tsvd_anfragen_breed_icon( $term->term_id );
+			$active = $breed === (int) $term->term_id;
+			$href   = add_query_arg( array_merge( $status_args, array( 'breed' => $active ? 0 : $term->term_id ) ), $base_url );
+			echo '<a class="tsvd-msgr__filter-btn' . ( $active ? ' is-current' : '' ) . '" href="' . esc_url( $href ) . '" title="' . esc_attr( $term->name ) . '" aria-label="' . esc_attr( $term->name ) . '">' . tsvd_anfragen_breed_icon_svg( $icon ) . '</a>';
 		}
 	}
-	echo '</select>';
-	echo '</form>';
+	echo '</div>';
 
 	echo '<div class="tsvd-msgr__filters">';
-	echo '<a href="' . esc_url( add_query_arg( array_merge( array( 'status' => 'mine' ), $breed_args ), $base_url ) ) . '"' . ( 'mine' === $status ? ' class="current"' : '' ) . ' title="' . esc_attr__( 'Meine Anfragen', 'tsvd' ) . '" aria-label="' . esc_attr__( 'Meine Anfragen', 'tsvd' ) . '"><span class="dashicons dashicons-admin-users"></span></a>';
-	echo '<a href="' . esc_url( add_query_arg( $breed_args, $base_url ) ) . '"' . ( '' === $status ? ' class="current"' : '' ) . ' title="' . esc_attr__( 'Alle', 'tsvd' ) . '" aria-label="' . esc_attr__( 'Alle', 'tsvd' ) . '"><span class="dashicons dashicons-menu-alt"></span></a>';
+	echo '<a class="tsvd-msgr__filter-btn' . ( 'mine' === $status ? ' is-current' : '' ) . '" href="' . esc_url( add_query_arg( array_merge( array( 'status' => 'mine' ), $breed_args ), $base_url ) ) . '" title="' . esc_attr__( 'Meine Anfragen', 'tsvd' ) . '" aria-label="' . esc_attr__( 'Meine Anfragen', 'tsvd' ) . '"><span class="dashicons dashicons-admin-users"></span></a>';
+	echo '<a class="tsvd-msgr__filter-btn' . ( '' === $status ? ' is-current' : '' ) . '" href="' . esc_url( add_query_arg( array_merge( array( 'status' => '' ), $breed_args ), $base_url ) ) . '" title="' . esc_attr__( 'Alle', 'tsvd' ) . '" aria-label="' . esc_attr__( 'Alle', 'tsvd' ) . '"><span class="dashicons dashicons-menu-alt"></span></a>';
 	foreach ( $status_labels as $key => $label ) {
 		if ( 'spam' === $key ) {
 			continue;
 		}
 		$icon = isset( $status_icons[ $key ] ) ? $status_icons[ $key ] : 'dashicons-marker';
-		echo '<a href="' . esc_url( add_query_arg( array_merge( array( 'status' => $key ), $breed_args ), $base_url ) ) . '"' . ( $status === $key ? ' class="current"' : '' ) . ' title="' . esc_attr( $label ) . '" aria-label="' . esc_attr( $label ) . '"><span class="dashicons ' . esc_attr( $icon ) . '"></span></a>';
+		echo '<a class="tsvd-msgr__filter-btn' . ( $status === $key ? ' is-current' : '' ) . '" href="' . esc_url( add_query_arg( array_merge( array( 'status' => $key ), $breed_args ), $base_url ) ) . '" title="' . esc_attr( $label ) . '" aria-label="' . esc_attr( $label ) . '"><span class="dashicons ' . esc_attr( $icon ) . '"></span></a>';
 	}
-	echo '<a href="' . esc_url( add_query_arg( array_merge( array( 'status' => 'spam' ), $breed_args ), $base_url ) ) . '"' . ( 'spam' === $status ? ' class="current"' : '' ) . ' title="' . esc_attr__( 'Spam', 'tsvd' ) . '" aria-label="' . esc_attr__( 'Spam', 'tsvd' ) . '"><span class="dashicons dashicons-warning"></span></a>';
-	echo '<a href="' . esc_url( add_query_arg( array_merge( array( 'status' => 'trash' ), $breed_args ), $base_url ) ) . '"' . ( 'trash' === $status ? ' class="current"' : '' ) . ' title="' . esc_attr__( 'Papierkorb', 'tsvd' ) . '" aria-label="' . esc_attr__( 'Papierkorb', 'tsvd' ) . '"><span class="dashicons dashicons-trash"></span></a>';
+	echo '<a class="tsvd-msgr__filter-btn' . ( 'spam' === $status ? ' is-current' : '' ) . '" href="' . esc_url( add_query_arg( array_merge( array( 'status' => 'spam' ), $breed_args ), $base_url ) ) . '" title="' . esc_attr__( 'Spam', 'tsvd' ) . '" aria-label="' . esc_attr__( 'Spam', 'tsvd' ) . '"><span class="dashicons dashicons-warning"></span></a>';
+	echo '<a class="tsvd-msgr__filter-btn' . ( 'trash' === $status ? ' is-current' : '' ) . '" href="' . esc_url( add_query_arg( array_merge( array( 'status' => 'trash' ), $breed_args ), $base_url ) ) . '" title="' . esc_attr__( 'Papierkorb', 'tsvd' ) . '" aria-label="' . esc_attr__( 'Papierkorb', 'tsvd' ) . '"><span class="dashicons dashicons-trash"></span></a>';
 	echo '</div></div>';
 
 	echo '<div class="tsvd-msgr__list">';
