@@ -91,6 +91,12 @@ function tsvd_anfragen_render_conversation( $id ) {
 	}
 	echo '</p>';
 
+	$payload = json_decode( $anfrage['payload'], true );
+	if ( ! empty( $payload['interesse_tier'] ) ) {
+		echo '<p class="tsvd-conv__interest">' . esc_html__( 'Interesse an Tier:', 'tsvd' ) . ' <strong>'
+			. esc_html( $payload['interesse_tier'] ) . '</strong></p>';
+	}
+
 	tsvd_anfragen_render_animal_card( (int) $anfrage['animal_id'] );
 
 	tsvd_anfragen_render_replies( $wpdb, $replies_table, $anfrage );
@@ -120,16 +126,28 @@ function tsvd_anfragen_field_value_label( $field, $value ) {
 	return $value;
 }
 
-function tsvd_anfragen_payload_facts( $anfrage ) {
+function tsvd_anfragen_payload_facts( $anfrage, $skip = array() ) {
 	$payload = json_decode( $anfrage['payload'], true );
 	$fields  = tsvd_get_form_fields( (int) $anfrage['form_id'] );
 	$facts   = array();
 	foreach ( $fields as $field ) {
 		$field_id = $field['id'];
+		if ( in_array( $field_id, $skip, true ) ) {
+			continue;
+		}
 		if ( ! isset( $payload[ $field_id ] ) || '' === $payload[ $field_id ] ) {
 			continue;
 		}
-		$label = ! empty( $field['label'] ) ? $field['label'] : $field_id;
+		$label = ! empty( $field['label'] ) ? $field['label'] : '';
+
+		if ( '' === $label ) {
+			$label_fallbacks = array(
+				'zustimmung_datenschutz' => __( 'Datenschutz-Zustimmung', 'tsvd' ),
+			);
+			$label = isset( $label_fallbacks[ $field_id ] )
+				? $label_fallbacks[ $field_id ]
+				: $field_id;
+		}
 		$raw   = $payload[ $field_id ];
 		if ( is_array( $raw ) ) {
 			$parts = array();
@@ -190,11 +208,11 @@ function tsvd_anfragen_chat_styles() {
 		. 'margin:0 0 12px;padding-bottom:8px;'
 		. 'border-bottom:1px solid var(--tsvd-chrome-border,#c3c4c7);}'
 		. '.tsvd-conv__participants-label{font-weight:600;}'
-		. '.tsvd-chat__facts{margin:0;display:flex;flex-direction:column;gap:3px;}'
-		. '.tsvd-chat__fact{display:flex;gap:8px;}'
-		. '.tsvd-chat__fact dt{flex:0 0 auto;min-width:120px;'
+		. '.tsvd-chat__facts{margin:0;display:flex;flex-direction:column;gap:6px;}'
+		. '.tsvd-chat__fact{display:flex;flex-direction:column;gap:1px;}'
+		. '.tsvd-chat__fact dt{font-size:11px;'
 		. 'color:var(--tsvd-chrome-text-muted,#646970);}'
-		. '.tsvd-chat__fact dd{margin:0;}'
+		. '.tsvd-chat__fact dd{margin:0;word-break:break-word;}'
 		. '.tsvd-composer__modes{display:flex;gap:6px;margin:0 0 8px;}'
 		. '.tsvd-composer__mode{display:inline-flex;align-items:center;justify-content:center;'
 		. 'width:36px;height:36px;padding:0;box-sizing:border-box;cursor:pointer;border-radius:3px;'
@@ -264,7 +282,10 @@ function tsvd_anfragen_render_participants( $replies ) {
 }
 
 function tsvd_anfragen_render_angaben_bubble( $anfrage ) {
-	$facts = tsvd_anfragen_payload_facts( $anfrage );
+	$facts = tsvd_anfragen_payload_facts(
+		$anfrage,
+		array( 'bewerber_name', 'bewerber_telefon', 'bewerber_email', 'interesse_tier' )
+	);
 	if ( empty( $facts ) ) {
 		return;
 	}

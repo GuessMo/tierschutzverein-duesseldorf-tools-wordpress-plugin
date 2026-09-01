@@ -38,8 +38,8 @@ function tsvd_tools_ai_interessentenbogen_fields() {
 
     $fields = array(
         // Kontaktblock
-        array('id' => 'bewerber_name', 'type' => 'applicant_name', 'label' => __('Name, Vorname (alle Halter:innen)', 'tsv-tools'), 'required' => true),
-        array('id' => 'bewerber_geburtsdatum', 'type' => 'text', 'label' => __('Geburtsdatum (alle Halter:innen)', 'tsv-tools'), 'required' => false),
+        array('id' => 'bewerber_name', 'type' => 'applicant_name', 'label' => __('Name, Vorname (aller Halter)', 'tsv-tools'), 'required' => true),
+        array('id' => 'bewerber_geburtsdatum', 'type' => 'text', 'label' => __('Geburtsdatum (aller Halter)', 'tsv-tools'), 'required' => false),
         array('id' => 'bewerber_anschrift', 'type' => 'textarea', 'label' => __('Anschrift', 'tsv-tools'), 'required' => true, 'rows' => 2),
         array('id' => 'bewerber_telefon', 'type' => 'tel', 'label' => __('Telefon', 'tsv-tools'), 'required' => true),
         array('id' => 'bewerber_email', 'type' => 'email', 'label' => __('E-Mail', 'tsv-tools'), 'required' => true),

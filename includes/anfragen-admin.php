@@ -152,7 +152,8 @@ function tsvd_anfragen_breed_houses() {
 }
 
 /**
- * Nur Häuser mit veröffentlichten Tieren oder offenen Anfragen, in fester Reihenfolge.
+ * Nur Häuser mit sichtbaren Anfragen, in fester Reihenfolge.
+ * Ein Haus erscheint erst, wenn mindestens eine offene (nicht spam/blocked) Anfrage vorliegt.
  *
  * @return WP_Term[]
  */
@@ -167,15 +168,6 @@ function tsvd_anfragen_breed_houses_visible() {
 	$ids   = array_map( 'absint', wp_list_pluck( $houses, 'term_id' ) );
 	$in    = implode( ',', $ids );
 
-	$has_animals = $wpdb->get_col(
-		"SELECT DISTINCT CASE WHEN tt.parent = 0 THEN tt.term_id ELSE tt.parent END
-		 FROM {$wpdb->term_relationships} tr
-		 INNER JOIN {$wpdb->term_taxonomy} tt ON tt.term_taxonomy_id = tr.term_taxonomy_id
-		 INNER JOIN {$wpdb->posts} p ON p.ID = tr.object_id
-		 WHERE tt.taxonomy = 'animal_breed'
-		 AND ( tt.term_id IN ( {$in} ) OR tt.parent IN ( {$in} ) )
-		 AND p.post_type = 'animals' AND p.post_status = 'publish'"
-	);
 	$has_requests = $wpdb->get_col(
 		"SELECT DISTINCT CASE WHEN tt.parent = 0 THEN tt.term_id ELSE tt.parent END
 		 FROM {$table} a
@@ -186,7 +178,7 @@ function tsvd_anfragen_breed_houses_visible() {
 		 AND ( tt.term_id IN ( {$in} ) OR tt.parent IN ( {$in} ) )
 		 AND a.deleted_at IS NULL AND a.status NOT IN ( 'spam', 'blocked' )"
 	);
-	$visible = array_flip( array_map( 'intval', array_merge( $has_animals, $has_requests ) ) );
+	$visible = array_flip( array_map( 'intval', $has_requests ) );
 
 	return array_values( array_filter( $houses, function ( $term ) use ( $visible ) {
 		return isset( $visible[ (int) $term->term_id ] );
@@ -198,10 +190,11 @@ function tsvd_anfragen_breed_icon( $term_id ) {
 	$map  = array(
 		'Hund'     => 'dog',
 		'Katze'    => 'cat',
-		'Kleintier' => 'paw',
+		'Kleintier' => 'rabbit',
 		'Vogel'    => 'canary',
 		'Insekt'   => 'bug',
 		'Spinne'   => 'spider',
+		'Amphibie' => 'frog',
 	);
 	return isset( $map[ $name ] ) ? $map[ $name ] : 'paw';
 }
@@ -214,6 +207,8 @@ function tsvd_anfragen_breed_icon_svg( $icon ) {
 		'canary' => '<path d="M12 20v-2" /><path d="M15 8.01v.01" /><path d="M3 17l8 -8v-1a4 4 0 1 1 8 0h2l-2 2v1a7 7 0 0 1 -13.215 3.223" />',
 		'bug'    => '<path d="M9 9v-1a3 3 0 0 1 6 0v1" /><path d="M8 9h8a6 6 0 0 1 1 3v3a5 5 0 0 1 -10 0v-3a6 6 0 0 1 1 -3" /><path d="M3 13l4 0" /><path d="M17 13l4 0" /><path d="M12 20l0 -6" /><path d="M4 19l3.35 -2" /><path d="M20 19l-3.35 -2" /><path d="M4 7l3.75 2.4" /><path d="M20 7l-3.75 2.4" />',
 		'spider' => '<path d="M5 4v2l5 5" /><path d="M2.5 9.5l1.5 1.5h6" /><path d="M4 19v-2l6 -6" /><path d="M19 4v2l-5 5" /><path d="M21.5 9.5l-1.5 1.5h-6" /><path d="M20 19v-2l-6 -6" /><path d="M8 15a4 4 0 1 0 8 0a4 4 0 1 0 -8 0" /><path d="M10 9a2 2 0 1 0 4 0a2 2 0 1 0 -4 0" />',
+		'rabbit' => '<path d="M13 16a3 3 0 0 1 2.24 5" /><path d="M18 12h.01" /><path d="M18 21h-8a4 4 0 0 1-4-4 7 7 0 0 1 7-7h.2L9.6 6.4a1 1 0 1 1 2.8-2.8L15.8 7h.2c3.3 0 6 2.7 6 6v1a2 2 0 0 1-2 2h-1a3 3 0 0 0-3 3" /><path d="M20 8.54V4a2 2 0 1 0-4 0v3" /><path d="M7.612 12.524a3 3 0 1 0-1.6 4.3" />',
+		'frog' => '<circle cx="8" cy="6.5" r="2" /><circle cx="16" cy="6.5" r="2" /><path d="M4 10a8 4.5 0 0 1 16 0v1.5a3.5 3.5 0 0 1 -3.5 3.5h-9A3.5 3.5 0 0 1 4 11.5z" /><path d="M9.5 13.5c1.2 1.6 3.8 1.6 5 0" />',
 	);
 	$body = isset( $paths[ $icon ] ) ? $paths[ $icon ] : $paths['paw'];
 	return '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"'

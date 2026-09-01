@@ -3,8 +3,8 @@
  * Seed-Skript für das Anfragen-Dashboard (nur Dev/Staging).
  *
  * Idempotent: leert beim Lauf beide Anfragen-Tabellen und baut exakt
- * 13 Anfragen (open 5, answered 4, spam 2, blocked 1, trash 1) mit
- * 44 Replies auf. Nur in der development-Umgebung ausführbar — sonst
+ * 14 Anfragen (open 6, answered 4, spam 2, blocked 1, trash 1) mit
+ * 46 Replies auf. Nur in der development-Umgebung ausführbar — sonst
  * bricht das Skript ab, es sei denn TSVD_SEED=1 ist gesetzt.
  *
  * Aufruf: wp eval-file wp-content/plugins/tsv-tools/tools/seed-anfragen-chats.php
@@ -79,6 +79,8 @@ $tiers = array(
 	'capone-hund-20-07-2026'       => 'Capone',
 	'ginny-hund-20-07-2026'        => 'Ginny',
 	'simba-katze-main-coon-06-07-2026' => 'Simba',
+	'athena-kleintier-20-07-2026'      => 'Athena',
+	'pallas-kleintier-20-07-2026'      => 'Pallas',
 );
 
 // [status, tier_slug, name, email, phone, assigned_login, days_ago, extra_payload, replies]
@@ -97,6 +99,10 @@ $conversations = array(
 		array( 'in', '', 'Für Fufu würde ich mich gerne bewerben.', 0, '08:30' ),
 		array( 'out', 'corinna.hoeppner', 'Hallo Frau Meier, schön! Ich sende Ihnen den Interessentenbogen und melde mich.', 0, '09:45' ),
 		array( 'in', '', 'Vielen Dank, ich habe den Bogen schon ausgefüllt.', 0, '11:20' ),
+	) ),
+	array( 'open', 'athena-kleintier-20-07-2026', 'Claudia Roth', 'claudia.roth@example.de', '0178 919 88 77', '', 1, array( 's3_tierart' => 'Vogel', 's1_wohnform' => 'Wohnung', 's1_kinder' => 'Keine Kinder', 's6_motivation' => 'Athena würde in unsere ruhige, vogelsichere Wohnung passen.' ), array(
+		array( 'in', '', 'Guten Tag, ich interessiere mich sehr für Athena.', 1, '09:40' ),
+		array( 'out', 'katrin.haas', 'Hallo Frau Roth, danke für Ihr Interesse. Athena ist eine Papageien-Dame — haben Sie Erfahrung mit Vögeln?', 0, '11:00' ),
 	) ),
 	array( 'open', 'mimi-katze-20-07-2026', 'Jonas Weber', 'jonas.weber@example.de', '0177 555 44 33', '', 3, array( 's3_tierart' => 'Katze', 's1_kinder' => 'Keine Kinder', 's6_motivation' => 'Mimi sieht lieb aus, wir möchten sie kennenlernen.' ), array(
 		array( 'in', '', 'Hallo, ist Mimi noch verfügbar?', 3, '13:10' ),
