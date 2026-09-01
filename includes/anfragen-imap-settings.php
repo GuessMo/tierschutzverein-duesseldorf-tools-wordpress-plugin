@@ -42,6 +42,7 @@ function tsvd_anfragen_imap_save_settings() {
     update_option('tsvd_anfragen_imap_username', sanitize_text_field($_POST['tsvd_anfragen_imap_username'] ?? ''));
     update_option('tsvd_anfragen_imap_folder', sanitize_text_field($_POST['tsvd_anfragen_imap_folder'] ?? 'INBOX'));
     update_option('tsvd_anfragen_send_delay', absint($_POST['tsvd_anfragen_send_delay'] ?? 120));
+    update_option('tsvd_anfragen_signature', sanitize_textarea_field(wp_unslash($_POST['tsvd_anfragen_signature'] ?? '')));
     // Passwort nur überschreiben, wenn tatsächlich ein neuer Wert eingegeben wurde
     // (Feld wird beim Anzeigen nie mit dem echten Wert vorbefüllt).
     if (!empty($_POST['tsvd_anfragen_imap_password'])) {
@@ -98,6 +99,13 @@ function tsvd_render_anfragen_imap_settings_tab() {
             <td>
                 <input type="number" min="0" step="10" id="tsvd_anfragen_send_delay" name="tsvd_anfragen_send_delay" value="<?php echo esc_attr((int) get_option('tsvd_anfragen_send_delay', 120)); ?>" />
                 <p class="description"><?php esc_html_e('Zeitfenster, in dem eine gesendete Antwort noch bearbeitet oder abgebrochen werden kann, bevor die Mail wirklich rausgeht. 0 = sofort senden. Empfohlen: 120.', 'tsv-tools'); ?></p>
+            </td>
+        </tr>
+        <tr>
+            <th><label for="tsvd_anfragen_signature"><?php esc_html_e('Signatur für Antwort-Mails', 'tsv-tools'); ?></label></th>
+            <td>
+                <textarea id="tsvd_anfragen_signature" name="tsvd_anfragen_signature" class="large-text" rows="4"><?php echo esc_textarea(get_option('tsvd_anfragen_signature', '')); ?></textarea>
+                <p class="description"><?php esc_html_e('Wird automatisch unter jede Antwort an Interessent:innen angehängt.', 'tsv-tools'); ?></p>
             </td>
         </tr>
     </table>

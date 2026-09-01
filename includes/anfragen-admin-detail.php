@@ -500,6 +500,11 @@ function tsvd_anfragen_render_conversation_actions( $anfrage ) {
 		tsvd_anfragen_action_form( $id, 'tsvd_anfrage_delete', 'tsvd_anfrage_delete_', __( 'Endgültig löschen', 'tsvd' ), 'dashicons-trash', 'is-danger', __( 'Anfrage endgültig löschen? Dies kann nicht rückgängig gemacht werden.', 'tsvd' ) );
 	} else {
 		tsvd_anfragen_render_assign_control( $anfrage );
+		if ( 'blocked' === $anfrage['status'] ) {
+			tsvd_anfragen_action_form( $id, 'tsvd_anfrage_unblock', 'tsvd_anfrage_unblock_', __( 'Blockierung aufheben', 'tsvd' ), 'dashicons-shield', '', __( 'Blockierung aufheben und wieder als offen markieren?', 'tsvd' ) );
+		} else {
+			tsvd_anfragen_action_form( $id, 'tsvd_anfrage_block', 'tsvd_anfrage_block_', __( 'Absender blockieren', 'tsvd' ), 'dashicons-shield-alt', '', __( 'Absender blockieren? Weitere Anfragen dieser E-Mail-Adresse werden blockiert.', 'tsvd' ) );
+		}
 		if ( 'spam' === $anfrage['status'] ) {
 			tsvd_anfragen_action_form( $id, 'tsvd_anfrage_unspam', 'tsvd_anfrage_unspam_', __( 'Kein Spam', 'tsvd' ), 'dashicons-email' );
 		} else {
@@ -544,6 +549,10 @@ function tsvd_anfragen_mail_reply( $anfrage, $body ) {
 	$reply_to = is_email( $reply_to ) ? $reply_to : get_option( 'admin_email' );
 	$headers  = array( 'Reply-To: ' . $reply_to );
 	$subject  = sprintf( __( 'Antwort auf Ihre Anfrage #%d', 'tsvd' ), (int) $anfrage['id'] );
+	$signature = get_option( 'tsvd_anfragen_signature', '' );
+	if ( '' !== trim( $signature ) ) {
+		$body .= "\n\n" . $signature;
+	}
 	return wp_mail( $anfrage['applicant_email'], $subject, $body, $headers );
 }
 

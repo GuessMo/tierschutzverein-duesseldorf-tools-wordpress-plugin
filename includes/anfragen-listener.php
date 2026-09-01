@@ -18,7 +18,9 @@ function tsvd_anfragen_capture_submission( $form_id, $submitted_data, $normalize
 	}
 
 	global $wpdb;
-	$now = current_time( 'mysql' );
+	$now    = current_time( 'mysql' );
+	$email  = isset( $normalized_data['email'] ) ? sanitize_email( $normalized_data['email'] ) : '';
+	$status = tsvd_anfragen_is_blacklisted( $email ) ? 'blocked' : 'open';
 
 	$wpdb->insert(
 		tsvd_anfragen_table_name(),
@@ -26,10 +28,10 @@ function tsvd_anfragen_capture_submission( $form_id, $submitted_data, $normalize
 			'form_id'         => absint( $form_id ),
 			'animal_id'       => $context_animal_id ? absint( $context_animal_id ) : null,
 			'applicant_name'  => isset( $normalized_data['applicant_name'] ) ? sanitize_text_field( $normalized_data['applicant_name'] ) : '',
-			'applicant_email' => isset( $normalized_data['email'] ) ? sanitize_email( $normalized_data['email'] ) : '',
+			'applicant_email' => $email,
 			'applicant_phone' => isset( $normalized_data['tel'] ) ? sanitize_text_field( $normalized_data['tel'] ) : '',
 			'payload'         => wp_json_encode( $submitted_data ),
-			'status'          => 'open',
+			'status'          => $status,
 			'created_at'      => $now,
 			'updated_at'      => $now,
 		),

@@ -85,3 +85,34 @@ function tsvd_anfragen_migrate_status_values( $table ) {
 	$wpdb->query( "UPDATE {$table} SET status = 'open' WHERE status IN ( 'new', 'in_progress' )" );
 	$wpdb->query( "UPDATE {$table} SET status = 'answered' WHERE status = 'closed'" );
 }
+
+function tsvd_anfragen_blacklist() {
+	$list = get_option( 'tsvd_anfragen_blacklist', array() );
+	return is_array( $list ) ? $list : array();
+}
+
+function tsvd_anfragen_is_blacklisted( $email ) {
+	$email = strtolower( trim( sanitize_email( $email ) ) );
+	return $email && in_array( $email, tsvd_anfragen_blacklist(), true );
+}
+
+function tsvd_anfragen_blacklist_add( $email ) {
+	$email = strtolower( trim( sanitize_email( $email ) ) );
+	if ( ! $email ) {
+		return;
+	}
+	$list   = tsvd_anfragen_blacklist();
+	$list[] = $email;
+	$list   = array_values( array_unique( $list ) );
+	update_option( 'tsvd_anfragen_blacklist', $list );
+}
+
+function tsvd_anfragen_blacklist_remove( $email ) {
+	$email = strtolower( trim( sanitize_email( $email ) ) );
+	if ( ! $email ) {
+		return;
+	}
+	$list   = tsvd_anfragen_blacklist();
+	$list   = array_values( array_diff( $list, array( $email ) ) );
+	update_option( 'tsvd_anfragen_blacklist', $list );
+}
