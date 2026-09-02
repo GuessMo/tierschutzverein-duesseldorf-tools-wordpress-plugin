@@ -227,7 +227,7 @@ function tsvd_anfragen_calc_status_sql( $alias = 'a' ) {
 	return "CASE WHEN {$alias}.status IN ('spam','blocked') THEN {$alias}.status
 		WHEN COALESCE(
 			(SELECT r.direction FROM {$replies} r
-			 WHERE r.anfrage_id = {$alias}.id
+			 WHERE r.anfrage_id = {$alias}.id AND r.direction IN ( 'in', 'out' )
 			 ORDER BY COALESCE(r.sent_at, r.scheduled_at) DESC, r.id DESC LIMIT 1),
 			'in') = 'in' THEN 'open'
 		ELSE 'answered' END";
@@ -237,7 +237,8 @@ function tsvd_anfragen_calc_status( $anfrage ) {
 	global $wpdb;
 	$replies = tsvd_anfragen_replies_table_name();
 	$last    = $wpdb->get_var( $wpdb->prepare(
-		"SELECT direction FROM {$replies} WHERE anfrage_id = %d
+		"SELECT direction FROM {$replies}
+		 WHERE anfrage_id = %d AND direction IN ( 'in', 'out' )
 		 ORDER BY COALESCE(sent_at, scheduled_at) DESC, id DESC LIMIT 1",
 		(int) $anfrage['id']
 	) );
