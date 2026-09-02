@@ -78,7 +78,8 @@ function tsvd_anfragen_render_conversation( $id ) {
 	}
 
 	$status_labels = tsvd_anfragen_status_labels();
-	$label         = isset( $status_labels[ $anfrage['status'] ] ) ? $status_labels[ $anfrage['status'] ] : $anfrage['status'];
+	$calc_status   = tsvd_anfragen_calc_status( $anfrage );
+	$label         = isset( $status_labels[ $calc_status ] ) ? $status_labels[ $calc_status ] : $calc_status;
 
 	echo '<div class="tsvd-conv__head"><h2>' . esc_html( $anfrage['applicant_name'] ) . '</h2>';
 	echo '<span class="tsvd-msgr__badge">' . esc_html( $label ) . '</span>';

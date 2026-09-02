@@ -216,21 +216,57 @@ function tsvd_anfragen_breed_icon_svg( $icon ) {
 }
 
 
+/**
+ * Dynamischer Status aus letzter Nachrichtrichtung.
+ * offene Anfragen (letzte Nachricht vom Anfragenden oder keine Antworten) = 'open',
+ * beantwortete (letzte Nachricht von der Org) = 'answered'.
+ * Spam/Blockiert bleiben wie in DB.
+ */
+function tsvd_anfragen_calc_status_sql( $alias = 'a' ) {
+	$replies = tsvd_anfragen_replies_table_name();
+	return "CASE WHEN {$alias}.status IN ('spam','blocked') THEN {$alias}.status
+		WHEN COALESCE(
+			(SELECT r.direction FROM {$replies} r
+			 WHERE r.anfrage_id = {$alias}.id
+			 ORDER BY COALESCE(r.sent_at, r.scheduled_at) DESC, r.id DESC LIMIT 1),
+			'in') = 'in' THEN 'open'
+		ELSE 'answered' END";
+}
+
+function tsvd_anfragen_calc_status( $anfrage ) {
+	global $wpdb;
+	$replies = tsvd_anfragen_replies_table_name();
+	$last    = $wpdb->get_var( $wpdb->prepare(
+		"SELECT direction FROM {$replies} WHERE anfrage_id = %d
+		 ORDER BY COALESCE(sent_at, scheduled_at) DESC, id DESC LIMIT 1",
+		(int) $anfrage['id']
+	) );
+	if ( 'spam' === $anfrage['status'] || 'blocked' === $anfrage['status'] ) {
+		return $anfrage['status'];
+	}
+	return 'out' === $last ? 'answered' : 'open';
+}
+
 function tsvd_anfragen_list_where( $status, $search, $breed = 0 ) {
 	global $wpdb;
 	$clauses = array();
 	if ( 'trash' === $status ) {
-		$clauses[] = 'deleted_at IS NOT NULL';
+		$clauses[] = 'a.deleted_at IS NOT NULL';
 	} elseif ( 'mine' === $status ) {
-		$clauses[] = 'deleted_at IS NULL';
-		$clauses[] = "status NOT IN ( 'spam', 'blocked' )";
-		$clauses[] = $wpdb->prepare( 'assigned_user_id = %d', get_current_user_id() );
+		$clauses[] = 'a.deleted_at IS NULL';
+		$clauses[] = "a.status NOT IN ( 'spam', 'blocked' )";
+		$clauses[] = $wpdb->prepare( 'a.assigned_user_id = %d', get_current_user_id() );
 	} else {
-		$clauses[] = 'deleted_at IS NULL';
+		$clauses[] = 'a.deleted_at IS NULL';
 		if ( $status ) {
-			$clauses[] = $wpdb->prepare( 'status = %s', $status );
+			if ( 'spam' === $status || 'blocked' === $status ) {
+				$clauses[] = $wpdb->prepare( 'a.status = %s', $status );
+			} else {
+				$calc = tsvd_anfragen_calc_status_sql( 'a' );
+				$clauses[] = "{$calc} = " . $wpdb->prepare( '%s', $status );
+			}
 		} else {
-			$clauses[] = "status NOT IN ( 'spam', 'blocked' )";
+			$clauses[] = "a.status NOT IN ( 'spam', 'blocked' )";
 		}
 	}
 	if ( '' !== $search ) {
@@ -308,7 +344,8 @@ function tsvd_anfragen_render_sidebar( $status, $search, $selected, $pos = 'righ
 	global $wpdb;
 	$table = tsvd_anfragen_table_name();
 	$where = tsvd_anfragen_list_where( $status, $search, $breed );
-	$total  = (int) $wpdb->get_var( "SELECT COUNT(*) FROM {$table} {$where}" );
+	$calc  = tsvd_anfragen_calc_status_sql( 'a' );
+	$total = (int) $wpdb->get_var( "SELECT COUNT(*) FROM {$table} a {$where}" );
 	$pages  = max( 1, (int) ceil( $total / TSVD_ANFRAGEN_PER_PAGE ) );
 	$paged  = max( 1, isset( $_GET['paged'] ) ? absint( $_GET['paged'] ) : 1 );
 	if ( $paged > $pages ) {
@@ -316,7 +353,7 @@ function tsvd_anfragen_render_sidebar( $status, $search, $selected, $pos = 'righ
 	}
 	$offset = ( $paged - 1 ) * TSVD_ANFRAGEN_PER_PAGE;
 	$rows   = $wpdb->get_results(
-		$wpdb->prepare( "SELECT * FROM {$table} {$where} ORDER BY created_at DESC LIMIT %d OFFSET %d", TSVD_ANFRAGEN_PER_PAGE, $offset ),
+		$wpdb->prepare( "SELECT a.*, {$calc} AS calc_status FROM {$table} a {$where} ORDER BY a.created_at DESC LIMIT %d OFFSET %d", TSVD_ANFRAGEN_PER_PAGE, $offset ),
 		ARRAY_A
 	);
 
@@ -412,13 +449,24 @@ function tsvd_anfragen_render_sidebar( $status, $search, $selected, $pos = 'righ
 			$url    = add_query_arg( $args, $base_url );
 			$active = ( (int) $row['id'] === $selected ) ? ' is-active' : '';
 			$animal = $row['animal_id'] ? get_the_title( (int) $row['animal_id'] ) : '';
-			$label  = isset( $status_labels[ $row['status'] ] ) ? $status_labels[ $row['status'] ] : $row['status'];
+			$lstatus = $row['calc_status'];
+			$spam    = 'spam' === $row['status'] || 'blocked' === $row['status'];
+			$open    = 'open' === $lstatus;
+			$state   = $spam ? ' is-spam' : ( $open ? ' is-open' : '' );
 
-			echo '<a class="tsvd-msgr__item' . $active . '" href="' . esc_url( $url ) . '">';
-			echo '<div class="tsvd-msgr__item-top"><span class="tsvd-msgr__name">' . esc_html( $row['applicant_name'] ) . '</span>';
+			echo '<a class="tsvd-msgr__item' . $active . $state . '" href="' . esc_url( $url ) . '">';
+			echo '<div class="tsvd-msgr__item-top"><span class="tsvd-msgr__name">';
+			if ( $open && ! $spam ) {
+				echo '<span class="tsvd-msgr__dot" aria-hidden="true"></span>';
+			}
+			echo esc_html( $row['applicant_name'] ) . '</span>';
 			echo '<span class="tsvd-msgr__time">' . esc_html( get_date_from_gmt( $row['created_at'], 'd.m.Y' ) ) . '</span></div>';
 			echo '<div class="tsvd-msgr__sub"><span>' . esc_html( $animal ? $animal : '—' ) . '</span>';
-			echo '<span class="tsvd-msgr__badge">' . esc_html( $label ) . '</span></div>';
+			if ( $spam ) {
+				$label = isset( $status_labels[ $row['status'] ] ) ? $status_labels[ $row['status'] ] : $row['status'];
+				echo '<span class="tsvd-msgr__badge">' . esc_html( $label ) . '</span>';
+			}
+			echo '</div>';
 			echo '</a>';
 		}
 	}
