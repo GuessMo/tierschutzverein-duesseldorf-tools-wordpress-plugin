@@ -8,6 +8,8 @@
     --tsvd-chrome-badge-bg: #e5f0fb;
     --tsvd-chrome-badge-text: #135e96;
     --tsvd-chrome-open-bg: #eef4fb;
+    --tsvd-chrome-open-bg-hover: #dbe9f8;
+    --tsvd-chrome-open-bg-active: #c9ddf2;
     --tsvd-link: #2145e6;
     --tsvd-number-spin-filter: none;
     --tsvd-select-arrow: url("data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%2020%2020'%3E%3Cpath%20fill='%233c434a'%20d='M5%207l5%205%205-5z'/%3E%3C/svg%3E");
@@ -23,6 +25,8 @@
     --tsvd-chrome-badge-bg: #1d3a5c;
     --tsvd-chrome-badge-text: #7cb8f2;
     --tsvd-chrome-open-bg: #1d2a3d;
+    --tsvd-chrome-open-bg-hover: #263549;
+    --tsvd-chrome-open-bg-active: #2e4058;
     --tsvd-link: #8aa8ff;
     --tsvd-number-spin-filter: invert(1);
     --tsvd-select-arrow: url("data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%2020%2020'%3E%3Cpath%20fill='%23e3e5e8'%20d='M5%207l5%205%205-5z'/%3E%3C/svg%3E");
@@ -39,6 +43,8 @@
         --tsvd-chrome-badge-bg: #1d3a5c;
         --tsvd-chrome-badge-text: #7cb8f2;
         --tsvd-chrome-open-bg: #1d2a3d;
+        --tsvd-chrome-open-bg-hover: #263549;
+        --tsvd-chrome-open-bg-active: #2e4058;
         --tsvd-link: #8aa8ff;
         --tsvd-number-spin-filter: invert(1);
         --tsvd-select-arrow: url("data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%2020%2020'%3E%3Cpath%20fill='%23e3e5e8'%20d='M5%207l5%205%205-5z'/%3E%3C/svg%3E");

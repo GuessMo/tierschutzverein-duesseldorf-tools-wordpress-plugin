@@ -14,7 +14,7 @@
 .tsvd-msgr__side-title{font-weight:600;font-size:11px;text-transform:uppercase;
 	letter-spacing:.03em;color:var(--tsvd-chrome-text-muted,#646970);}
 #wpbody-content a.tsvd-msgr__pos,#wpbody-content a.tsvd-msgr__filter-btn{display:inline-flex;align-items:center;justify-content:center;
-	width:36px;height:36px;border:1px solid var(--tsvd-chrome-border,#c3c4c7);
+	width:36px;height:36px;padding:0;border:1px solid var(--tsvd-chrome-border,#c3c4c7);
 	border-radius:3px;color:var(--tsvd-chrome-text-muted,#646970);text-decoration:none;
 	background:var(--tsvd-chrome-surface,#fff);box-sizing:border-box;cursor:pointer;}
 #wpbody-content a.tsvd-msgr__pos:hover,#wpbody-content a.tsvd-msgr__filter-btn:hover{color:var(--tsvd-chrome-heading,#1d2327);
@@ -25,8 +25,8 @@
 	float:none;width:100%;box-sizing:border-box;}
 .tsvd-msgr__side-head .search-box input[type=search]{flex:1;min-width:0;}
 .tsvd-msgr__side-head .tsvd-msgr__search-btn{flex:0 0 auto;display:inline-flex;
-	align-items:center;justify-content:center;width:36px;height:36px;min-height:36px;
-	padding:0;line-height:1;border-radius:3px;box-sizing:border-box;}
+	align-items:center;justify-content:center;width:36px;height:36px;padding:0;
+	line-height:1;border-radius:3px;box-sizing:border-box;}
 .tsvd-msgr__search-btn:focus,.tsvd-msgr__search-btn:focus-visible{border-color:var(--tsvd-chrome-border,#c3c4c7);
 	color:var(--tsvd-chrome-text-muted,#646970);box-shadow:none;outline:2px solid var(--tsvd-link,#2271b1);
 	outline-offset:-1px;}
@@ -55,6 +55,8 @@
 .tsvd-msgr__sub{font-size:12px;color:var(--tsvd-chrome-text-muted,#646970);
 	margin-top:2px;display:flex;justify-content:space-between;gap:8px;align-items:flex-start;}
 #wpbody-content a.tsvd-msgr__item.is-open{background:var(--tsvd-chrome-open-bg,#eef4fb);}
+#wpbody-content a.tsvd-msgr__item.is-open:hover{background:var(--tsvd-chrome-open-bg-hover,#dbe9f8);}
+#wpbody-content a.tsvd-msgr__item.is-open:active{background:var(--tsvd-chrome-open-bg-active,#c9ddf2);}
 #wpbody-content a.tsvd-msgr__item:not(.is-open):not(.is-spam){opacity:.78;}
 .tsvd-msgr__badge{font-size:11px;padding:2px 8px;border-radius:9px;
 	border:1px solid var(--tsvd-chrome-border,#c3c4c7);white-space:nowrap;
