@@ -243,7 +243,7 @@ function tsvd_tools_ai_create_interessentenbogen_form( $input ) {
     $recipient = isset( $input['recipient_email'] ) && is_email( $input['recipient_email'] ) ? sanitize_email( $input['recipient_email'] ) : get_option( 'admin_email' );
     update_post_meta( $form_id, '_tsvd_form_recipient', $recipient );
     update_post_meta( $form_id, '_tsvd_form_subject', __( 'Neue Anfrage: Interessentenbogen Tiervermittlung', 'tsv-tools' ) );
-    update_post_meta( $form_id, '_tsvd_form_success_message', __( 'Vielen Dank für Ihr Interesse! Ihre Angaben sind bei uns eingegangen und werden geprüft.', 'tsv-tools' ) );
+    update_post_meta( $form_id, '_tsvd_form_success_message', __( 'Vielen Dank für dein Interesse! Deine Angaben sind bei uns eingegangen und werden geprüft.', 'tsv-tools' ) );
     update_post_meta( $form_id, '_tsvd_form_show_title', '1' );
     // Feed the Anfragen-Dashboard (siehe anfragen-listener.php) — dieses Formular
     // ersetzt keinen bestehenden Kanal, sondern ist von Anfang an Teil davon.

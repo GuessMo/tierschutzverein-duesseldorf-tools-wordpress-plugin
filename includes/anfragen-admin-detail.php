@@ -503,7 +503,7 @@ function tsvd_anfragen_mail_reply( $anfrage, $body ) {
 	$reply_to = get_post_meta( (int) $anfrage['form_id'], '_tsvd_form_recipient', true );
 	$reply_to = is_email( $reply_to ) ? $reply_to : get_option( 'admin_email' );
 	$headers  = array( 'Reply-To: ' . $reply_to );
-	$subject  = sprintf( __( 'Antwort auf Ihre Anfrage #%d', 'tsvd' ), (int) $anfrage['id'] );
+	$subject  = sprintf( __( 'Antwort auf deine Anfrage #%d', 'tsvd' ), (int) $anfrage['id'] );
 	$signature = get_option( 'tsvd_anfragen_signature', '' );
 	if ( '' !== trim( $signature ) ) {
 		$body .= "\n\n" . $signature;
