@@ -13,11 +13,11 @@
 .tsvd-msgr__side-bar{display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;}
 .tsvd-msgr__side-title{font-weight:600;font-size:11px;text-transform:uppercase;
 	letter-spacing:.03em;color:var(--tsvd-chrome-text-muted,#646970);}
-.tsvd-msgr__pos,.tsvd-msgr__filter-btn{display:inline-flex;align-items:center;justify-content:center;
+#wpbody-content a.tsvd-msgr__pos,#wpbody-content a.tsvd-msgr__filter-btn{display:inline-flex;align-items:center;justify-content:center;
 	width:36px;height:36px;border:1px solid var(--tsvd-chrome-border,#c3c4c7);
 	border-radius:3px;color:var(--tsvd-chrome-text-muted,#646970);text-decoration:none;
 	background:var(--tsvd-chrome-surface,#fff);box-sizing:border-box;cursor:pointer;}
-.tsvd-msgr__pos:hover,.tsvd-msgr__filter-btn:hover{color:var(--tsvd-chrome-heading,#1d2327);
+#wpbody-content a.tsvd-msgr__pos:hover,#wpbody-content a.tsvd-msgr__filter-btn:hover{color:var(--tsvd-chrome-heading,#1d2327);
 	border-color:var(--tsvd-chrome-heading,#1d2327);}
 .tsvd-msgr__pos:focus-visible,.tsvd-msgr__filter-btn:focus-visible{outline:2px solid var(--tsvd-link,#2271b1);
 	outline-offset:-1px;}
@@ -32,7 +32,7 @@
 	outline-offset:-1px;}
 .tsvd-msgr__filters{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px;
 	width:100%;box-sizing:border-box;}
-.tsvd-msgr__filter-btn.is-current{background:var(--wp-admin-theme-color,#2271b1);
+#wpbody-content a.tsvd-msgr__filter-btn.is-current{background:var(--wp-admin-theme-color,#2271b1);
 	border-color:var(--wp-admin-theme-color,#2271b1);color:#fff;}
 .tsvd-msgr__filter-btn.is-current svg{color:#fff;}
 .tsvd-msgr__filter-btn svg{width:18px;height:18px;display:block;}
@@ -42,10 +42,10 @@
 .tsvd-msgr__side-head .tsvd-msgr__filters:not(.tsvd-msgr__filters--breed){margin-top:8px;
 	border-top:1px solid var(--tsvd-chrome-border,#c3c4c7);padding-top:8px;}
 .tsvd-msgr__list{overflow-y:auto;flex:1;}
-.tsvd-msgr__item{display:block;text-decoration:none;padding:10px 12px;
+#wpbody-content a.tsvd-msgr__item{display:block;text-decoration:none;padding:10px 12px;
 	border-bottom:1px solid var(--tsvd-chrome-border,#c3c4c7);color:var(--tsvd-chrome-text,#3c434a);}
-.tsvd-msgr__item:hover{background:var(--tsvd-chrome-surface,#fff);}
-.tsvd-msgr__item.is-active{background:var(--tsvd-chrome-surface,#fff);
+#wpbody-content a.tsvd-msgr__item:hover{background:var(--tsvd-chrome-surface,#fff);}
+#wpbody-content a.tsvd-msgr__item.is-active{background:var(--tsvd-chrome-surface,#fff);
 	box-shadow:inset 3px 0 0 var(--wp-admin-theme-color,#2271b1);}
 .tsvd-msgr__item-top{display:flex;justify-content:space-between;gap:8px;}
 .tsvd-msgr__name{font-weight:600;}
