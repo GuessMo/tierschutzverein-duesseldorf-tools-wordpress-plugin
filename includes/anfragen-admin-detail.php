@@ -164,72 +164,6 @@ function tsvd_anfragen_payload_facts( $anfrage, $skip = array() ) {
 	return $facts;
 }
 
-function tsvd_anfragen_chat_styles() {
-	static $done = false;
-	if ( $done ) {
-		return;
-	}
-	$done = true;
-	echo '<style>'
-		. '.tsvd-chat{display:flex;flex-direction:column;gap:10px;width:100%;margin:0 0 16px;}'
-		. '.tsvd-chat__msg{display:flex;}'
-		. '.tsvd-chat__msg--out{justify-content:flex-end;}'
-		. '.tsvd-chat__msg--in{justify-content:flex-start;}'
-		. '.tsvd-chat__msg--note{justify-content:stretch;}'
-		. '.tsvd-chat__bubble{position:relative;max-width:78%;padding:8px 12px;border-radius:3px;'
-		. 'border:1px solid var(--tsvd-chrome-border,#c3c4c7);'
-		. 'background:var(--tsvd-chrome-surface,#fff);color:var(--tsvd-chrome-text,#3c434a);}'
-		. '.tsvd-chat__msg--out .tsvd-chat__bubble{background:var(--wp-admin-theme-color,#2271b1);'
-		. 'border-color:var(--wp-admin-theme-color,#2271b1);color:#fff;}'
-		. '.tsvd-chat__msg--out .tsvd-chat__bubble::after{content:"";position:absolute;bottom:-1px;'
-		. 'right:-7px;border:7px solid transparent;border-bottom:0;border-right:0;'
-		. 'border-left-color:var(--wp-admin-theme-color,#2271b1);}'
-		. '.tsvd-chat__msg--in .tsvd-chat__bubble::after{content:"";position:absolute;bottom:-1px;'
-		. 'left:-7px;border:7px solid transparent;border-bottom:0;border-left:0;'
-		. 'border-right-color:var(--tsvd-chrome-border,#c3c4c7);}'
-		. '.tsvd-chat__msg--note .tsvd-chat__bubble{max-width:100%;width:100%;background:transparent;'
-		. 'border-style:dashed;color:var(--tsvd-chrome-text-muted,#646970);}'
-		. '.tsvd-chat__meta{font-size:11px;opacity:.75;margin-bottom:3px;display:flex;'
-		. 'align-items:center;justify-content:space-between;gap:8px;}'
-		. '.tsvd-chat__edited{font-style:italic;}'
-		. '.tsvd-chat__tools{display:inline-flex;gap:2px;opacity:0;transition:opacity .1s;}'
-		. '.tsvd-chat__msg:hover .tsvd-chat__tools{opacity:1;}'
-		. '.tsvd-chat__tool{background:none;border:0;cursor:pointer;padding:2px;color:inherit;'
-		. 'opacity:.8;display:inline-flex;}'
-		. '.tsvd-chat__tool:hover{opacity:1;}'
-		. '.tsvd-chat__tool .dashicons{font-size:16px;width:16px;height:16px;}'
-		. '.tsvd-chat__timer{margin-top:6px;font-size:12px;opacity:.9;display:flex;'
-		. 'align-items:center;gap:4px;}'
-		. '.tsvd-chat__timer .dashicons{font-size:15px;width:15px;height:15px;}'
-		. '.tsvd-chat__msg.is-pending .tsvd-chat__bubble{opacity:.9;border-style:dashed;}'
-		. '.tsvd-chat__edit{margin-top:6px;}'
-		. '.tsvd-chat__body{white-space:pre-wrap;word-wrap:break-word;}'
-		. '.tsvd-chat__empty{color:var(--tsvd-chrome-text-muted,#646970);}'
-		. '.tsvd-conv__participants{font-size:12px;color:var(--tsvd-chrome-text-muted,#646970);'
-		. 'margin:0 0 12px;padding-bottom:8px;'
-		. 'border-bottom:1px solid var(--tsvd-chrome-border,#c3c4c7);}'
-		. '.tsvd-conv__participants-label{font-weight:600;}'
-		. '.tsvd-chat__facts{margin:0;display:flex;flex-direction:column;gap:6px;}'
-		. '.tsvd-chat__fact{display:flex;flex-direction:column;gap:1px;}'
-		. '.tsvd-chat__fact dt{font-size:11px;'
-		. 'color:var(--tsvd-chrome-text-muted,#646970);}'
-		. '.tsvd-chat__fact dd{margin:0;word-break:break-word;}'
-		. '.tsvd-composer__modes{display:flex;gap:6px;margin:0 0 8px;}'
-		. '.tsvd-composer__mode{display:inline-flex;align-items:center;justify-content:center;'
-		. 'width:36px;height:36px;padding:0;box-sizing:border-box;cursor:pointer;border-radius:3px;'
-		. 'border:1px solid var(--tsvd-chrome-border,#c3c4c7);'
-		. 'background:var(--tsvd-chrome-surface,#fff);color:var(--tsvd-chrome-text-muted,#646970);}'
-		. '.tsvd-composer__mode .dashicons{display:flex;align-items:center;justify-content:center;'
-		. 'width:18px;height:18px;font-size:18px;line-height:1;}'
-		. '.tsvd-composer__mode.is-active{background:var(--wp-admin-theme-color,#2271b1);'
-		. 'border-color:var(--wp-admin-theme-color,#2271b1);color:#fff;}'
-		. '.tsvd-composer__mode.is-active .dashicons{color:#fff;}'
-		. '.tsvd-composer__mode:focus-visible{outline:none;'
-		. 'border-color:var(--tsvd-link,#2271b1);box-shadow:0 0 0 1px var(--tsvd-link,#2271b1);}'
-		. '.tsvd-composer__hint{font-size:12px;color:var(--tsvd-chrome-text-muted,#646970);margin:6px 0;}'
-		. '</style>';
-}
-
 function tsvd_anfragen_reply_author( $reply, $applicant_name ) {
 	$direction = $reply['direction'];
 	if ( 'in' === $direction ) {
@@ -246,7 +180,6 @@ function tsvd_anfragen_render_replies( $wpdb, $replies_table, $anfrage ) {
 	$id             = (int) $anfrage['id'];
 	$applicant_name = $anfrage['applicant_name'];
 	echo '<h2>' . esc_html__( 'Konversation', 'tsvd' ) . '</h2>';
-	tsvd_anfragen_chat_styles();
 	$replies = $wpdb->get_results( $wpdb->prepare( "SELECT * FROM {$replies_table} WHERE anfrage_id = %d ORDER BY COALESCE(sent_at, scheduled_at) ASC, id ASC", $id ), ARRAY_A );
 	$nonce   = wp_create_nonce( 'tsvd_anfrage_reply_' . $id );
 
@@ -438,8 +371,8 @@ function tsvd_anfragen_render_reply_form( $id ) {
 	?>
 	<h2><?php esc_html_e( 'Nachricht', 'tsvd' ); ?></h2>
 	<div class="tsvd-composer__modes">
-		<button type="button" class="tsvd-composer__mode is-active" data-mode="reply" title="<?php esc_attr_e( 'Antwort', 'tsvd' ); ?>" aria-label="<?php esc_attr_e( 'Antwort', 'tsvd' ); ?>"><span class="dashicons dashicons-email"></span></button>
-		<button type="button" class="tsvd-composer__mode" data-mode="note" title="<?php esc_attr_e( 'Interne Notiz', 'tsvd' ); ?>" aria-label="<?php esc_attr_e( 'Interne Notiz', 'tsvd' ); ?>"><span class="dashicons dashicons-edit"></span></button>
+		<button type="button" class="tsvd-icon-btn tsvd-composer__mode is-active" data-mode="reply" title="<?php esc_attr_e( 'Antwort', 'tsvd' ); ?>" aria-label="<?php esc_attr_e( 'Antwort', 'tsvd' ); ?>"><span class="dashicons dashicons-email"></span></button>
+		<button type="button" class="tsvd-icon-btn tsvd-composer__mode" data-mode="note" title="<?php esc_attr_e( 'Interne Notiz', 'tsvd' ); ?>" aria-label="<?php esc_attr_e( 'Interne Notiz', 'tsvd' ); ?>"><span class="dashicons dashicons-edit"></span></button>
 	</div>
 	<textarea id="tsvd-anfrage-reply-body" class="widefat" rows="6"></textarea>
 	<p class="tsvd-composer__hint" id="tsvd-anfrage-hint"><?php esc_html_e( 'Wird per E-Mail an den Interessenten gesendet.', 'tsvd' ); ?></p>
@@ -509,7 +442,7 @@ function tsvd_anfragen_action_form( $id, $action, $nonce_prefix, $label, $icon =
 	echo '<input type="hidden" name="action" value="' . esc_attr( $action ) . '">';
 	echo '<input type="hidden" name="id" value="' . (int) $id . '">';
 	wp_nonce_field( $nonce_prefix . $id );
-	echo '<button type="submit" class="tsvd-conv__act-btn ' . esc_attr( $classes ) . '" title="' . esc_attr( $label ) . '" aria-label="' . esc_attr( $label ) . '">';
+	echo '<button type="submit" class="tsvd-icon-btn tsvd-conv__act-btn ' . esc_attr( $classes ) . '" title="' . esc_attr( $label ) . '" aria-label="' . esc_attr( $label ) . '">';
 	echo '<span class="dashicons ' . esc_attr( $icon ? $icon : 'dashicons-marker' ) . '"></span>';
 	echo '</button></form>';
 }

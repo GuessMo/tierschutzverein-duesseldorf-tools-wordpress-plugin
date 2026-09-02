@@ -307,7 +307,7 @@ function tsvd_anfragen_render_search_box( $status, $search, $breed = 0 ) {
 	echo '<p class="search-box">';
 	echo '<label class="screen-reader-text" for="tsvd-anfrage-search">' . esc_html__( 'Anfragen durchsuchen', 'tsvd' ) . '</label>';
 	echo '<input type="search" id="tsvd-anfrage-search" name="s" value="' . esc_attr( $search ) . '" placeholder="' . esc_attr__( 'Name, E-Mail, Telefon, Tier', 'tsvd' ) . '" />';
-	echo '<button type="submit" class="button tsvd-msgr__search-btn" title="' . esc_attr__( 'Anfragen durchsuchen', 'tsvd' ) . '" aria-label="' . esc_attr__( 'Anfragen durchsuchen', 'tsvd' ) . '"><span class="dashicons dashicons-search"></span></button>';
+	echo '<button type="submit" class="tsvd-icon-btn tsvd-msgr__search-btn" title="' . esc_attr__( 'Anfragen durchsuchen', 'tsvd' ) . '" aria-label="' . esc_attr__( 'Anfragen durchsuchen', 'tsvd' ) . '"><span class="dashicons dashicons-search"></span></button>';
 	echo '</p></form>';
 }
 
@@ -391,7 +391,7 @@ function tsvd_anfragen_render_sidebar( $status, $search, $selected, $pos = 'righ
 
 	echo '<div class="tsvd-msgr__side-bar">';
 	echo '<span class="tsvd-msgr__side-title">' . esc_html__( 'Konversationen', 'tsvd' ) . '</span>';
-	echo '<a class="tsvd-msgr__pos" href="' . esc_url( $toggle_url ) . '" title="' . esc_attr( $toggle_lbl ) . '" aria-label="' . esc_attr( $toggle_lbl ) . '"><span class="dashicons ' . esc_attr( $toggle_icon ) . '"></span></a>';
+	echo '<a class="tsvd-icon-btn tsvd-msgr__pos" href="' . esc_url( $toggle_url ) . '" title="' . esc_attr( $toggle_lbl ) . '" aria-label="' . esc_attr( $toggle_lbl ) . '"><span class="dashicons ' . esc_attr( $toggle_icon ) . '"></span></a>';
 	echo '</div>';
 
 	tsvd_anfragen_render_search_box( $status, $search, $breed );
@@ -406,29 +406,29 @@ function tsvd_anfragen_render_sidebar( $status, $search, $selected, $pos = 'righ
 
 	$houses = tsvd_anfragen_breed_houses_visible();
 	echo '<div class="tsvd-msgr__filters tsvd-msgr__filters--breed">';
-	echo '<a class="tsvd-msgr__filter-btn' . ( $breed ? '' : ' is-current' ) . '" href="' . esc_url( add_query_arg( array_merge( $status_args, array( 'breed' => 0 ) ), $base_url ) ) . '" title="' . esc_attr__( 'Alle Tierarten', 'tsvd' ) . '" aria-label="' . esc_attr__( 'Alle Tierarten', 'tsvd' ) . '">' . tsvd_anfragen_breed_icon_svg( 'paw' ) . '</a>';
+	echo '<a class="tsvd-icon-btn tsvd-msgr__filter-btn' . ( $breed ? '' : ' is-current' ) . '" href="' . esc_url( add_query_arg( array_merge( $status_args, array( 'breed' => 0 ) ), $base_url ) ) . '" title="' . esc_attr__( 'Alle Tierarten', 'tsvd' ) . '" aria-label="' . esc_attr__( 'Alle Tierarten', 'tsvd' ) . '">' . tsvd_anfragen_breed_icon_svg( 'paw' ) . '</a>';
 	if ( ! is_wp_error( $houses ) ) {
 		foreach ( $houses as $term ) {
 			$icon   = tsvd_anfragen_breed_icon( $term->term_id );
 			$active = $breed === (int) $term->term_id;
 			$href   = add_query_arg( array_merge( $status_args, array( 'breed' => $active ? 0 : $term->term_id ) ), $base_url );
-			echo '<a class="tsvd-msgr__filter-btn' . ( $active ? ' is-current' : '' ) . '" href="' . esc_url( $href ) . '" title="' . esc_attr( $term->name ) . '" aria-label="' . esc_attr( $term->name ) . '">' . tsvd_anfragen_breed_icon_svg( $icon ) . '</a>';
+			echo '<a class="tsvd-icon-btn tsvd-msgr__filter-btn' . ( $active ? ' is-current' : '' ) . '" href="' . esc_url( $href ) . '" title="' . esc_attr( $term->name ) . '" aria-label="' . esc_attr( $term->name ) . '">' . tsvd_anfragen_breed_icon_svg( $icon ) . '</a>';
 		}
 	}
 	echo '</div>';
 
 	echo '<div class="tsvd-msgr__filters">';
-	echo '<a class="tsvd-msgr__filter-btn' . ( 'mine' === $status ? ' is-current' : '' ) . '" href="' . esc_url( add_query_arg( array_merge( array( 'status' => 'mine' ), $breed_args ), $base_url ) ) . '" title="' . esc_attr__( 'Meine Anfragen', 'tsvd' ) . '" aria-label="' . esc_attr__( 'Meine Anfragen', 'tsvd' ) . '"><span class="dashicons dashicons-admin-users"></span></a>';
-	echo '<a class="tsvd-msgr__filter-btn' . ( '' === $status ? ' is-current' : '' ) . '" href="' . esc_url( add_query_arg( array_merge( array( 'status' => '' ), $breed_args ), $base_url ) ) . '" title="' . esc_attr__( 'Alle', 'tsvd' ) . '" aria-label="' . esc_attr__( 'Alle', 'tsvd' ) . '"><span class="dashicons dashicons-menu-alt"></span></a>';
+	echo '<a class="tsvd-icon-btn tsvd-msgr__filter-btn' . ( 'mine' === $status ? ' is-current' : '' ) . '" href="' . esc_url( add_query_arg( array_merge( array( 'status' => 'mine' ), $breed_args ), $base_url ) ) . '" title="' . esc_attr__( 'Meine Anfragen', 'tsvd' ) . '" aria-label="' . esc_attr__( 'Meine Anfragen', 'tsvd' ) . '"><span class="dashicons dashicons-admin-users"></span></a>';
+	echo '<a class="tsvd-icon-btn tsvd-msgr__filter-btn' . ( '' === $status ? ' is-current' : '' ) . '" href="' . esc_url( add_query_arg( array_merge( array( 'status' => '' ), $breed_args ), $base_url ) ) . '" title="' . esc_attr__( 'Alle', 'tsvd' ) . '" aria-label="' . esc_attr__( 'Alle', 'tsvd' ) . '"><span class="dashicons dashicons-menu-alt"></span></a>';
 	foreach ( $status_labels as $key => $label ) {
 		if ( 'spam' === $key ) {
 			continue;
 		}
 		$icon = isset( $status_icons[ $key ] ) ? $status_icons[ $key ] : 'dashicons-marker';
-		echo '<a class="tsvd-msgr__filter-btn' . ( $status === $key ? ' is-current' : '' ) . '" href="' . esc_url( add_query_arg( array_merge( array( 'status' => $key ), $breed_args ), $base_url ) ) . '" title="' . esc_attr( $label ) . '" aria-label="' . esc_attr( $label ) . '"><span class="dashicons ' . esc_attr( $icon ) . '"></span></a>';
+		echo '<a class="tsvd-icon-btn tsvd-msgr__filter-btn' . ( $status === $key ? ' is-current' : '' ) . '" href="' . esc_url( add_query_arg( array_merge( array( 'status' => $key ), $breed_args ), $base_url ) ) . '" title="' . esc_attr( $label ) . '" aria-label="' . esc_attr( $label ) . '"><span class="dashicons ' . esc_attr( $icon ) . '"></span></a>';
 	}
-	echo '<a class="tsvd-msgr__filter-btn' . ( 'spam' === $status ? ' is-current' : '' ) . '" href="' . esc_url( add_query_arg( array_merge( array( 'status' => 'spam' ), $breed_args ), $base_url ) ) . '" title="' . esc_attr__( 'Spam', 'tsvd' ) . '" aria-label="' . esc_attr__( 'Spam', 'tsvd' ) . '"><span class="dashicons dashicons-warning"></span></a>';
-	echo '<a class="tsvd-msgr__filter-btn' . ( 'trash' === $status ? ' is-current' : '' ) . '" href="' . esc_url( add_query_arg( array_merge( array( 'status' => 'trash' ), $breed_args ), $base_url ) ) . '" title="' . esc_attr__( 'Papierkorb', 'tsvd' ) . '" aria-label="' . esc_attr__( 'Papierkorb', 'tsvd' ) . '"><span class="dashicons dashicons-trash"></span></a>';
+	echo '<a class="tsvd-icon-btn tsvd-msgr__filter-btn' . ( 'spam' === $status ? ' is-current' : '' ) . '" href="' . esc_url( add_query_arg( array_merge( array( 'status' => 'spam' ), $breed_args ), $base_url ) ) . '" title="' . esc_attr__( 'Spam', 'tsvd' ) . '" aria-label="' . esc_attr__( 'Spam', 'tsvd' ) . '"><span class="dashicons dashicons-warning"></span></a>';
+	echo '<a class="tsvd-icon-btn tsvd-msgr__filter-btn' . ( 'trash' === $status ? ' is-current' : '' ) . '" href="' . esc_url( add_query_arg( array_merge( array( 'status' => 'trash' ), $breed_args ), $base_url ) ) . '" title="' . esc_attr__( 'Papierkorb', 'tsvd' ) . '" aria-label="' . esc_attr__( 'Papierkorb', 'tsvd' ) . '"><span class="dashicons dashicons-trash"></span></a>';
 	echo '</div></div>';
 
 	echo '<div class="tsvd-msgr__list">';
