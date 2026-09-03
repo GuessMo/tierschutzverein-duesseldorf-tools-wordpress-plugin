@@ -77,7 +77,9 @@ function tsvd_anfragen_render_page() {
 		return;
 	}
 
-	$selected = absint( isset( $_GET['view'] ) ? $_GET['view'] : 0 );
+	$view_raw = isset( $_GET['view'] ) ? sanitize_key( wp_unslash( $_GET['view'] ) ) : '0';
+	$selected = 'blacklist' === $view_raw ? 0 : absint( $view_raw );
+	$is_blacklist = 'blacklist' === $view_raw;
 	$search   = isset( $_GET['s'] ) ? sanitize_text_field( wp_unslash( $_GET['s'] ) ) : '';
 
 	if ( isset( $_GET['status'] ) ) {
@@ -107,11 +109,16 @@ function tsvd_anfragen_render_page() {
 	if ( isset( $_GET['spammed'] ) ) {
 		echo '<div class="notice notice-success is-dismissible"><p>' . esc_html__( 'Anfrage als Spam markiert.', 'tsvd' ) . '</p></div>';
 	}
+	if ( isset( $_GET['released'] ) ) {
+		echo '<div class="notice notice-success is-dismissible"><p>' . esc_html__( 'Absender freigegeben, Anfragen sind wieder offen.', 'tsvd' ) . '</p></div>';
+	}
 
 	echo '<div class="tsvd-msgr tsvd-msgr--' . esc_attr( $pos ) . '">';
-	tsvd_anfragen_render_sidebar( $status, $search, $selected, $pos, $breed );
+	tsvd_anfragen_render_sidebar( $status, $search, $selected, $pos, $breed, $is_blacklist );
 	echo '<div class="tsvd-msgr__main">';
-	if ( $selected ) {
+	if ( $is_blacklist ) {
+		tsvd_anfragen_render_blacklist();
+	} elseif ( $selected ) {
 		tsvd_anfragen_render_conversation( $selected );
 	} else {
 		echo '<div class="tsvd-msgr__empty"><p>' . esc_html__( 'Wähle links eine Konversation aus.', 'tsvd' ) . '</p></div>';
@@ -341,7 +348,7 @@ function tsvd_anfragen_render_pagination( $total, $paged, $status, $search, $bre
 	echo '</div></div>';
 }
 
-function tsvd_anfragen_render_sidebar( $status, $search, $selected, $pos = 'right', $breed = 0 ) {
+function tsvd_anfragen_render_sidebar( $status, $search, $selected, $pos = 'right', $breed = 0, $is_blacklist = false ) {
 	global $wpdb;
 	$table = tsvd_anfragen_table_name();
 	$where = tsvd_anfragen_list_where( $status, $search, $breed );
@@ -429,6 +436,7 @@ function tsvd_anfragen_render_sidebar( $status, $search, $selected, $pos = 'righ
 		echo '<a class="tsvd-icon-btn tsvd-msgr__filter-btn' . ( $status === $key ? ' is-current' : '' ) . '" href="' . esc_url( add_query_arg( array_merge( array( 'status' => $key ), $breed_args ), $base_url ) ) . '" title="' . esc_attr( $label ) . '" aria-label="' . esc_attr( $label ) . '"><span class="dashicons ' . esc_attr( $icon ) . '"></span></a>';
 	}
 	echo '<a class="tsvd-icon-btn tsvd-msgr__filter-btn' . ( 'spam' === $status ? ' is-current' : '' ) . '" href="' . esc_url( add_query_arg( array_merge( array( 'status' => 'spam' ), $breed_args ), $base_url ) ) . '" title="' . esc_attr__( 'Spam', 'tsvd' ) . '" aria-label="' . esc_attr__( 'Spam', 'tsvd' ) . '"><span class="dashicons dashicons-warning"></span></a>';
+	echo '<a class="tsvd-icon-btn tsvd-msgr__filter-btn' . ( $is_blacklist ? ' is-current' : '' ) . '" href="' . esc_url( add_query_arg( array( 'view' => 'blacklist' ), tsvd_anfragen_list_base_url() ) ) . '" title="' . esc_attr__( 'Blacklist', 'tsvd' ) . '" aria-label="' . esc_attr__( 'Blacklist', 'tsvd' ) . '"><span class="dashicons dashicons-shield-alt"></span></a>';
 	echo '<a class="tsvd-icon-btn tsvd-msgr__filter-btn' . ( 'trash' === $status ? ' is-current' : '' ) . '" href="' . esc_url( add_query_arg( array_merge( array( 'status' => 'trash' ), $breed_args ), $base_url ) ) . '" title="' . esc_attr__( 'Papierkorb', 'tsvd' ) . '" aria-label="' . esc_attr__( 'Papierkorb', 'tsvd' ) . '"><span class="dashicons dashicons-trash"></span></a>';
 	echo '</div></div>';
 
@@ -481,6 +489,44 @@ function tsvd_anfragen_render_sidebar( $status, $search, $selected, $pos = 'righ
 	echo '</div>';
 }
 
+/**
+ * Zentrale Blacklist-Ansicht: alle geblockten Absender (Option), je mit
+ * Freigabe-Aktion. Konsistent zum Messenger-Layout (tsvd-animal-card, tsvd-icon-btn).
+ */
+function tsvd_anfragen_render_blacklist() {
+	global $wpdb;
+	$table = tsvd_anfragen_table_name();
+	$list  = tsvd_anfragen_blacklist();
+
+	echo '<div class="tsvd-conv__head"><h2>' . esc_html__( 'Blacklist', 'tsvd' ) . '</h2>';
+	echo '<div class="tsvd-conv__actions"><span class="tsvd-conv__contact">' . esc_html( sprintf( _n( '%d geblockter Absender', '%d geblockte Absender', count( $list ), 'tsvd' ), count( $list ) ) ) . '</span></div></div>';
+
+	if ( empty( $list ) ) {
+		echo '<div class="tsvd-msgr__empty"><p>' . esc_html__( 'Keine geblockten Absender.', 'tsvd' ) . '</p></div>';
+		return;
+	}
+
+	foreach ( $list as $email ) {
+		$count = (int) $wpdb->get_var( $wpdb->prepare(
+			"SELECT COUNT(*) FROM {$table} WHERE applicant_email = %s AND status = 'blocked'",
+			$email
+		) );
+
+		echo '<div class="tsvd-animal-card">';
+		echo '<div class="tsvd-animal-card__body">';
+		echo '<div class="tsvd-animal-card__name">' . esc_html( $email ) . '</div>';
+		echo '<div class="tsvd-animal-card__facts">' . esc_html( sprintf( _n( '%d geblockte Anfrage', '%d geblockte Anfragen', $count, 'tsvd' ), $count ) ) . '</div>';
+		echo '</div>';
+		echo '<form method="post" action="' . esc_url( admin_url( 'admin-post.php' ) ) . '">';
+		echo '<input type="hidden" name="action" value="tsvd_anfrage_blacklist_release">';
+		echo '<input type="hidden" name="email" value="' . esc_attr( $email ) . '">';
+		wp_nonce_field( 'tsvd_anfrage_blacklist_release_' . $email );
+		echo '<button type="submit" class="tsvd-icon-btn is-danger" title="' . esc_attr__( 'Absender freigeben', 'tsvd' ) . '" aria-label="' . esc_attr__( 'Absender freigeben', 'tsvd' ) . '"><span class="dashicons dashicons-unlock"></span></button>';
+		echo '</form>';
+		echo '</div>';
+	}
+}
+
 add_action( 'admin_post_tsvd_anfrage_trash', 'tsvd_anfragen_handle_trash' );
 add_action( 'admin_post_tsvd_anfrage_restore', 'tsvd_anfragen_handle_restore' );
 add_action( 'admin_post_tsvd_anfrage_delete', 'tsvd_anfragen_handle_delete' );
@@ -489,6 +535,7 @@ add_action( 'admin_post_tsvd_anfrage_spam', 'tsvd_anfragen_handle_spam' );
 add_action( 'admin_post_tsvd_anfrage_unspam', 'tsvd_anfragen_handle_unspam' );
 add_action( 'admin_post_tsvd_anfrage_block', 'tsvd_anfragen_handle_block' );
 add_action( 'admin_post_tsvd_anfrage_unblock', 'tsvd_anfragen_handle_unblock' );
+add_action( 'admin_post_tsvd_anfrage_blacklist_release', 'tsvd_anfragen_handle_blacklist_release' );
 
 function tsvd_anfragen_check_action( $nonce_prefix ) {
 	if ( ! current_user_can( 'manage_tsvd_anfragen' ) ) {
@@ -575,6 +622,31 @@ function tsvd_anfragen_handle_unblock() {
 		$wpdb->update( $table, array( 'status' => 'open', 'updated_at' => current_time( 'mysql' ) ), array( 'id' => $id ), array( '%s', '%s' ), array( '%d' ) );
 	}
 	wp_safe_redirect( add_query_arg( 'view', $id, tsvd_anfragen_list_base_url() ) );
+	exit;
+}
+
+/**
+ * Blacklist-Freigabe aus der zentralen Ansicht: E-Mail entfernen und ALLE
+ * Anfragen dieses Absenders von 'blocked' zurück auf 'open' setzen.
+ */
+function tsvd_anfragen_handle_blacklist_release() {
+	if ( ! current_user_can( 'manage_tsvd_anfragen' ) ) {
+		wp_die( '-1' );
+	}
+	$email = isset( $_POST['email'] ) ? strtolower( trim( sanitize_email( wp_unslash( $_POST['email'] ) ) ) ) : '';
+	check_admin_referer( 'tsvd_anfrage_blacklist_release_' . $email );
+	if ( $email ) {
+		tsvd_anfragen_blacklist_remove( $email );
+		global $wpdb;
+		$wpdb->update(
+			tsvd_anfragen_table_name(),
+			array( 'status' => 'open', 'updated_at' => current_time( 'mysql' ) ),
+			array( 'applicant_email' => $email, 'status' => 'blocked' ),
+			array( '%s', '%s' ),
+			array( '%s', '%s' )
+		);
+	}
+	wp_safe_redirect( add_query_arg( array( 'view' => 'blacklist', 'released' => '1' ), tsvd_anfragen_list_base_url() ) );
 	exit;
 }
 
