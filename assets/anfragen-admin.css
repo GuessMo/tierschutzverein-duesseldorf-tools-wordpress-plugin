@@ -29,10 +29,10 @@
 .tsvd-help-doc .dashicons{font-size:16px;width:16px;height:16px;}
 .tsvd-help-doc:hover{color:var(--tsvd-chrome-heading,#1d2327);}
 .tsvd-help-doc.is-open{color:var(--tsvd-chrome-heading,#1d2327);}
-.tsvd-help-pop{position:absolute;z-index:99999;min-width:280px;max-width:320px;padding:10px 12px;
+.tsvd-help-pop{position:fixed;z-index:99999;min-width:280px;max-width:320px;padding:10px 12px;
 	background:var(--tsvd-chrome-surface,#fff);border:1px solid var(--tsvd-chrome-border,#c3c4c7);
 	border-radius:4px;box-shadow:0 2px 6px rgba(0,0,0,.08);
-	font-size:13px;line-height:1.5;color:var(--tsvd-chrome-text,#3c434a);}
+	font-size:13px;line-height:1.5;color:var(--tsvd-chrome-text,#3c434a);text-transform:none;}
 .tsvd-help-wrap{position:relative;display:inline-block;}
 
 .tsvd-msgr__side-actions{display:flex;align-items:center;gap:6px;}
