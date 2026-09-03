@@ -24,7 +24,7 @@
 
 .tsvd-msgr{display:flex;border:1px solid var(--tsvd-chrome-border,#c3c4c7);
 	background:var(--tsvd-chrome-surface,#fff);border-radius:4px;overflow:hidden;
-	height:calc(100vh - 150px);min-height:480px;margin-top:12px;}
+	height:calc(100vh - 164px);min-height:480px;margin-top:12px;}
 .tsvd-msgr--right{flex-direction:row-reverse;}
 .tsvd-msgr--left{flex-direction:row;}
 .tsvd-msgr__side{width:340px;flex:0 0 340px;display:flex;flex-direction:column;
