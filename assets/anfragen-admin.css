@@ -21,6 +21,8 @@
 .tsvd-icon-btn.is-current .dashicons,.tsvd-icon-btn.is-current svg,
 .tsvd-icon-btn.is-active .dashicons,.tsvd-icon-btn.is-active svg{color:#fff;}
 .tsvd-icon-btn.is-danger{color:#d63638;border-color:#d63638;}
+.tsvd-help-doc{display:inline-flex;vertical-align:middle;margin-left:6px;}
+.tsvd-msgr__side-actions{display:flex;align-items:center;gap:6px;}
 
 .tsvd-msgr{display:flex;border:1px solid var(--tsvd-chrome-border,#c3c4c7);
 	background:var(--tsvd-chrome-surface,#fff);border-radius:4px;overflow:hidden;

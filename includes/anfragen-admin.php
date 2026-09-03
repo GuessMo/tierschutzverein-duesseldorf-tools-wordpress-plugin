@@ -72,6 +72,10 @@ function tsvd_anfragen_sidebar_pos() {
 	return 'left' === $pos ? 'left' : 'right';
 }
 
+function tsvd_anfragen_help_btn( $text ) {
+	echo '<button type="button" class="tsvd-icon-btn tsvd-help-doc" title="' . esc_attr( $text ) . '" aria-label="' . esc_attr( __( 'Hilfe', 'tsvd' ) ) . '"><span class="dashicons dashicons-editor-help"></span></button>';
+}
+
 function tsvd_anfragen_render_page() {
 	if ( ! current_user_can( 'manage_tsvd_anfragen' ) ) {
 		return;
@@ -97,6 +101,7 @@ function tsvd_anfragen_render_page() {
 	$pos = tsvd_anfragen_sidebar_pos();
 
 	echo '<div class="wrap"><h1 class="wp-heading-inline">' . esc_html__( 'Anfragen', 'tsvd' ) . '</h1>';
+	tsvd_anfragen_help_btn( __( 'Alle eingehenden Anfragen von Interessent:innen zu Tieren. Hier siehst du die Konversations-Liste links, filterst nach Tierart und Status und beantwortest Anfragen per E-Mail direkt in der Ansicht. Status: Offen = wartet auf deine Antwort, Beantwortet = du hast geantwortet, Spam/Blockiert = ausgeblendet.', 'tsvd' ) );
 
 	if ( isset( $_GET['deleted'] ) ) {
 		echo '<div class="notice notice-success is-dismissible"><p>' . esc_html__( 'Anfrage endgültig gelöscht.', 'tsvd' ) . '</p></div>';
@@ -392,8 +397,10 @@ function tsvd_anfragen_render_sidebar( $status, $search, $selected, $pos = 'righ
 
 	echo '<div class="tsvd-msgr__side-bar">';
 	echo '<span class="tsvd-msgr__side-title">' . esc_html__( 'Konversationen', 'tsvd' ) . '</span>';
+	echo '<span class="tsvd-msgr__side-actions">';
+	tsvd_anfragen_help_btn( __( 'Liste aller eingehenden Anfragen. Ein Punkt vor dem Namen bedeutet: die Anfrage ist offen (noch nicht beantwortet). Klicke auf einen Eintrag, um die Konversation rechts zu öffnen. Über die Icons filterst du nach Tierart, nach deinen eigenen Anfragen, Status und Papierkorb.', 'tsvd' ) );
 	echo '<a class="tsvd-icon-btn tsvd-msgr__pos" href="' . esc_url( $toggle_url ) . '" title="' . esc_attr( $toggle_lbl ) . '" aria-label="' . esc_attr( $toggle_lbl ) . '"><span class="dashicons ' . esc_attr( $toggle_icon ) . '"></span></a>';
-	echo '</div>';
+	echo '</span></div>';
 
 	tsvd_anfragen_render_search_box( $status, $search, $breed );
 

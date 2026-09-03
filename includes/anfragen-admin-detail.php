@@ -82,6 +82,7 @@ function tsvd_anfragen_render_conversation( $id ) {
 	$label         = isset( $status_labels[ $calc_status ] ) ? $status_labels[ $calc_status ] : $calc_status;
 
 	echo '<div class="tsvd-conv__head"><h2>' . esc_html( $anfrage['applicant_name'] ) . '</h2>';
+	tsvd_anfragen_help_btn( __( 'Diese Konversation gehört zu einer Person, die Interesse an einem Tier gezeigt hat. Du siehst hier ihre Kontaktdaten, das interessierende Tier und den Status. Über die Icons oben rechts kannst du die Anfrage zuweisen, blockieren, als Spam markieren oder in den Papierkorb legen.', 'tsvd' ) );
 	echo '<span class="tsvd-msgr__badge">' . esc_html( $label ) . '</span>';
 	tsvd_anfragen_render_conversation_actions( $anfrage );
 	echo '</div>';
@@ -180,6 +181,7 @@ function tsvd_anfragen_render_replies( $wpdb, $replies_table, $anfrage ) {
 	$id             = (int) $anfrage['id'];
 	$applicant_name = $anfrage['applicant_name'];
 	echo '<h2>' . esc_html__( 'Konversation', 'tsvd' ) . '</h2>';
+	tsvd_anfragen_help_btn( __( 'Der vollständige Verlauf dieser Anfrage: ganz oben die Formularangaben der Person, darunter alle Nachrichten. Blau = deine Ausgangsnachrichten, weiß = eingehende Nachrichten, gestrichelt = interne Notizen. Nutze die Symbole an einer Nachricht zum Bearbeiten oder Löschen (nur bei Notizen und geplanten Nachrichten).', 'tsvd' ) );
 	$replies = $wpdb->get_results( $wpdb->prepare( "SELECT * FROM {$replies_table} WHERE anfrage_id = %d ORDER BY COALESCE(sent_at, scheduled_at) ASC, id ASC", $id ), ARRAY_A );
 	$nonce   = wp_create_nonce( 'tsvd_anfrage_reply_' . $id );
 
@@ -370,6 +372,7 @@ function tsvd_anfragen_render_reply_form( $id ) {
 	$nonce = wp_create_nonce( 'tsvd_anfrage_reply_' . $id );
 	?>
 	<h2><?php esc_html_e( 'Nachricht', 'tsvd' ); ?></h2>
+	<?php tsvd_anfragen_help_btn( __( 'Schreibe hier eine Antwort an die interessierte Person. Sie wird per E-Mail versendet und die Signatur automatisch angehängt. Mit dem Notiz-Symbol wechselst du in den internen Modus — Notizen sind nur im System sichtbar und gehen nicht raus.', 'tsvd' ) ); ?>
 	<div class="tsvd-composer__modes">
 		<button type="button" class="tsvd-icon-btn tsvd-composer__mode is-active" data-mode="reply" title="<?php esc_attr_e( 'Antwort', 'tsvd' ); ?>" aria-label="<?php esc_attr_e( 'Antwort', 'tsvd' ); ?>"><span class="dashicons dashicons-email"></span></button>
 		<button type="button" class="tsvd-icon-btn tsvd-composer__mode" data-mode="note" title="<?php esc_attr_e( 'Interne Notiz', 'tsvd' ); ?>" aria-label="<?php esc_attr_e( 'Interne Notiz', 'tsvd' ); ?>"><span class="dashicons dashicons-edit"></span></button>
