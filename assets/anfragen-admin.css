@@ -1,5 +1,8 @@
 /* Anfragen-Messenger: Sidebar, Filterleisten, Konversations-Ansicht. */
 
+/* WP-Admin-Sidebar: Flyout-Submenus verursachen horizontalen Scroll. */
+#adminmenuwrap{overflow:hidden;}
+
 /* Gemeinsamer Icon-Button aller Messenger-Controls (pos/filter/search/act/composer). */
 .tsvd-icon-btn{display:inline-flex;align-items:center;justify-content:center;
 	width:36px;height:36px;padding:0;box-sizing:border-box;cursor:pointer;
