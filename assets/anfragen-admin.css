@@ -94,7 +94,6 @@
 .tsvd-animal-card__thumb img{width:64px;height:64px;object-fit:cover;display:block;}
 .tsvd-animal-card__thumb .dashicons{color:var(--tsvd-chrome-text-muted,#646970);
 	font-size:30px;width:30px;height:30px;}
-.tsvd-animal-card__body{flex:1;min-width:0;}
 .tsvd-animal-card__name{font-weight:600;font-size:14px;}
 .tsvd-animal-card__facts{font-size:12px;color:var(--tsvd-chrome-text-muted,#646970);margin-top:2px;}
 .tsvd-animal-card__links{display:flex;gap:14px;font-size:12px;margin-top:5px;}
