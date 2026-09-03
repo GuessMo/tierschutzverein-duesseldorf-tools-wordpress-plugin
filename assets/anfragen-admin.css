@@ -21,7 +21,20 @@
 .tsvd-icon-btn.is-current .dashicons,.tsvd-icon-btn.is-current svg,
 .tsvd-icon-btn.is-active .dashicons,.tsvd-icon-btn.is-active svg{color:#fff;}
 .tsvd-icon-btn.is-danger{color:#d63638;border-color:#d63638;}
-.tsvd-help-doc{display:inline-flex;vertical-align:middle;margin-left:6px;}
+
+/* Interaktive Inline-Hilfe: ?-Icon neben Titel + Popover beim Klick. */
+.tsvd-help-doc{display:inline-flex;align-items:center;justify-content:center;
+	vertical-align:middle;margin:0 0 0 4px;padding:0;border:0;background:none;
+	color:var(--wp-admin-theme-color,#2271b1);cursor:pointer;line-height:1;width:auto;height:auto;}
+.tsvd-help-doc .dashicons{font-size:16px;width:16px;height:16px;}
+.tsvd-help-doc:hover{color:var(--tsvd-chrome-heading,#1d2327);}
+.tsvd-help-doc.is-open{color:var(--tsvd-chrome-heading,#1d2327);}
+.tsvd-help-pop{position:absolute;z-index:99999;min-width:280px;max-width:320px;padding:10px 12px;
+	background:var(--tsvd-chrome-surface,#fff);border:1px solid var(--tsvd-chrome-border,#c3c4c7);
+	border-radius:4px;box-shadow:0 2px 6px rgba(0,0,0,.08);
+	font-size:13px;line-height:1.5;color:var(--tsvd-chrome-text,#3c434a);}
+.tsvd-help-wrap{position:relative;display:inline-block;}
+
 .tsvd-msgr__side-actions{display:flex;align-items:center;gap:6px;}
 
 .tsvd-msgr{display:flex;border:1px solid var(--tsvd-chrome-border,#c3c4c7);

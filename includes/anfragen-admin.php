@@ -73,7 +73,68 @@ function tsvd_anfragen_sidebar_pos() {
 }
 
 function tsvd_anfragen_help_btn( $text ) {
-	echo '<button type="button" class="tsvd-icon-btn tsvd-help-doc" title="' . esc_attr( $text ) . '" aria-label="' . esc_attr( __( 'Hilfe', 'tsvd' ) ) . '"><span class="dashicons dashicons-editor-help"></span></button>';
+	echo '<span class="tsvd-help-wrap">';
+	echo '<button type="button" class="tsvd-help-doc" data-help="' . esc_attr( $text ) . '" aria-label="' . esc_attr( __( 'Hilfe', 'tsvd' ) ) . '"><span class="dashicons dashicons-editor-help"></span></button>';
+	echo '<span class="tsvd-help-pop" role="tooltip" hidden></span>';
+	echo '</span>';
+}
+
+function tsvd_anfragen_help_script() {
+	static $done = false;
+	if ( $done ) {
+		return;
+	}
+	$done = true;
+	?>
+	<script>
+	(function () {
+		var pop;
+		function position( btn ) {
+			var wrap = btn.closest( '.tsvd-help-wrap' );
+			var r = wrap.getBoundingClientRect();
+			var w = pop.offsetWidth, h = pop.offsetHeight;
+			var x = Math.min( r.left, document.documentElement.clientWidth - w - 12 );
+			var y = r.bottom + 6;
+			pop.style.left = Math.max( 10, x ) + 'px';
+			pop.style.top = ( y + h > document.documentElement.clientHeight ? r.top - h - 6 : y ) + 'px';
+		}
+		function close() {
+			if ( ! pop ) return;
+			pop.hidden = true;
+			var open = document.querySelector( '.tsvd-help-doc.is-open' );
+			if ( open ) open.classList.remove( 'is-open' );
+		}
+		document.addEventListener( 'click', function ( e ) {
+			var btn = e.target.closest( '.tsvd-help-doc' );
+			if ( btn ) {
+				e.stopPropagation();
+				var wrap = btn.closest( '.tsvd-help-wrap' );
+				var wasOpen = ! wrap.querySelector( '.tsvd-help-pop' ).hidden;
+				close();
+				if ( ! wasOpen ) {
+					pop = wrap.querySelector( '.tsvd-help-pop' );
+					pop.textContent = btn.getAttribute( 'data-help' );
+					pop.hidden = false;
+					btn.classList.add( 'is-open' );
+					position( btn );
+				}
+				return;
+			}
+			if ( e.target.closest( '.tsvd-help-pop' ) ) return;
+			close();
+		} );
+		document.addEventListener( 'keydown', function ( e ) {
+			if ( 'Escape' === e.key ) close();
+		} );
+		window.addEventListener( 'resize', function () {
+			if ( pop && ! pop.hidden ) {
+				var btn = pop.closest( '.tsvd-help-wrap' ).querySelector( '.tsvd-help-doc' );
+				position( btn );
+			}
+		} );
+	})();
+	</script>
+	<?php
 }
 
 function tsvd_anfragen_render_page() {
@@ -122,6 +183,7 @@ function tsvd_anfragen_render_page() {
 		echo '<div class="tsvd-msgr__empty"><p>' . esc_html__( 'Wähle links eine Konversation aus.', 'tsvd' ) . '</p></div>';
 	}
 	echo '</div></div></div>';
+	tsvd_anfragen_help_script();
 }
 
 /**
