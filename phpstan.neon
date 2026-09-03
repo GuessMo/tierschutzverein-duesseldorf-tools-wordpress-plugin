@@ -1,0 +1,17 @@
+includes:
+    - vendor/szepeviktor/phpstan-wordpress/extension.neon
+
+parameters:
+    level: 5
+    bootstrapFiles:
+        - tsv-tools.php
+    paths:
+        - .
+    excludePaths:
+        - vendor
+        - node_modules (?)
+        - build (?)
+    phpVersion: 80100
+    reportUnmatchedIgnoredErrors: false
+    parallel:
+        maximumNumberOfProcesses: 1
