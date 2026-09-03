@@ -81,7 +81,10 @@ function tsvd_render_anfragen_imap_settings_tab() {
         </tr>
         <tr>
             <th><label for="tsvd_anfragen_imap_username"><?php esc_html_e('Mailbox-Adresse', 'tsv-tools'); ?></label></th>
-            <td><input type="email" id="tsvd_anfragen_imap_username" name="tsvd_anfragen_imap_username" class="regular-text" value="<?php echo esc_attr($s['username']); ?>" /></td>
+            <td>
+                <input type="text" id="tsvd_anfragen_imap_username" name="tsvd_anfragen_imap_username" class="regular-text" value="<?php echo esc_attr($s['username']); ?>" />
+                <p class="description"><?php esc_html_e('Benutzername für die Mailbox. In der lokalen Entwicklung (Mailpit) reicht eine beliebige Adresse wie tieranfragen@localhost:8080, weil keine echten Mails verschickt werden. In Produktion hier die echte Mailbox-Adresse eintragen.', 'tsv-tools'); ?></p>
+            </td>
         </tr>
         <tr>
             <th><label for="tsvd_anfragen_imap_password"><?php esc_html_e('App-Passwort', 'tsv-tools'); ?></label></th>
