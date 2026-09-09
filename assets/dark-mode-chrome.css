@@ -135,6 +135,11 @@ body {
     color-scheme: var(--tsvd-color-scheme);
 }
 
+.wp-core-ui select option,
+.wp-core-ui select optgroup {
+    color: var(--tsvd-chrome-heading);
+}
+
 .wp-core-ui select.disabled,
 .wp-core-ui select:disabled {
     background-color: var(--tsvd-chrome-canvas);
