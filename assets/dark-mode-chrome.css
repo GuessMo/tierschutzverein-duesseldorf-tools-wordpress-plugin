@@ -152,6 +152,10 @@ body {
     border-color: var(--tsvd-chrome-heading);
 }
 
+.wp-core-ui select:focus {
+    color: var(--tsvd-chrome-heading);
+}
+
 #wp-content-editor-container,
 .wp-editor-container {
     background-color: var(--tsvd-chrome-surface) !important;
