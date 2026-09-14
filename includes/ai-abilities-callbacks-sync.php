@@ -3,7 +3,7 @@
 if (!defined('ABSPATH')) exit;
 
 function tsvd_tools_ai_sync_default_types() {
-    return array('projects', 'tsvd_form', 'page', 'post', 'animals');
+    return array('projects', 'tsvd_form', 'page', 'post', 'animals', 'informationsmaterial', 'tierschutzbrief', 'staff');
 }
 
 function tsvd_tools_ai_export_content_delta($input) {
@@ -45,6 +45,7 @@ function tsvd_tools_ai_export_content_delta($input) {
         'count'       => count($posts),
         'posts'       => $posts,
         'options'     => tsvd_tools_ai_sync_export_options(),
+        'ref_map'     => tsvd_tools_ai_sync_build_ref_map(),
     );
 }
 
@@ -77,10 +78,10 @@ function tsvd_tools_ai_sync_export_post($post, $with_media) {
 }
 
 function tsvd_tools_ai_sync_gather_ids($value, &$ids, $key_hint = '') {
-    $is_image_key = $key_hint !== ''
-        && preg_match('/(image|thumbnail|thumb|logo|photo|picture|gallery|bild|foto|attachment)/i', $key_hint);
+    $is_media_key = $key_hint !== ''
+        && preg_match('/(image|thumbnail|thumb|logo|photo|picture|gallery|bild|foto|attachment|asset|download|file|document|pdf|media|video)/i', $key_hint);
     if (is_numeric($value)) {
-        if ($is_image_key) {
+        if ($is_media_key) {
             $ids[] = (int) $value;
         }
         return;
@@ -124,7 +125,7 @@ function tsvd_tools_ai_sync_collect_attachments($post) {
 
     $out = array();
     foreach (array_unique(array_filter($ids)) as $id) {
-        if (get_post_type($id) !== 'attachment' || ! wp_attachment_is_image($id)) {
+        if (get_post_type($id) !== 'attachment') {
             continue;
         }
         $relative = get_post_meta($id, '_wp_attached_file', true);
@@ -137,9 +138,74 @@ function tsvd_tools_ai_sync_collect_attachments($post) {
             'relative' => $relative,
             'url'      => $url,
             'filename' => basename($relative),
+            'mime'     => get_post_mime_type($id),
         );
     }
     return $out;
+}
+
+function tsvd_tools_ai_sync_resolve_ref($id, &$map) {
+    $id = (int) $id;
+    if ($id <= 0 || isset($map[$id])) {
+        return;
+    }
+    $post_type = get_post_type($id);
+    if (! $post_type) {
+        return;
+    }
+    $post = get_post($id);
+    $map[$id] = array('kind' => 'post', 'type' => $post_type, 'slug' => $post->post_name);
+}
+
+function tsvd_tools_ai_sync_resolve_term($id, $taxonomy, &$map) {
+    $id = (int) $id;
+    if ($id <= 0 || isset($map[$id])) {
+        return;
+    }
+    $term = get_term($id, $taxonomy);
+    if (is_wp_error($term) || ! $term) {
+        return;
+    }
+    $map[$id] = array('kind' => 'term', 'type' => $taxonomy, 'slug' => $term->slug);
+}
+
+function tsvd_tools_ai_sync_build_ref_map() {
+    global $wpdb;
+    $map = array();
+    $names = $wpdb->get_col("SELECT option_name FROM {$wpdb->options} WHERE option_name LIKE 'tsvd\\_%'");
+    foreach ((array) $names as $name) {
+        $expected = null;
+        if (preg_match('/_form$/', $name)) {
+            $expected = 'tsvd_form';
+        } elseif (preg_match('/_(page|pid)$/', $name)) {
+            $expected = 'page';
+        } elseif (preg_match('/_image$/', $name)) {
+            $expected = 'attachment';
+        }
+        if (! $expected) {
+            continue;
+        }
+        $id = (int) get_option($name);
+        if ($id > 0 && get_post_type($id) === $expected) {
+            tsvd_tools_ai_sync_resolve_ref($id, $map);
+        }
+    }
+    $form_pages = get_option('tsvd_animal_form_pages');
+    if (is_array($form_pages)) {
+        foreach ($form_pages as $entry) {
+            if (! empty($entry['form_id'])) tsvd_tools_ai_sync_resolve_ref($entry['form_id'], $map);
+            if (! empty($entry['animal_id'])) tsvd_tools_ai_sync_resolve_ref($entry['animal_id'], $map);
+        }
+    }
+    $categories = get_option('tsvd_tdw_target_categories');
+    if (is_array($categories)) {
+        foreach ($categories as $taxonomy => $ids) {
+            foreach ((array) $ids as $term_id) {
+                tsvd_tools_ai_sync_resolve_term($term_id, $taxonomy, $map);
+            }
+        }
+    }
+    return $map;
 }
 
 function tsvd_tools_ai_sync_sensitive_pattern() {
