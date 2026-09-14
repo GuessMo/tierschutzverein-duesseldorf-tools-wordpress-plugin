@@ -137,6 +137,24 @@ function tsvd_tools_ai_sync_collect_attachments($post) {
     return $out;
 }
 
+function tsvd_tools_ai_sync_sensitive_pattern() {
+    return '/(pass|password|token|secret|_key$|api[_-]?key|imap|smtp|mailer|credential|auth)/i';
+}
+
+function tsvd_tools_ai_sync_redact($value) {
+    if (! is_array($value)) {
+        return $value;
+    }
+    $out = array();
+    foreach ($value as $key => $inner) {
+        if (is_string($key) && preg_match('/(pass|password|token|secret|key|credential|auth)/i', $key)) {
+            continue;
+        }
+        $out[$key] = tsvd_tools_ai_sync_redact($inner);
+    }
+    return $out;
+}
+
 function tsvd_tools_ai_sync_export_options() {
     global $wpdb;
     $options = array();
@@ -144,11 +162,15 @@ function tsvd_tools_ai_sync_export_options() {
         "SELECT option_name FROM {$wpdb->options}
          WHERE option_name LIKE 'tsvd\\_%' AND option_name NOT LIKE '\\_transient\\_%'"
     );
+    $sensitive = tsvd_tools_ai_sync_sensitive_pattern();
     foreach ((array) $names as $name) {
         if (in_array($name, array('siteurl', 'home'), true)) {
             continue;
         }
-        $options[$name] = get_option($name);
+        if (preg_match($sensitive, $name)) {
+            continue;
+        }
+        $options[$name] = tsvd_tools_ai_sync_redact(get_option($name));
     }
     return $options;
 }
