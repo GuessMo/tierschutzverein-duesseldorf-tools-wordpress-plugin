@@ -76,14 +76,19 @@ function tsvd_tools_ai_sync_export_post($post, $with_media) {
     );
 }
 
-function tsvd_tools_ai_sync_gather_ids($value, &$ids) {
+function tsvd_tools_ai_sync_gather_ids($value, &$ids, $key_hint = '') {
+    $is_image_key = $key_hint !== ''
+        && preg_match('/(image|thumbnail|thumb|logo|photo|picture|gallery|bild|foto|attachment)/i', $key_hint);
     if (is_numeric($value)) {
-        $ids[] = (int) $value;
+        if ($is_image_key) {
+            $ids[] = (int) $value;
+        }
         return;
     }
     if (is_array($value)) {
-        foreach ($value as $item) {
-            tsvd_tools_ai_sync_gather_ids($item, $ids);
+        foreach ($value as $key => $item) {
+            $next = is_string($key) ? $key : $key_hint;
+            tsvd_tools_ai_sync_gather_ids($item, $ids, $next);
         }
     }
 }
@@ -104,9 +109,9 @@ function tsvd_tools_ai_sync_collect_attachments($post) {
     foreach ((array) $children as $child_id) {
         $ids[] = (int) $child_id;
     }
-    foreach (get_post_meta($post->ID) as $values) {
+    foreach (get_post_meta($post->ID) as $meta_key => $values) {
         foreach ((array) $values as $raw) {
-            tsvd_tools_ai_sync_gather_ids(maybe_unserialize($raw), $ids);
+            tsvd_tools_ai_sync_gather_ids(maybe_unserialize($raw), $ids, $meta_key);
         }
     }
     if (preg_match_all('/\[gallery[^\]]*ids=.([0-9,]+)./', $post->post_content, $matches)) {
