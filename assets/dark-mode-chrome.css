@@ -121,8 +121,13 @@ body {
 .wp-core-ui input[type="email"],
 .wp-core-ui input[type="url"],
 .wp-core-ui input[type="password"],
+.wp-core-ui input[type="tel"],
 .wp-core-ui input[type="number"],
 .wp-core-ui input[type="date"],
+.wp-core-ui input[type="datetime-local"],
+.wp-core-ui input[type="month"],
+.wp-core-ui input[type="week"],
+.wp-core-ui input[type="time"],
 .wp-core-ui textarea,
 .wp-core-ui select {
     background-color: var(--tsvd-chrome-surface);
@@ -132,6 +137,14 @@ body {
 
 .wp-core-ui select {
     background-image: var(--tsvd-select-arrow);
+    color-scheme: var(--tsvd-color-scheme);
+}
+
+.wp-core-ui input[type="date"],
+.wp-core-ui input[type="datetime-local"],
+.wp-core-ui input[type="month"],
+.wp-core-ui input[type="week"],
+.wp-core-ui input[type="time"] {
     color-scheme: var(--tsvd-color-scheme);
 }
 
