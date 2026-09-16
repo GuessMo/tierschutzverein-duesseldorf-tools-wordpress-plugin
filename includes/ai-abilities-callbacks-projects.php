@@ -112,6 +112,16 @@ function tsvd_tools_ai_update_project($input) {
     );
 }
 
+function tsvd_tools_ai_normalize_milestone_images($input) {
+    if (isset($input['images']) && is_array($input['images'])) {
+        return array_values(array_filter(array_map('absint', $input['images'])));
+    }
+    if (!empty($input['image'])) {
+        return array(absint($input['image']));
+    }
+    return array();
+}
+
 function tsvd_tools_ai_add_project_milestone($input) {
     $post_id = absint($input['id'] ?? 0);
     $post    = $post_id ? get_post($post_id) : null;
@@ -135,7 +145,7 @@ function tsvd_tools_ai_add_project_milestone($input) {
         'date'         => sanitize_text_field($input['date'] ?? ''),
         'progress'     => tsvd_tools_ai_normalize_milestone_progress($status, min(100, absint($input['progress'] ?? 0))),
         'status'       => $status,
-        'image'        => absint($input['image'] ?? 0),
+        'images'       => tsvd_tools_ai_normalize_milestone_images($input),
         'publish_at'   => sanitize_text_field($input['publish_at'] ?? ''),
         'show_in_news' => !empty($input['show_in_news']),
     );
@@ -191,8 +201,8 @@ function tsvd_tools_ai_update_project_milestone($input) {
     if (isset($input['status']) && in_array($input['status'], array('pending', 'in_progress', 'completed'), true)) {
         $milestones[$index]['status'] = $input['status'];
     }
-    if (isset($input['image'])) {
-        $milestones[$index]['image'] = absint($input['image']);
+    if (isset($input['images']) || isset($input['image'])) {
+        $milestones[$index]['images'] = tsvd_tools_ai_normalize_milestone_images($input);
     }
     if (isset($input['publish_at'])) {
         $milestones[$index]['publish_at'] = sanitize_text_field($input['publish_at']);
