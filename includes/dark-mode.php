@@ -3,6 +3,10 @@ if (!defined('ABSPATH')) exit;
 
 add_action('admin_head', 'tsvd_dark_mode_print_early_script', 1);
 function tsvd_dark_mode_print_early_script() {
+    if (tsvd_dark_mode_is_block_editor()) {
+        echo '<script>document.documentElement.setAttribute("data-theme","light");</script>';
+        return;
+    }
     ?>
 <script>
 (function() {
@@ -30,8 +34,20 @@ function tsvd_dark_mode_is_native_screen($hook_suffix) {
     return in_array($hook_suffix, $native_screens, true);
 }
 
+function tsvd_dark_mode_is_block_editor() {
+    if (!function_exists('get_current_screen')) {
+        return false;
+    }
+    $screen = get_current_screen();
+    return $screen && method_exists($screen, 'is_block_editor') && $screen->is_block_editor();
+}
+
 add_action('admin_enqueue_scripts', 'tsvd_dark_mode_enqueue_assets');
 function tsvd_dark_mode_enqueue_assets($hook_suffix) {
+    if (tsvd_dark_mode_is_block_editor()) {
+        return;
+    }
+
     wp_enqueue_style('tsvd-dark-mode', TSVD_TOOLS_URL . 'assets/dark-mode.css', array(), tsvd_dark_mode_asset_version('assets/dark-mode.css'));
     wp_enqueue_style('tsvd-dark-mode-menu', TSVD_TOOLS_URL . 'assets/dark-mode-menu.css', array(), tsvd_dark_mode_asset_version('assets/dark-mode-menu.css'));
     wp_enqueue_script('tsvd-dark-mode', TSVD_TOOLS_URL . 'assets/dark-mode.js', array(), tsvd_dark_mode_asset_version('assets/dark-mode.js'), true);
