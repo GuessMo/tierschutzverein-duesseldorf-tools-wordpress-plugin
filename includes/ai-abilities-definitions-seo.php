@@ -58,5 +58,35 @@ function tsvd_tools_ai_get_ability_definitions_seo() {
                 'annotations' => array('readonly' => true, 'destructive' => false, 'idempotent' => true),
             ),
         ),
+        'tsv-tools/set-seo-meta' => array(
+            'label'               => __('SEO-Meta setzen', 'tsv-tools'),
+            'description'         => __('Setzt Fokus-Keyword und/oder Meta-Description (SEO-Metabox) eines Beitrags oder einer Seite. Nur übergebene Felder werden geändert.', 'tsv-tools'),
+            'category'            => 'tsv-tools-animals',
+            'input_schema'        => array(
+                'type'       => 'object',
+                'properties' => array(
+                    'post_id'          => array('type' => 'integer', 'description' => 'ID eines Beitrags oder einer Seite'),
+                    'focus_keyword'    => array('type' => 'string', 'description' => 'Fokus-Keyword (optional)'),
+                    'meta_description' => array('type' => 'string', 'description' => 'Meta-Description-Override (optional)'),
+                ),
+                'required'             => array('post_id'),
+                'additionalProperties' => false,
+            ),
+            'output_schema'       => array(
+                'type'       => 'object',
+                'properties' => array(
+                    'post_id'          => array('type' => 'integer'),
+                    'focus_keyword'    => array('type' => 'string'),
+                    'meta_description' => array('type' => 'string'),
+                    'updated'          => array('type' => 'array', 'items' => array('type' => 'string')),
+                ),
+            ),
+            'permission_callback' => 'tsvd_tools_ai_can_manage_settings',
+            'execute_callback'    => 'tsvd_tools_ai_set_seo_meta',
+            'meta'                => array(
+                'mcp'         => array('public' => true),
+                'annotations' => array('readonly' => false, 'destructive' => false, 'idempotent' => true),
+            ),
+        ),
     );
 }
