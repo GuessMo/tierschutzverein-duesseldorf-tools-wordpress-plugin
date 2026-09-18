@@ -54,6 +54,7 @@ require_once TSVD_TOOLS_DIR . 'includes/newsletter-cpt.php';
 require_once TSVD_TOOLS_DIR . 'includes/newsletter-blocks.php';
 require_once TSVD_TOOLS_DIR . 'includes/newsletter-block-rte.php';
 require_once TSVD_TOOLS_DIR . 'includes/newsletter-block-image.php';
+require_once TSVD_TOOLS_DIR . 'includes/newsletter-render.php';
 require_once TSVD_TOOLS_DIR . 'includes/newsletter-send.php';
 require_once TSVD_TOOLS_DIR . 'includes/newsletter-admin.php';
 require_once TSVD_TOOLS_DIR . 'includes/newsletter-compose.php';
