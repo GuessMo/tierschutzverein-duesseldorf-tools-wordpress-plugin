@@ -50,4 +50,6 @@ require_once TSVD_TOOLS_DIR . 'includes/anfragen-admin.php';
 require_once TSVD_TOOLS_DIR . 'includes/anfragen-admin-detail.php';
 require_once TSVD_TOOLS_DIR . 'includes/anfragen-replies.php';
 require_once TSVD_TOOLS_DIR . 'includes/newsletter-subscribers.php';
+require_once TSVD_TOOLS_DIR . 'includes/newsletter-send.php';
 require_once TSVD_TOOLS_DIR . 'includes/newsletter-admin.php';
+require_once TSVD_TOOLS_DIR . 'includes/newsletter-compose.php';
