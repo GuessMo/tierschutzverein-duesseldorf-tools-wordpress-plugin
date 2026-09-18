@@ -15,6 +15,13 @@ function tsvd_newsletter_render_email( $post_id ) {
 function tsvd_newsletter_email_document( $subject, $inner_html ) {
 	$title = esc_html( $subject );
 
+	$site      = get_bloginfo( 'name' );
+	$logo_id   = get_theme_mod( 'custom_logo' );
+	$logo_url  = $logo_id ? wp_get_attachment_image_url( $logo_id, 'medium' ) : '';
+	$logo_html = $logo_url
+		? '<img src="' . esc_url( $logo_url ) . '" alt="' . esc_attr( $site ) . '" style="max-height:56px;width:auto;display:inline-block;">'
+		: '<span style="font-size:20px;font-weight:700;color:#009879;">' . esc_html( $site ) . '</span>';
+
 	$head  = '<!DOCTYPE html><html lang="de" xmlns="http://www.w3.org/1999/xhtml">';
 	$head .= '<head><meta charset="utf-8">';
 	$head .= '<meta name="viewport" content="width=device-width, initial-scale=1">';
@@ -27,7 +34,9 @@ function tsvd_newsletter_email_document( $subject, $inner_html ) {
 		. 'style="background-color:#f5ede5;"><tr><td align="center" style="padding:24px 12px;">';
 	$body_open .= '<table role="presentation" width="600" cellpadding="0" cellspacing="0" border="0" '
 		. 'style="width:600px;max-width:100%;background-color:#ffffff;border-radius:12px;overflow:hidden;">';
-	$body_open .= '<tr><td style="padding:28px 28px 8px;font-family:Arial,Helvetica,sans-serif;'
+	$body_open .= '<tr><td align="center" style="padding:24px 28px 16px;text-align:center;'
+		. 'background-color:#ffffff;border-bottom:1px solid #ebdfd4;">' . $logo_html . '</td></tr>';
+	$body_open .= '<tr><td style="padding:24px 28px 8px;font-family:Arial,Helvetica,sans-serif;'
 		. 'font-size:16px;line-height:1.6;color:#3a2f28;">';
 
 	$body_close  = '</td></tr></table>';

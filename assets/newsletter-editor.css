@@ -79,3 +79,65 @@
 	display: block;
 	margin-top: 4px;
 }
+
+.tsvd-nl-preview-dialog {
+	width: min(680px, 92vw);
+	max-width: 92vw;
+	padding: 0;
+	border: 1px solid var(--tsvd-chrome-border, #dcdcde);
+	border-radius: 8px;
+	background: var(--tsvd-chrome-surface, #fff);
+	color: var(--tsvd-chrome-text, inherit);
+}
+
+.tsvd-nl-preview-dialog::backdrop {
+	background: rgba(0, 0, 0, 0.6);
+}
+
+.tsvd-nl-preview-dialog-head {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	padding: 10px 14px;
+	border-bottom: 1px solid var(--tsvd-chrome-border, #dcdcde);
+}
+
+.tsvd-nl-preview-close {
+	cursor: pointer;
+	color: var(--tsvd-chrome-text, inherit);
+	text-decoration: none;
+}
+
+.tsvd-nl-preview-frame {
+	display: block;
+	width: 100%;
+	height: 70vh;
+	border: 0;
+	background: #fff;
+}
+
+.tsvd-nl-btn-full {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	gap: 6px;
+	width: 100%;
+	box-sizing: border-box;
+	text-align: center;
+}
+
+.tsvd-nl-btn-full .dashicons {
+	line-height: 1;
+}
+
+.tsvd-nl-divider {
+	border: 0;
+	border-top: 1px solid var(--tsvd-chrome-border, #dcdcde);
+	margin: 14px 0;
+}
+
+.tsvd-nl-send-actions {
+	display: flex;
+	flex-direction: column;
+	gap: 8px;
+}
