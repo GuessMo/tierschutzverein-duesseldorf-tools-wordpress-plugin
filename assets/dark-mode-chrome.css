@@ -418,3 +418,35 @@ body:has(#options-connectors-wp-admin-app) {
         color: var(--tsvd-chrome-text);
     }
 }
+
+:root[data-theme="dark"] .notification-dialog {
+    background: var(--tsvd-chrome-surface);
+    color: var(--tsvd-chrome-text);
+}
+
+:root[data-theme="dark"] .notification-dialog h1,
+:root[data-theme="dark"] .notification-dialog h2,
+:root[data-theme="dark"] .notification-dialog p {
+    color: var(--tsvd-chrome-text);
+}
+
+:root[data-theme="dark"] .notification-dialog-background {
+    background: #000;
+}
+
+@media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) .notification-dialog {
+        background: var(--tsvd-chrome-surface);
+        color: var(--tsvd-chrome-text);
+    }
+
+    :root:not([data-theme="light"]) .notification-dialog h1,
+    :root:not([data-theme="light"]) .notification-dialog h2,
+    :root:not([data-theme="light"]) .notification-dialog p {
+        color: var(--tsvd-chrome-text);
+    }
+
+    :root:not([data-theme="light"]) .notification-dialog-background {
+        background: #000;
+    }
+}
