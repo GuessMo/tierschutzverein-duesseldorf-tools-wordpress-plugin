@@ -12,9 +12,19 @@ function tsvd_newsletter_register_rte_block( $types ) {
 		'dynamic'  => false,
 		'sanitize' => 'tsvd_newsletter_rte_sanitize',
 		'render'   => 'tsvd_newsletter_rte_render',
+		'edit'     => 'tsvd_newsletter_rte_edit',
 	);
 
 	return $types;
+}
+
+function tsvd_newsletter_rte_edit( $index, $data ) {
+	$html  = isset( $data['html'] ) ? $data['html'] : '';
+	$field = 'newsletter_blocks[' . $index . '][data][html]';
+	$id    = 'tsvd-nl-rte-' . $index;
+
+	return '<textarea class="tsvd-nl-rte widefat" rows="6" id="' . esc_attr( $id ) . '" name="'
+		. esc_attr( $field ) . '">' . esc_textarea( $html ) . '</textarea>';
 }
 
 function tsvd_newsletter_rte_sanitize( $data ) {
