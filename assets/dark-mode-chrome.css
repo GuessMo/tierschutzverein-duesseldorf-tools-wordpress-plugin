@@ -378,3 +378,43 @@ body:has(#options-connectors-wp-admin-app) {
         border-bottom-color: var(--tsvd-chrome-surface);
     }
 }
+
+:root[data-theme="dark"] .categorydiv .tabs-panel,
+:root[data-theme="dark"] .customlinkdiv .tabs-panel,
+:root[data-theme="dark"] .tagsdiv .tabs-panel,
+:root[data-theme="dark"] .wp-tab-panel {
+    background: var(--tsvd-chrome-surface);
+    border-color: var(--tsvd-chrome-border);
+}
+
+:root[data-theme="dark"] .category-tabs a,
+:root[data-theme="dark"] .wp-tab-bar a {
+    color: var(--tsvd-link);
+}
+
+:root[data-theme="dark"] .categorychecklist,
+:root[data-theme="dark"] .categorychecklist label,
+:root[data-theme="dark"] .wp-tab-panel label {
+    color: var(--tsvd-chrome-text);
+}
+
+@media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) .categorydiv .tabs-panel,
+    :root:not([data-theme="light"]) .customlinkdiv .tabs-panel,
+    :root:not([data-theme="light"]) .tagsdiv .tabs-panel,
+    :root:not([data-theme="light"]) .wp-tab-panel {
+        background: var(--tsvd-chrome-surface);
+        border-color: var(--tsvd-chrome-border);
+    }
+
+    :root:not([data-theme="light"]) .category-tabs a,
+    :root:not([data-theme="light"]) .wp-tab-bar a {
+        color: var(--tsvd-link);
+    }
+
+    :root:not([data-theme="light"]) .categorychecklist,
+    :root:not([data-theme="light"]) .categorychecklist label,
+    :root:not([data-theme="light"]) .wp-tab-panel label {
+        color: var(--tsvd-chrome-text);
+    }
+}
