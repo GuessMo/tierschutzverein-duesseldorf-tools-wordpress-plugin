@@ -39,7 +39,7 @@ function tsvd_newsletter_sent_in_metabox_render( $post ) {
 function tsvd_newsletter_sent_in_markup( $post_id, $with_date ) {
 	$entries = tsvd_newsletter_item_sent_in( $post_id );
 	if ( empty( $entries ) ) {
-		return '<span style="color:#8a7a6d;">' . esc_html__( 'Noch nicht versendet', 'tsvd' ) . '</span>';
+		return '<span style="color:var(--tsvd-chrome-text-muted,#646970);">' . esc_html__( 'Noch nicht versendet', 'tsvd' ) . '</span>';
 	}
 
 	$items = array();
@@ -49,7 +49,7 @@ function tsvd_newsletter_sent_in_markup( $post_id, $with_date ) {
 			$label = '<a href="' . esc_url( $entry['edit_url'] ) . '">' . $label . '</a>';
 		}
 		if ( $with_date && $entry['sent_at'] > 0 ) {
-			$label .= ' <span style="color:#8a7a6d;">(' . esc_html( date_i18n( 'd.m.Y', $entry['sent_at'] ) ) . ')</span>';
+			$label .= ' <span style="color:var(--tsvd-chrome-text-muted,#646970);">(' . esc_html( date_i18n( 'd.m.Y', $entry['sent_at'] ) ) . ')</span>';
 		}
 		$items[] = $label;
 	}

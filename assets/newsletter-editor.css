@@ -70,7 +70,7 @@
 	font-weight: 600;
 	text-transform: uppercase;
 	letter-spacing: 0.04em;
-	color: var(--tsvd-chrome-muted, #646970);
+	color: var(--tsvd-chrome-text-muted, #646970);
 }
 
 .tsvd-nl-picker-items {
