@@ -21,6 +21,7 @@ require_once TSVD_TOOLS_DIR . 'includes/ai-abilities-callbacks-projects.php';
 require_once TSVD_TOOLS_DIR . 'includes/ai-abilities-callbacks-media.php';
 require_once TSVD_TOOLS_DIR . 'includes/ai-abilities-callbacks-forms.php';
 require_once TSVD_TOOLS_DIR . 'includes/ai-abilities-callbacks-sync.php';
+require_once TSVD_TOOLS_DIR . 'includes/ai-abilities-callbacks-newsletter.php';
 require_once TSVD_TOOLS_DIR . 'includes/ai-abilities-definitions.php';
 require_once TSVD_TOOLS_DIR . 'includes/ai-abilities-definitions-extra.php';
 require_once TSVD_TOOLS_DIR . 'includes/ai-abilities-definitions-seo.php';
@@ -32,6 +33,7 @@ require_once TSVD_TOOLS_DIR . 'includes/ai-abilities-definitions-projects.php';
 require_once TSVD_TOOLS_DIR . 'includes/ai-abilities-definitions-media.php';
 require_once TSVD_TOOLS_DIR . 'includes/ai-abilities-definitions-forms.php';
 require_once TSVD_TOOLS_DIR . 'includes/ai-abilities-definitions-sync.php';
+require_once TSVD_TOOLS_DIR . 'includes/ai-abilities-definitions-newsletter.php';
 
 function tsvd_tools_ai_get_all_ability_definitions() {
     return array_merge(
@@ -45,7 +47,8 @@ function tsvd_tools_ai_get_all_ability_definitions() {
         tsvd_tools_ai_get_ability_definitions_projects(),
         tsvd_tools_ai_get_ability_definitions_media(),
         tsvd_tools_ai_get_ability_definitions_forms(),
-        tsvd_tools_ai_get_ability_definitions_sync()
+        tsvd_tools_ai_get_ability_definitions_sync(),
+        tsvd_tools_ai_get_ability_definitions_newsletter()
     );
 }
 
