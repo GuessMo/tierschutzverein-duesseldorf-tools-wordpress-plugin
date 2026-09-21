@@ -25,9 +25,6 @@ function tsvd_tools_ai_create_website_update($input) {
         return $id;
     }
 
-    $visibility = (isset($input['visibility']) && 'extern' === $input['visibility']) ? 'extern' : 'intern';
-    update_post_meta($id, TSVD_UPDATE_VISIBILITY_META, $visibility);
-
     return array(
         'id'       => (int) $id,
         'status'   => $status,
