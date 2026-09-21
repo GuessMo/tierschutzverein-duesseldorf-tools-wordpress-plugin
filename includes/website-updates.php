@@ -80,7 +80,7 @@ function tsvd_update_save_visibility( $post_id ) {
 	update_post_meta( $post_id, TSVD_UPDATE_VISIBILITY_META, $value );
 }
 
-function tsvd_update_recent( $limit = 5, $only_public = false ) {
+function tsvd_update_recent( $limit = 5, $only_public = false, $only_unsent = false ) {
 	$args = array(
 		'post_type'      => TSVD_UPDATE_CPT,
 		'post_status'    => 'publish',
@@ -89,13 +89,21 @@ function tsvd_update_recent( $limit = 5, $only_public = false ) {
 		'order'          => 'DESC',
 	);
 
+	$meta_query = array();
 	if ( $only_public ) {
-		$args['meta_query'] = array(
-			array(
-				'key'   => TSVD_UPDATE_VISIBILITY_META,
-				'value' => 'extern',
-			),
+		$meta_query[] = array(
+			'key'   => TSVD_UPDATE_VISIBILITY_META,
+			'value' => 'extern',
 		);
+	}
+	if ( $only_unsent ) {
+		$meta_query[] = array(
+			'key'     => TSVD_NEWSLETTER_SENT_IN_META,
+			'compare' => 'NOT EXISTS',
+		);
+	}
+	if ( $meta_query ) {
+		$args['meta_query'] = $meta_query;
 	}
 
 	return get_posts( $args );

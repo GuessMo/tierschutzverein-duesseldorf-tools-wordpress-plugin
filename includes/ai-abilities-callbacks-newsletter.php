@@ -55,6 +55,7 @@ function tsvd_tools_ai_send_newsletter( $input ) {
 		$result = tsvd_newsletter_send_html( $emails, $subject, $body );
 		if ( $result['sent'] > 0 ) {
 			update_post_meta( $id, TSVD_NEWSLETTER_SENT_META, time() );
+			tsvd_newsletter_mark_items_sent( $id, tsvd_newsletter_collect_sent_items( $id ) );
 		}
 		return $result;
 	}

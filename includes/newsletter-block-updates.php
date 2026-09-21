@@ -8,20 +8,29 @@ add_filter( 'tsvd_newsletter_block_types', 'tsvd_newsletter_register_updates_blo
 
 function tsvd_newsletter_register_updates_block( $types ) {
 	$types['website-updates'] = array(
-		'label'   => __( 'Website-Updates', 'tsvd' ),
-		'dynamic' => true,
-		'render'  => 'tsvd_newsletter_updates_render',
+		'label'      => __( 'Website-Updates', 'tsvd' ),
+		'dynamic'    => true,
+		'render'     => 'tsvd_newsletter_updates_render',
+		'sent_items' => 'tsvd_newsletter_updates_sent_items',
 	);
 
 	return $types;
 }
 
-function tsvd_newsletter_updates_render( $data ) {
+function tsvd_newsletter_updates_items() {
 	if ( ! function_exists( 'tsvd_update_recent' ) ) {
-		return '';
+		return array();
 	}
 
-	$updates = tsvd_update_recent( 5, false );
+	return tsvd_update_recent( -1, false, true );
+}
+
+function tsvd_newsletter_updates_sent_items( $data ) {
+	return wp_list_pluck( tsvd_newsletter_updates_items(), 'ID' );
+}
+
+function tsvd_newsletter_updates_render( $data ) {
+	$updates = tsvd_newsletter_updates_items();
 	if ( empty( $updates ) ) {
 		return '';
 	}

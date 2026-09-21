@@ -85,6 +85,7 @@ function tsvd_newsletter_handle_send_action() {
 		$result = tsvd_newsletter_send_html( $emails, $subject, $body );
 		if ( $result['sent'] > 0 ) {
 			update_post_meta( $post_id, TSVD_NEWSLETTER_SENT_META, time() );
+			tsvd_newsletter_mark_items_sent( $post_id, tsvd_newsletter_collect_sent_items( $post_id ) );
 		}
 	} else {
 		$me     = wp_get_current_user();
