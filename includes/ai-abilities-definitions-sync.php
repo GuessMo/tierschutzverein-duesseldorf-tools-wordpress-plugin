@@ -6,7 +6,7 @@ function tsvd_tools_ai_get_ability_definitions_sync() {
     return array(
         'tsv-tools/export-content-delta' => array(
             'label'               => __('Inhalte exportieren (Delta)', 'tsv-tools'),
-            'description'         => __('Exportiert Inhalte als Manifest für den Live→Lokal-Abgleich: gewählte Post-Types (Default projects, tsvd_form, page, post, animals) mit Meta, Taxonomien und Medien-Referenzen (inkl. URL). Inkrementell per since (post_modified_gmt). KEINE Personendaten (Anfragen/User ausgeschlossen). Medien-Dateien werden per URL referenziert, nicht mitgeliefert.', 'tsv-tools'),
+            'description'         => __('Exportiert Inhalte als Manifest für den Live→Lokal-Abgleich: gewählte Post-Types (Default projects, tsvd_form, page, post, animals, tsvd_newsletter, tsvd_update) mit Meta, Taxonomien und Medien-Referenzen (inkl. URL). Inkrementell per since (post_modified_gmt). KEINE Personendaten (Anfragen/User/Newsletter-Abonnenten ausgeschlossen). Medien-Dateien werden per URL referenziert, nicht mitgeliefert.', 'tsv-tools'),
             'category'            => 'tsv-tools-animals',
             'input_schema'        => array(
                 'type'       => 'object',

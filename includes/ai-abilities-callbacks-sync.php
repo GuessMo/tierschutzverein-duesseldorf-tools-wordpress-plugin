@@ -3,7 +3,7 @@
 if (!defined('ABSPATH')) exit;
 
 function tsvd_tools_ai_sync_default_types() {
-    return array('projects', 'tsvd_form', 'page', 'post', 'animals', 'informationsmaterial', 'tierschutzbrief', 'staff');
+    return array('projects', 'tsvd_form', 'page', 'post', 'animals', 'informationsmaterial', 'tierschutzbrief', 'staff', 'tsvd_newsletter', 'tsvd_update');
 }
 
 function tsvd_tools_ai_export_content_delta($input) {

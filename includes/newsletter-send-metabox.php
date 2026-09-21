@@ -37,6 +37,8 @@ function tsvd_newsletter_send_metabox_render( $post ) {
 	echo '<p class="description">' . esc_html__( 'Vorschau zeigt den gespeicherten Stand. Vor dem Senden speichern.', 'tsvd' ) . '</p>';
 	echo '<button type="button" class="button button-large tsvd-nl-btn-full tsvd-nl-preview-open">'
 		. '<span class="dashicons dashicons-visibility"></span>' . esc_html__( 'Vorschau anzeigen', 'tsvd' ) . '</button>';
+	echo '<button type="button" class="button tsvd-nl-btn-full tsvd-nl-pdf">'
+		. '<span class="dashicons dashicons-media-document"></span>' . esc_html__( 'Als PDF speichern', 'tsvd' ) . '</button>';
 	echo '<hr class="tsvd-nl-divider">';
 
 	echo '<dialog class="tsvd-nl-preview-dialog">';
@@ -49,7 +51,9 @@ function tsvd_newsletter_send_metabox_render( $post ) {
 	echo '<script>(function(){var b=document.querySelector(".tsvd-nl-preview-open"),d=document.querySelector(".tsvd-nl-preview-dialog");'
 		. 'if(!b||!d){return;}b.addEventListener("click",function(){if(d.showModal){d.showModal();}});'
 		. 'd.addEventListener("click",function(e){if(e.target===d){d.close();}});'
-		. 'var c=d.querySelector(".tsvd-nl-preview-close");if(c){c.addEventListener("click",function(){d.close();});}})();</script>';
+		. 'var c=d.querySelector(".tsvd-nl-preview-close");if(c){c.addEventListener("click",function(){d.close();});}'
+		. 'var p=document.querySelector(".tsvd-nl-pdf"),f=d.querySelector(".tsvd-nl-preview-frame");'
+		. 'if(p&&f){p.addEventListener("click",function(){var w=f.contentWindow;if(w){w.focus();w.print();}});}})();</script>';
 
 	echo '<form method="post" action="' . esc_url( admin_url( 'admin-post.php' ) ) . '" style="margin-top:12px;">';
 	echo '<input type="hidden" name="action" value="tsvd_newsletter_send">';
