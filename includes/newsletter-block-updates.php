@@ -12,9 +12,30 @@ function tsvd_newsletter_register_updates_block( $types ) {
 		'dynamic'    => true,
 		'render'     => 'tsvd_newsletter_updates_render',
 		'sent_items' => 'tsvd_newsletter_updates_sent_items',
+		'admin'      => array(
+			'description' => __( 'Zeigt die neuesten noch nicht versendeten Website-Updates (Changelog).', 'tsvd' ),
+			'status'      => 'tsvd_newsletter_updates_admin_status',
+			'manage_url'  => 'tsvd_newsletter_updates_manage_url',
+		),
 	);
 
 	return $types;
+}
+
+function tsvd_newsletter_updates_manage_url() {
+	return admin_url( 'edit.php?post_type=' . TSVD_UPDATE_CPT );
+}
+
+function tsvd_newsletter_updates_admin_status() {
+	$counts    = wp_count_posts( TSVD_UPDATE_CPT );
+	$published = isset( $counts->publish ) ? (int) $counts->publish : 0;
+	$draft     = isset( $counts->draft ) ? (int) $counts->draft : 0;
+
+	return sprintf(
+		__( '%1$d veröffentlicht · %2$d Entwürfe', 'tsvd' ),
+		$published,
+		$draft
+	);
 }
 
 function tsvd_newsletter_updates_items() {

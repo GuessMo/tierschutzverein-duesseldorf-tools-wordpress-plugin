@@ -24,7 +24,7 @@ function tsvd_update_register_cpt() {
 			),
 			'public'          => false,
 			'show_ui'         => true,
-			'show_in_menu'    => 'tsvd-newsletter',
+			'show_in_menu'    => false,
 			'supports'        => array( 'title', 'editor' ),
 			'capability_type' => 'post',
 			'map_meta_cap'    => true,
