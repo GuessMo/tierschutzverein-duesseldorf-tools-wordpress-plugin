@@ -18,9 +18,15 @@ function tsvd_newsletter_email_document( $subject, $inner_html ) {
 	$site      = get_bloginfo( 'name' );
 	$logo_id   = get_theme_mod( 'custom_logo' );
 	$logo_url  = $logo_id ? wp_get_attachment_image_url( $logo_id, 'medium' ) : '';
-	$logo_html = $logo_url
-		? '<img src="' . esc_url( $logo_url ) . '" alt="' . esc_attr( $site ) . '" style="max-height:56px;width:auto;display:inline-block;">'
-		: '<span style="font-size:20px;font-weight:700;color:#009879;">' . esc_html( $site ) . '</span>';
+
+	if ( $logo_url ) {
+		$logo_html = '<img src="' . esc_url( $logo_url ) . '" alt="' . esc_attr( $site )
+			. '" style="max-height:72px;width:auto;display:inline-block;">';
+	} else {
+		$logo_html = '<img src="' . esc_url( TSVD_TOOLS_URL . 'assets/newsletter-logo.png' )
+			. '" alt="' . esc_attr( $site )
+			. '" width="72" height="72" style="width:72px;height:72px;max-width:72px;display:inline-block;">';
+	}
 
 	$head  = '<!DOCTYPE html><html lang="de" xmlns="http://www.w3.org/1999/xhtml">';
 	$head .= '<head><meta charset="utf-8">';
