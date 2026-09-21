@@ -45,6 +45,23 @@ function tsvd_newsletter_editor_row( $index, $type, array $data ) {
 	return $html;
 }
 
+function tsvd_newsletter_picker_group( $heading, array $group ) {
+	if ( empty( $group ) ) {
+		return '';
+	}
+
+	$html  = '<div class="tsvd-nl-picker-group">';
+	$html .= '<span class="tsvd-nl-picker-heading">' . esc_html( $heading ) . '</span>';
+	$html .= '<div class="tsvd-nl-picker-items">';
+	foreach ( $group as $key => $definition ) {
+		$html .= '<button type="button" class="button tsvd-nl-pick" data-type="' . esc_attr( $key ) . '">'
+			. esc_html( $definition['label'] ) . '</button>';
+	}
+	$html .= '</div></div>';
+
+	return $html;
+}
+
 function tsvd_newsletter_editor_render( $post ) {
 	wp_nonce_field( 'tsvd_newsletter_blocks_save', 'tsvd_newsletter_blocks_nonce' );
 
@@ -63,11 +80,19 @@ function tsvd_newsletter_editor_render( $post ) {
 	echo '<div class="tsvd-nl-inserter">';
 	echo '<button type="button" class="button button-secondary tsvd-nl-add" aria-expanded="false">'
 		. '<span class="dashicons dashicons-plus-alt2"></span> ' . esc_html__( 'Block hinzufügen', 'tsvd' ) . '</button>';
-	echo '<div class="tsvd-nl-picker" hidden>';
+	$static_types  = array();
+	$dynamic_types = array();
 	foreach ( $types as $key => $definition ) {
-		echo '<button type="button" class="button tsvd-nl-pick" data-type="' . esc_attr( $key ) . '">'
-			. esc_html( $definition['label'] ) . '</button>';
+		if ( ! empty( $definition['dynamic'] ) ) {
+			$dynamic_types[ $key ] = $definition;
+		} else {
+			$static_types[ $key ] = $definition;
+		}
 	}
+
+	echo '<div class="tsvd-nl-picker" hidden>';
+	echo tsvd_newsletter_picker_group( __( 'Inhaltsblöcke', 'tsvd' ), $static_types );
+	echo tsvd_newsletter_picker_group( __( 'Dynamische Blöcke', 'tsvd' ), $dynamic_types );
 	echo '</div></div>';
 
 	foreach ( $types as $key => $definition ) {

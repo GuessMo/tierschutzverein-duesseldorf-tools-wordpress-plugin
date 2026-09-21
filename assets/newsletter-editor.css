@@ -46,8 +46,8 @@
 
 .tsvd-nl-picker {
 	display: flex;
-	flex-wrap: wrap;
-	gap: 8px;
+	flex-direction: column;
+	gap: 12px;
 	margin-top: 8px;
 	padding: 10px;
 	border: 1px solid var(--tsvd-chrome-border, #dcdcde);
@@ -57,6 +57,26 @@
 
 .tsvd-nl-picker[hidden] {
 	display: none;
+}
+
+.tsvd-nl-picker-group {
+	display: flex;
+	flex-direction: column;
+	gap: 6px;
+}
+
+.tsvd-nl-picker-heading {
+	font-size: 11px;
+	font-weight: 600;
+	text-transform: uppercase;
+	letter-spacing: 0.04em;
+	color: var(--tsvd-chrome-muted, #646970);
+}
+
+.tsvd-nl-picker-items {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 8px;
 }
 
 .tsvd-nl-image-preview {
