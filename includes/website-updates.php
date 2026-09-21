@@ -96,6 +96,26 @@ function tsvd_update_backfill_numbers() {
 	update_option( 'tsvd_update_numbers_backfilled', 1 );
 }
 
+add_action( 'admin_init', 'tsvd_update_cleanup_visibility_meta' );
+
+function tsvd_update_cleanup_visibility_meta() {
+	if ( get_option( 'tsvd_update_visibility_removed' ) ) {
+		return;
+	}
+	$posts = get_posts(
+		array(
+			'post_type'      => TSVD_UPDATE_CPT,
+			'post_status'    => 'any',
+			'posts_per_page' => -1,
+			'fields'         => 'ids',
+		)
+	);
+	foreach ( $posts as $id ) {
+		delete_post_meta( $id, '_tsvd_update_visibility' );
+	}
+	update_option( 'tsvd_update_visibility_removed', 1 );
+}
+
 function tsvd_update_recent( $limit = 5, $only_public = false, $only_unsent = false ) {
 	$meta_query = array(
 		'number_clause' => array(

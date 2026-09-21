@@ -32,6 +32,35 @@ function tsvd_tools_ai_create_website_update($input) {
     );
 }
 
+function tsvd_tools_ai_update_website_update($input) {
+    $id = isset($input['id']) ? absint($input['id']) : 0;
+    if (!$id || TSVD_UPDATE_CPT !== get_post_type($id)) {
+        return new WP_Error('bad_id', __('Kein gueltiges Website-Update.', 'tsv-tools'));
+    }
+
+    $data = array('ID' => $id);
+    if (isset($input['title'])) {
+        $data['post_title'] = sanitize_text_field($input['title']);
+    }
+    if (isset($input['content'])) {
+        $data['post_content'] = wp_kses_post($input['content']);
+    }
+    if (isset($input['status']) && in_array($input['status'], array('draft', 'publish'), true)) {
+        $data['post_status'] = $input['status'];
+    }
+
+    $result = wp_update_post($data, true);
+    if (is_wp_error($result)) {
+        return $result;
+    }
+
+    return array(
+        'id'       => $id,
+        'status'   => get_post_status($id),
+        'edit_url' => get_edit_post_link($id, 'raw'),
+    );
+}
+
 function tsvd_tools_ai_set_project_form($input) {
     $id = isset($input['id']) ? absint($input['id']) : 0;
     if (!$id || 'projects' !== get_post_type($id)) {
