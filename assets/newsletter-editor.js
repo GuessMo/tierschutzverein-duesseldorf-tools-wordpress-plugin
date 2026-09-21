@@ -7,13 +7,17 @@
 		if ( ! textarea || ! window.wp || ! wp.editor || ! wp.editor.initialize ) {
 			return;
 		}
+		var tiny = {
+			wpautop: true,
+			toolbar1: 'formatselect,bold,italic,bullist,numlist,link,unlink,undo,redo'
+		};
+		if ( window.tsvdNlEditor && tsvdNlEditor.iframeCss ) {
+			tiny.content_css = tsvdNlEditor.iframeCss;
+		}
 		wp.editor.initialize( textarea.id, {
 			mediaButtons: false,
 			quicktags: true,
-			tinymce: {
-				wpautop: true,
-				toolbar1: 'formatselect,bold,italic,bullist,numlist,link,unlink,undo,redo'
-			}
+			tinymce: tiny
 		} );
 	}
 

@@ -103,6 +103,16 @@ function tsvd_newsletter_editor_assets( $hook ) {
 		true
 	);
 
+	$iframe_css = TSVD_TOOLS_DIR . 'assets/dark-mode-editor-iframe.css';
+	wp_localize_script(
+		'tsvd-newsletter-editor',
+		'tsvdNlEditor',
+		array(
+			'iframeCss' => TSVD_TOOLS_URL . 'assets/dark-mode-editor-iframe.css?ver='
+				. ( file_exists( $iframe_css ) ? (string) filemtime( $iframe_css ) : TSVD_TOOLS_VERSION ),
+		)
+	);
+
 	$css = TSVD_TOOLS_DIR . 'assets/newsletter-editor.css';
 	wp_enqueue_style(
 		'tsvd-newsletter-editor',

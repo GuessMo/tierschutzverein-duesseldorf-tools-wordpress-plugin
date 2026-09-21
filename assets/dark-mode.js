@@ -2,6 +2,7 @@
     var STORAGE_KEY = 'tsvd_admin_theme';
     var CYCLE = ['system', 'light', 'dark'];
     var root = document.documentElement;
+    var currentChoice = 'system';
 
     function setThemeAttribute(el, choice) {
         if (choice === 'dark') {
@@ -13,23 +14,34 @@
         }
     }
 
-    function syncTinymceIframeThemes(choice) {
+    function applyToIframe(iframe) {
+        try {
+            setThemeAttribute(iframe.contentDocument.documentElement, currentChoice);
+        } catch (e) {}
+    }
+
+    function syncTinymceIframeThemes() {
         var iframes = document.querySelectorAll('iframe[id$="_ifr"]');
         iframes.forEach(function(iframe) {
-            try {
-                setThemeAttribute(iframe.contentDocument.documentElement, choice);
-            } catch (e) {}
+            applyToIframe(iframe);
+            if (!iframe.dataset.tsvdThemeBound) {
+                iframe.dataset.tsvdThemeBound = '1';
+                iframe.addEventListener('load', function() {
+                    applyToIframe(iframe);
+                });
+            }
         });
     }
 
     function applyTheme(choice) {
+        currentChoice = choice;
         setThemeAttribute(root, choice);
-        syncTinymceIframeThemes(choice);
+        syncTinymceIframeThemes();
     }
 
-    function observeNewTinymceIframes(getCurrentChoice) {
+    function observeNewTinymceIframes() {
         var observer = new MutationObserver(function() {
-            syncTinymceIframeThemes(getCurrentChoice());
+            syncTinymceIframeThemes();
         });
         observer.observe(document.body, { childList: true, subtree: true });
     }
@@ -46,21 +58,20 @@
     }
 
     function init() {
-        var current = localStorage.getItem(STORAGE_KEY) || 'system';
-        syncTinymceIframeThemes(current);
-        observeNewTinymceIframes(function() { return current; });
+        currentChoice = localStorage.getItem(STORAGE_KEY) || 'system';
+        syncTinymceIframeThemes();
+        observeNewTinymceIframes();
 
         var toggle = document.getElementById('tsvd-theme-toggle');
         if (!toggle) return;
 
         var icons = Array.prototype.slice.call(toggle.querySelectorAll('.tsvd-theme-icon'));
-        setVisibleIcon(icons, current);
+        setVisibleIcon(icons, currentChoice);
 
         toggle.addEventListener('click', function() {
-            current = nextChoice(current);
-            localStorage.setItem(STORAGE_KEY, current);
-            applyTheme(current);
-            setVisibleIcon(icons, current);
+            applyTheme(nextChoice(currentChoice));
+            localStorage.setItem(STORAGE_KEY, currentChoice);
+            setVisibleIcon(icons, currentChoice);
         });
     }
 
