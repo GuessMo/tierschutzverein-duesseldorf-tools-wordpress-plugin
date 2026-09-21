@@ -98,18 +98,19 @@ function tsvd_newsletter_render_subscribers_form( array $users, array $subscribe
 		. esc_attr__( 'Benutzer suchen…', 'tsvd' )
 		. '" style="width:100%;max-width:480px;margin:8px 0;">';
 
-	echo '<select name="tsvd_newsletter_subscribers[]" id="tsvd-newsletter-user-select" multiple '
-		. 'style="width:100%;max-width:480px;min-height:220px;display:block;">';
+	echo '<div class="tabs-panel" style="max-width:480px;max-height:320px;overflow:auto;margin-bottom:8px;">';
+	echo '<ul class="categorychecklist form-no-clear" id="tsvd-newsletter-user-list">';
 	foreach ( $users as $user ) {
-		$selected = in_array( (int) $user->ID, $subscriber_ids, true ) ? ' selected' : '';
-		echo '<option value="' . esc_attr( $user->ID ) . '"' . $selected . '>'
+		$checked = in_array( (int) $user->ID, $subscriber_ids, true ) ? ' checked' : '';
+		echo '<li class="tsvd-newsletter-user"><label class="selectit">'
+			. '<input type="checkbox" name="tsvd_newsletter_subscribers[]" value="' . esc_attr( $user->ID ) . '"' . $checked . '> '
 			. esc_html( tsvd_newsletter_user_label( $user ) . ' (' . $user->user_email . ')' )
-			. '</option>';
+			. '</label></li>';
 	}
-	echo '</select>';
+	echo '</ul></div>';
 
 	echo '<p class="description">'
-		. esc_html__( 'Mehrere mit Strg/Cmd+Klick auswählen.', 'tsvd' )
+		. esc_html__( 'Empfänger ankreuzen. Filter oben durchsucht die Liste.', 'tsvd' )
 		. '</p>';
 
 	submit_button( __( 'Abonnenten speichern', 'tsvd' ) );
@@ -126,7 +127,7 @@ function tsvd_newsletter_render_current_list( array $subscriber_ids ) {
 		return;
 	}
 
-	echo '<table class="widefat striped" style="max-width:640px;"><thead><tr>';
+	echo '<table class="wp-list-table widefat striped" style="max-width:640px;"><thead><tr>';
 	echo '<th>' . esc_html__( 'Name', 'tsvd' ) . '</th>';
 	echo '<th>' . esc_html__( 'E-Mail', 'tsvd' ) . '</th>';
 	echo '</tr></thead><tbody>';
@@ -142,16 +143,16 @@ function tsvd_newsletter_filter_script() {
 	<script>
 	(function () {
 		var filter = document.getElementById('tsvd-newsletter-user-filter');
-		var select = document.getElementById('tsvd-newsletter-user-select');
-		if (!filter || !select) {
+		var list = document.getElementById('tsvd-newsletter-user-list');
+		if (!filter || !list) {
 			return;
 		}
-		var options = Array.prototype.slice.call(select.options);
+		var items = Array.prototype.slice.call(list.querySelectorAll('li'));
 		filter.addEventListener('input', function () {
 			var query = this.value.toLowerCase().trim();
-			options.forEach(function (option) {
-				var match = !query || option.textContent.toLowerCase().indexOf(query) !== -1;
-				option.style.display = match ? '' : 'none';
+			items.forEach(function (item) {
+				var match = !query || item.textContent.toLowerCase().indexOf(query) !== -1;
+				item.style.display = match ? '' : 'none';
 			});
 		});
 	})();

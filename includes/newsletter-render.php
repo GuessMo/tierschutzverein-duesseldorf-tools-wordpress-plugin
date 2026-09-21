@@ -27,21 +27,30 @@ function tsvd_newsletter_email_document( $subject, $inner_html ) {
 	$head .= '<meta name="viewport" content="width=device-width, initial-scale=1">';
 	$head .= '<meta name="color-scheme" content="light dark">';
 	$head .= '<meta name="supported-color-schemes" content="light dark">';
-	$head .= '<title>' . $title . '</title></head>';
+	$head .= '<title>' . $title . '</title>';
+	$head .= '<style>@media (prefers-color-scheme: dark){'
+		. '.tsvd-mail-bg{background-color:#1d1e20 !important;}'
+		. '.tsvd-mail-card,.tsvd-mail-header{background-color:#26272b !important;}'
+		. '.tsvd-mail-header{border-bottom-color:#3c3f43 !important;}'
+		. '.tsvd-mail-content,.tsvd-mail-content *{color:#e3e5e8 !important;}'
+		. '.tsvd-mail-content a{color:#8aa8ff !important;}'
+		. '.tsvd-mail-footer{color:#9a9ea6 !important;}'
+		. '}</style>';
+	$head .= '</head>';
 
-	$body_open  = '<body style="margin:0;padding:0;background-color:#f5ede5;">';
-	$body_open .= '<table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" '
+	$body_open  = '<body class="tsvd-mail-bg" style="margin:0;padding:0;background-color:#f5ede5;">';
+	$body_open .= '<table role="presentation" class="tsvd-mail-bg" width="100%" cellpadding="0" cellspacing="0" border="0" '
 		. 'style="background-color:#f5ede5;"><tr><td align="center" style="padding:24px 12px;">';
-	$body_open .= '<table role="presentation" width="600" cellpadding="0" cellspacing="0" border="0" '
+	$body_open .= '<table role="presentation" class="tsvd-mail-card" width="600" cellpadding="0" cellspacing="0" border="0" '
 		. 'style="width:600px;max-width:100%;background-color:#ffffff;border-radius:12px;overflow:hidden;">';
-	$body_open .= '<tr><td align="center" style="padding:24px 28px 16px;text-align:center;'
+	$body_open .= '<tr><td align="center" class="tsvd-mail-header" style="padding:24px 28px 16px;text-align:center;'
 		. 'background-color:#ffffff;border-bottom:1px solid #ebdfd4;">' . $logo_html . '</td></tr>';
-	$body_open .= '<tr><td style="padding:24px 28px 8px;font-family:Arial,Helvetica,sans-serif;'
+	$body_open .= '<tr><td class="tsvd-mail-content" style="padding:24px 28px 8px;font-family:Arial,Helvetica,sans-serif;'
 		. 'font-size:16px;line-height:1.6;color:#3a2f28;">';
 
 	$body_close  = '</td></tr></table>';
-	$body_close .= '<table role="presentation" width="600" cellpadding="0" cellspacing="0" border="0" '
-		. 'style="width:600px;max-width:100%;"><tr><td style="padding:16px 28px;'
+	$body_close .= '<table role="presentation" class="tsvd-mail-bg" width="600" cellpadding="0" cellspacing="0" border="0" '
+		. 'style="width:600px;max-width:100%;"><tr><td class="tsvd-mail-footer" style="padding:16px 28px;'
 		. 'font-family:Arial,Helvetica,sans-serif;font-size:12px;line-height:1.5;color:#8a7a6d;text-align:center;">';
 	$body_close .= esc_html__( 'Interner Newsletter – Tierschutzverein Düsseldorf und Umgebung e.V. 1873', 'tsvd' );
 	$body_close .= '</td></tr></table>';
