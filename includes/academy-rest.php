@@ -4,6 +4,13 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
+add_filter( 'tsvd_rest_request_allowed_prefixes', 'tsvd_academy_allow_rest_request' );
+
+function tsvd_academy_allow_rest_request( $prefixes ) {
+	$prefixes[] = '/wp/v2/' . TSVD_ACADEMY_CPT;
+	return $prefixes;
+}
+
 function tsvd_academy_rest_forbidden() {
 	if ( current_user_can( TSVD_ACADEMY_EDIT_CAP ) ) {
 		return null;
