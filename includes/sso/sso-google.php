@@ -58,3 +58,20 @@ add_action(
 		);
 	}
 );
+
+add_action(
+	'template_redirect',
+	function () {
+		$uri  = isset( $_SERVER['REQUEST_URI'] ) ? wp_unslash( $_SERVER['REQUEST_URI'] ) : '';
+		$path = trim( (string) wp_parse_url( $uri, PHP_URL_PATH ), '/' );
+		if ( 'login' !== $path ) {
+			return;
+		}
+		if ( is_user_logged_in() ) {
+			wp_safe_redirect( admin_url() );
+			exit;
+		}
+		wp_safe_redirect( tsvd_sso_is_configured() ? tsvd_sso_start_url() : wp_login_url() );
+		exit;
+	}
+);
