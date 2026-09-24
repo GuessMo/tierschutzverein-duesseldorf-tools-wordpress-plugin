@@ -65,8 +65,8 @@ function tsvd_tools_theme_notice() {
 add_action('admin_enqueue_scripts', 'tsvd_tools_enqueue_assets');
 function tsvd_tools_enqueue_assets($hook) {
     if ($hook !== 'toplevel_page_tsvd-tools' || !tsvd_tools_theme_active()) return;
-    wp_enqueue_style('tsvd-tools-admin', TSVD_TOOLS_URL . 'assets/admin.css', array(), TSVD_TOOLS_VERSION);
-    wp_enqueue_script('tsvd-tools-admin', TSVD_TOOLS_URL . 'assets/admin.js', array(), TSVD_TOOLS_VERSION, true);
+    wp_enqueue_style('tsvd-tools-admin', TSVD_TOOLS_URL . 'assets/admin.css', array(), TSVD_TOOLS_ASSET_VERSION);
+    wp_enqueue_script('tsvd-tools-admin', TSVD_TOOLS_URL . 'assets/admin.js', array(), TSVD_TOOLS_ASSET_VERSION, true);
 
     wp_localize_script('tsvd-tools-admin', 'tsvdTools', array(
         'nonce'   => wp_create_nonce('tsvd_tools_nonce'),

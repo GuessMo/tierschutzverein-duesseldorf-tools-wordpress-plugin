@@ -26,7 +26,7 @@ function tsvd_r301_enqueue( $hook ) {
     if ( false === strpos( (string) $hook, 'tsvd-tools-redirects' ) ) {
         return;
     }
-    wp_enqueue_script( 'tsvd-r301', TSVD_TOOLS_URL . 'assets/redirects.js', array(), TSVD_TOOLS_VERSION, true );
+    wp_enqueue_script( 'tsvd-r301', TSVD_TOOLS_URL . 'assets/redirects.js', array(), TSVD_TOOLS_ASSET_VERSION, true );
     wp_add_inline_style( 'wp-admin', 'th.r301-sortable{cursor:pointer;white-space:nowrap} th.r301-sortable.sorted.asc::after{content:" \\2191"} th.r301-sortable.sorted.desc::after{content:" \\2193"}' );
 }
 

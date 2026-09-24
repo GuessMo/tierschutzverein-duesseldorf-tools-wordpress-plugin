@@ -1,0 +1,94 @@
+/* ── Anfragen: one shared button component; variants change colour or shape only ── */
+#wpbody-content .tsvd-anf-btn {
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	gap: 0.375rem;
+	height: var(--tsvd-anf-control-h);
+	min-height: var(--tsvd-anf-control-h);
+	margin: 0;
+	padding: 0 0.75rem;
+	box-sizing: border-box;
+	font-size: 0.8125rem;
+	font-weight: 500;
+	line-height: 1;
+	white-space: nowrap;
+	color: var(--tsvd-chrome-text, #3c434a);
+	text-decoration: none;
+	list-style: none;
+	background: var(--tsvd-chrome-surface, #fff);
+	border: 1px solid var(--tsvd-anf-control-border);
+	border-radius: 3px;
+	box-shadow: none;
+	cursor: pointer;
+	transition: border-color 150ms ease-out, background-color 150ms ease-out;
+}
+
+#wpbody-content .tsvd-anf-btn:hover {
+	color: var(--tsvd-chrome-heading, #1d2327);
+	border-color: var(--tsvd-chrome-heading, #1d2327);
+}
+
+#wpbody-content .tsvd-anf-btn[aria-current="true"],
+#wpbody-content .tsvd-anf-btn[aria-pressed="true"],
+#wpbody-content .tsvd-anf-btn--primary,
+#wpbody-content .tsvd-anf-btn--primary:hover {
+	color: var(--tsvd-anf-active-text);
+	background: var(--tsvd-anf-active-bg);
+	border-color: var(--tsvd-anf-active-bg);
+}
+
+#wpbody-content .tsvd-anf-btn:disabled {
+	cursor: default;
+	opacity: 0.6;
+}
+
+#wpbody-content .tsvd-anf-btn--danger {
+	color: var(--tsvd-anf-danger);
+}
+
+#wpbody-content .tsvd-anf-btn--icon {
+	width: var(--tsvd-anf-control-h);
+	padding: 0;
+}
+
+#wpbody-content .tsvd-anf-btn--menu-item {
+	justify-content: space-between;
+	width: 100%;
+	text-align: left;
+	background: transparent;
+	border-color: transparent;
+}
+
+#wpbody-content .tsvd-anf-btn--menu-item:hover,
+#wpbody-content .tsvd-anf-btn--menu-item[aria-current="true"] {
+	color: var(--tsvd-chrome-text, #3c434a);
+	background: var(--tsvd-chrome-canvas, #f0f0f0);
+	border-color: transparent;
+}
+
+#wpbody-content .tsvd-anf-btn--menu-item[aria-current="true"] {
+	font-weight: 600;
+}
+
+#wpbody-content .tsvd-anf-btn--menu-item.tsvd-anf-btn--danger {
+	color: var(--tsvd-anf-danger);
+}
+
+.tsvd-anf-btn svg,
+.tsvd-anf-btn .dashicons {
+	flex: none;
+	width: 1rem;
+	height: 1rem;
+	font-size: 1rem;
+	line-height: 1;
+}
+
+.tsvd-anf-btn::-webkit-details-marker {
+	display: none;
+}
+
+.tsvd-anf-count {
+	font-variant-numeric: tabular-nums;
+	font-weight: 400;
+}

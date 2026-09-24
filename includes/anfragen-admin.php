@@ -24,7 +24,11 @@ function tsvd_anfragen_admin_menu() {
 	);
 	add_action( 'admin_print_scripts-' . $hook, function () {
 		wp_enqueue_script( 'jquery' );
-		wp_enqueue_style( 'tsvd-tools-anfragen', TSVD_TOOLS_URL . 'assets/anfragen-admin.css', array(), TSVD_TOOLS_VERSION );
+		wp_enqueue_style( 'tsvd-tools-anfragen', TSVD_TOOLS_URL . 'assets/anfragen-admin.css', array(), TSVD_TOOLS_ASSET_VERSION );
+		wp_enqueue_script( 'tsvd-tools-anfragen-menus', TSVD_TOOLS_URL . 'assets/anfragen-menus.js', array(), TSVD_TOOLS_ASSET_VERSION, true );
+		wp_enqueue_style( 'tsvd-tools-anfragen-controls', TSVD_TOOLS_URL . 'assets/anfragen-controls.css', array( 'tsvd-tools-anfragen' ), TSVD_TOOLS_ASSET_VERSION );
+		wp_enqueue_style( 'tsvd-tools-anfragen-button', TSVD_TOOLS_URL . 'assets/anfragen-button.css', array( 'tsvd-tools-anfragen-controls' ), TSVD_TOOLS_ASSET_VERSION );
+		wp_enqueue_style( 'tsvd-tools-anfragen-composer', TSVD_TOOLS_URL . 'assets/anfragen-composer.css', array( 'tsvd-tools-anfragen-controls' ), TSVD_TOOLS_ASSET_VERSION );
 	} );
 }
 
@@ -74,8 +78,10 @@ function tsvd_anfragen_sidebar_pos() {
 
 function tsvd_anfragen_help_btn( $text ) {
 	echo '<span class="tsvd-help-wrap">';
-	echo '<button type="button" class="tsvd-help-doc" data-help="' . esc_attr( $text ) . '" aria-label="' . esc_attr( __( 'Hilfe', 'tsvd' ) ) . '"><span class="dashicons dashicons-editor-help"></span></button>';
-	echo '<span class="tsvd-help-pop" role="tooltip" hidden></span>';
+	static $index = 0;
+	$pop_id = 'tsvd-help-pop-' . ( ++$index );
+	echo '<button type="button" class="tsvd-help-doc" data-help="' . esc_attr( $text ) . '" aria-label="' . esc_attr( __( 'Hilfe', 'tsvd' ) ) . '" aria-expanded="false" aria-controls="' . esc_attr( $pop_id ) . '"><span class="dashicons dashicons-editor-help" aria-hidden="true"></span></button>';
+	echo '<span class="tsvd-help-pop" id="' . esc_attr( $pop_id ) . '" role="note" hidden></span>';
 	echo '</span>';
 }
 
@@ -102,7 +108,7 @@ function tsvd_anfragen_help_script() {
 			if ( ! pop ) return;
 			pop.hidden = true;
 			var open = document.querySelector( '.tsvd-help-doc.is-open' );
-			if ( open ) open.classList.remove( 'is-open' );
+			if ( open ) { open.classList.remove( 'is-open' ); open.setAttribute( 'aria-expanded', 'false' ); }
 		}
 		document.addEventListener( 'click', function ( e ) {
 			var btn = e.target.closest( '.tsvd-help-doc' );
@@ -116,6 +122,7 @@ function tsvd_anfragen_help_script() {
 					pop.textContent = btn.getAttribute( 'data-help' );
 					pop.hidden = false;
 					btn.classList.add( 'is-open' );
+					btn.setAttribute( 'aria-expanded', 'true' );
 					position( btn );
 				}
 				return;
@@ -162,7 +169,7 @@ function tsvd_anfragen_render_page() {
 	$pos = tsvd_anfragen_sidebar_pos();
 
 	echo '<div class="wrap"><h1 class="wp-heading-inline">' . esc_html__( 'Anfragen', 'tsvd' );
-	tsvd_anfragen_help_btn( __( 'Alle eingehenden Anfragen von Interessent:innen zu Tieren. Hier siehst du die Konversations-Liste links, filterst nach Tierart und Status und beantwortest Anfragen per E-Mail direkt in der Ansicht. Status: Offen = wartet auf deine Antwort, Beantwortet = du hast geantwortet, Spam/Blockiert = ausgeblendet.', 'tsvd' ) );
+	tsvd_anfragen_help_btn( __( 'Alle eingehenden Anfragen zu Tieren. In der Konversations-Liste filterst Du nach Tierart und Status und beantwortest Anfragen per E-Mail direkt hier. Offen = wartet auf eine Antwort, Beantwortet = der Verein hat geantwortet. Spam, Blockiert und Papierkorb findest Du unter „Mehr“.', 'tsvd' ) );
 	echo '</h1>';
 
 	if ( isset( $_GET['deleted'] ) ) {
@@ -181,7 +188,7 @@ function tsvd_anfragen_render_page() {
 	if ( $selected ) {
 		tsvd_anfragen_render_conversation( $selected );
 	} else {
-		echo '<div class="tsvd-msgr__empty"><p>' . esc_html__( 'Wähle links eine Konversation aus.', 'tsvd' ) . '</p></div>';
+		tsvd_anfragen_render_main_empty();
 	}
 	echo '</div></div></div>';
 	tsvd_anfragen_help_script();
@@ -376,7 +383,7 @@ function tsvd_anfragen_render_search_box( $status, $search, $breed = 0 ) {
 	echo '<p class="search-box">';
 	echo '<label class="screen-reader-text" for="tsvd-anfrage-search">' . esc_html__( 'Anfragen durchsuchen', 'tsvd' ) . '</label>';
 	echo '<input type="search" id="tsvd-anfrage-search" name="s" value="' . esc_attr( $search ) . '" placeholder="' . esc_attr__( 'Name, E-Mail, Telefon, Tier', 'tsvd' ) . '" />';
-	echo '<button type="submit" class="tsvd-icon-btn tsvd-msgr__search-btn" title="' . esc_attr__( 'Anfragen durchsuchen', 'tsvd' ) . '" aria-label="' . esc_attr__( 'Anfragen durchsuchen', 'tsvd' ) . '"><span class="dashicons dashicons-search"></span></button>';
+	echo '<button type="submit" class="tsvd-anf-btn tsvd-anf-btn--icon tsvd-msgr__search-btn" title="' . esc_attr__( 'Anfragen durchsuchen', 'tsvd' ) . '" aria-label="' . esc_attr__( 'Anfragen durchsuchen', 'tsvd' ) . '"><span class="dashicons dashicons-search"></span></button>';
 	echo '</p></form>';
 }
 
@@ -387,7 +394,7 @@ function tsvd_anfragen_render_pagination( $total, $paged, $status, $search, $bre
 		$args['status'] = $status;
 	}
 	if ( '' !== $search ) {
-		$args['s'] = $search;
+		$args['s'] = rawurlencode( $search );
 	}
 	if ( $breed ) {
 		$args['breed'] = $breed;
@@ -442,70 +449,30 @@ function tsvd_anfragen_render_sidebar( $status, $search, $selected, $pos = 'righ
 	if ( $breed ) {
 		$keep['breed'] = $breed;
 	}
-	$breed_args = $breed ? array( 'breed' => $breed ) : array();
 	$opposite   = 'right' === $pos ? 'left' : 'right';
 	$toggle_url  = add_query_arg( array_merge( $keep, array( 'msgr_side' => $opposite ) ), $base_url );
 	$toggle_icon = 'right' === $pos ? 'dashicons-align-pull-left' : 'dashicons-align-pull-right';
 	$toggle_lbl  = 'right' === $pos ? __( 'Seitenleiste nach links', 'tsvd' ) : __( 'Seitenleiste nach rechts', 'tsvd' );
-
-	$status_icons = array(
-		'open'     => 'dashicons-marker',
-		'answered' => 'dashicons-yes',
-		'spam'     => 'dashicons-warning',
-		'blocked'  => 'dashicons-shield-alt',
-	);
 
 	echo '<div class="tsvd-msgr__side">';
 	echo '<div class="tsvd-msgr__side-head">';
 
 	echo '<div class="tsvd-msgr__side-bar">';
 	echo '<span class="tsvd-msgr__side-title">' . esc_html__( 'Konversationen', 'tsvd' );
-	tsvd_anfragen_help_btn( __( 'Liste aller eingehenden Anfragen. Ein Punkt vor dem Namen bedeutet: die Anfrage ist offen (noch nicht beantwortet). Klicke auf einen Eintrag, um die Konversation rechts zu öffnen. Über die Icons filterst du nach Tierart, nach deinen eigenen Anfragen, Status und Papierkorb.', 'tsvd' ) );
+	tsvd_anfragen_help_btn( __( 'Liste aller eingehenden Anfragen. Ein Punkt vor dem Namen bedeutet: Die Anfrage ist offen und wartet auf eine Antwort. Klicke auf einen Eintrag, um die Konversation daneben zu öffnen. Darunter filterst Du nach Tierart, Status und nach Anfragen, die Dir zugewiesen sind.', 'tsvd' ) );
 	echo '</span>';
 	echo '<span class="tsvd-msgr__side-actions">';
-	echo '<a class="tsvd-icon-btn tsvd-msgr__pos" href="' . esc_url( $toggle_url ) . '" title="' . esc_attr( $toggle_lbl ) . '" aria-label="' . esc_attr( $toggle_lbl ) . '"><span class="dashicons ' . esc_attr( $toggle_icon ) . '"></span></a>';
+	echo '<a class="tsvd-anf-btn tsvd-anf-btn--icon tsvd-msgr__pos" href="' . esc_url( $toggle_url ) . '" title="' . esc_attr( $toggle_lbl ) . '" aria-label="' . esc_attr( $toggle_lbl ) . '"><span class="dashicons ' . esc_attr( $toggle_icon ) . '"></span></a>';
 	echo '</span></div>';
 
 	tsvd_anfragen_render_search_box( $status, $search, $breed );
 
-	$status_args = array();
-	if ( $status ) {
-		$status_args['status'] = $status;
-	}
-	if ( '' !== $search ) {
-		$status_args['s'] = $search;
-	}
-
-	$houses = tsvd_anfragen_breed_houses_visible();
-	echo '<div class="tsvd-msgr__filters tsvd-msgr__filters--breed">';
-	echo '<a class="tsvd-icon-btn tsvd-msgr__filter-btn' . ( $breed ? '' : ' is-current' ) . '" href="' . esc_url( add_query_arg( array_merge( $status_args, array( 'breed' => 0 ) ), $base_url ) ) . '" title="' . esc_attr__( 'Alle Tierarten', 'tsvd' ) . '" aria-label="' . esc_attr__( 'Alle Tierarten', 'tsvd' ) . '">' . tsvd_anfragen_breed_icon_svg( 'paw' ) . '</a>';
-	if ( ! is_wp_error( $houses ) ) {
-		foreach ( $houses as $term ) {
-			$icon   = tsvd_anfragen_breed_icon( $term->term_id );
-			$active = $breed === (int) $term->term_id;
-			$href   = add_query_arg( array_merge( $status_args, array( 'breed' => $active ? 0 : $term->term_id ) ), $base_url );
-			echo '<a class="tsvd-icon-btn tsvd-msgr__filter-btn' . ( $active ? ' is-current' : '' ) . '" href="' . esc_url( $href ) . '" title="' . esc_attr( $term->name ) . '" aria-label="' . esc_attr( $term->name ) . '">' . tsvd_anfragen_breed_icon_svg( $icon ) . '</a>';
-		}
-	}
+	tsvd_anfragen_render_filters( $status, $search, $breed );
 	echo '</div>';
-
-	echo '<div class="tsvd-msgr__filters">';
-	echo '<a class="tsvd-icon-btn tsvd-msgr__filter-btn' . ( 'mine' === $status ? ' is-current' : '' ) . '" href="' . esc_url( add_query_arg( array_merge( array( 'status' => 'mine' ), $breed_args ), $base_url ) ) . '" title="' . esc_attr__( 'Meine Anfragen', 'tsvd' ) . '" aria-label="' . esc_attr__( 'Meine Anfragen', 'tsvd' ) . '"><span class="dashicons dashicons-admin-users"></span></a>';
-	echo '<a class="tsvd-icon-btn tsvd-msgr__filter-btn' . ( '' === $status ? ' is-current' : '' ) . '" href="' . esc_url( add_query_arg( array_merge( array( 'status' => '' ), $breed_args ), $base_url ) ) . '" title="' . esc_attr__( 'Alle', 'tsvd' ) . '" aria-label="' . esc_attr__( 'Alle', 'tsvd' ) . '"><span class="dashicons dashicons-menu-alt"></span></a>';
-	foreach ( $status_labels as $key => $label ) {
-		if ( 'spam' === $key ) {
-			continue;
-		}
-		$icon = isset( $status_icons[ $key ] ) ? $status_icons[ $key ] : 'dashicons-marker';
-		echo '<a class="tsvd-icon-btn tsvd-msgr__filter-btn' . ( $status === $key ? ' is-current' : '' ) . '" href="' . esc_url( add_query_arg( array_merge( array( 'status' => $key ), $breed_args ), $base_url ) ) . '" title="' . esc_attr( $label ) . '" aria-label="' . esc_attr( $label ) . '"><span class="dashicons ' . esc_attr( $icon ) . '"></span></a>';
-	}
-	echo '<a class="tsvd-icon-btn tsvd-msgr__filter-btn' . ( 'spam' === $status ? ' is-current' : '' ) . '" href="' . esc_url( add_query_arg( array_merge( array( 'status' => 'spam' ), $breed_args ), $base_url ) ) . '" title="' . esc_attr__( 'Spam', 'tsvd' ) . '" aria-label="' . esc_attr__( 'Spam', 'tsvd' ) . '"><span class="dashicons dashicons-warning"></span></a>';
-	echo '<a class="tsvd-icon-btn tsvd-msgr__filter-btn' . ( 'trash' === $status ? ' is-current' : '' ) . '" href="' . esc_url( add_query_arg( array_merge( array( 'status' => 'trash' ), $breed_args ), $base_url ) ) . '" title="' . esc_attr__( 'Papierkorb', 'tsvd' ) . '" aria-label="' . esc_attr__( 'Papierkorb', 'tsvd' ) . '"><span class="dashicons dashicons-trash"></span></a>';
-	echo '</div></div>';
 
 	echo '<div class="tsvd-msgr__list">';
 	if ( empty( $rows ) ) {
-		echo '<p class="tsvd-msgr__empty" style="padding:12px;">' . esc_html__( 'Keine Anfragen gefunden.', 'tsvd' ) . '</p>';
+		tsvd_anfragen_render_list_empty( $status, $search, $breed );
 	} else {
 		foreach ( $rows as $row ) {
 			$args = array( 'view' => (int) $row['id'] );
@@ -520,23 +487,23 @@ function tsvd_anfragen_render_sidebar( $status, $search, $selected, $pos = 'righ
 			}
 			$url    = add_query_arg( $args, $base_url );
 			$active = ( (int) $row['id'] === $selected ) ? ' is-active' : '';
-			$animal = $row['animal_id'] ? get_the_title( (int) $row['animal_id'] ) : '';
+			$animal = tsvd_anfragen_animal_name( (int) $row['animal_id'] );
 			$lstatus = $row['calc_status'];
 			$spam    = 'spam' === $row['status'] || 'blocked' === $row['status'];
 			$open    = 'open' === $lstatus;
 			$state   = $spam ? ' is-spam' : ( $open ? ' is-open' : '' );
 
-			echo '<a class="tsvd-msgr__item' . $active . $state . '" href="' . esc_url( $url ) . '">';
+			echo '<a class="tsvd-msgr__item' . $active . $state . '" href="' . esc_url( $url ) . '"' . ( $active ? ' aria-current="page"' : '' ) . '>';
 			echo '<div class="tsvd-msgr__item-top"><span class="tsvd-msgr__name">';
 			if ( $open && ! $spam ) {
-				echo '<span class="tsvd-msgr__dot" aria-hidden="true"></span>';
+				echo '<span class="tsvd-msgr__dot" aria-hidden="true"></span><span class="screen-reader-text">' . esc_html__( 'Offen:', 'tsvd' ) . ' </span>';
 			}
 			echo esc_html( $row['applicant_name'] ) . '</span>';
-			echo '<span class="tsvd-msgr__time">' . esc_html( get_date_from_gmt( $row['created_at'], 'd.m.Y' ) ) . '</span></div>';
+			echo '<span class="tsvd-msgr__time">' . esc_html( tsvd_anfragen_format_local( $row['created_at'], 'd.m.Y' ) ) . '</span></div>';
 			echo '<div class="tsvd-msgr__sub"><span>' . esc_html( $animal ? $animal : '—' ) . '</span>';
 			if ( $spam ) {
 				$label = isset( $status_labels[ $row['status'] ] ) ? $status_labels[ $row['status'] ] : $row['status'];
-				echo '<span class="tsvd-msgr__badge">' . esc_html( $label ) . '</span>';
+				echo '<span class="tsvd-msgr__badge tsvd-msgr__badge--' . esc_attr( $row['status'] ) . '">' . esc_html( $label ) . '</span>';
 			}
 			echo '</div>';
 			echo '</a>';

@@ -32,6 +32,7 @@ if (is_readable($tsvd_tools_autoload)) {
     }
 }
 
+require_once TSVD_TOOLS_DIR . 'includes/asset-version.php';
 require_once TSVD_TOOLS_DIR . 'includes/admin.php';
 require_once TSVD_TOOLS_DIR . 'includes/dark-mode.php';
 require_once TSVD_TOOLS_DIR . 'includes/password-reset.php';
@@ -46,6 +47,10 @@ require_once TSVD_TOOLS_DIR . 'includes/anfragen-db.php';
 require_once TSVD_TOOLS_DIR . 'includes/anfragen-listener.php';
 require_once TSVD_TOOLS_DIR . 'includes/anfragen-imap-settings.php';
 require_once TSVD_TOOLS_DIR . 'includes/anfragen-imap-poll.php';
+require_once TSVD_TOOLS_DIR . 'includes/anfragen-admin-helpers.php';
+require_once TSVD_TOOLS_DIR . 'includes/anfragen-admin-filters.php';
+require_once TSVD_TOOLS_DIR . 'includes/anfragen-admin-actions.php';
+require_once TSVD_TOOLS_DIR . 'includes/anfragen-admin-composer.php';
 require_once TSVD_TOOLS_DIR . 'includes/anfragen-admin.php';
 require_once TSVD_TOOLS_DIR . 'includes/anfragen-admin-detail.php';
 require_once TSVD_TOOLS_DIR . 'includes/anfragen-replies.php';

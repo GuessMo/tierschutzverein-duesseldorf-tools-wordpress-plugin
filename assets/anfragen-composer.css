@@ -1,0 +1,62 @@
+/* ── Composer ── */
+.tsvd-composer__modes {
+	display: flex;
+	flex-wrap: wrap;
+	gap: var(--tsvd-anf-gap);
+	margin: 0 0 0.75rem;
+}
+
+.tsvd-composer__label {
+	display: block;
+	margin-bottom: 0.375rem;
+	font-weight: 600;
+	color: var(--tsvd-chrome-heading, #1d2327);
+}
+
+.tsvd-msgr .tsvd-composer__input {
+	flex-shrink: 0;
+	min-height: 8rem;
+	resize: vertical;
+}
+
+.tsvd-composer[data-mode="note"] .tsvd-composer__input {
+	border-style: dashed;
+	background: var(--tsvd-anf-note-bg);
+}
+
+.tsvd-composer__bar {
+	display: flex;
+	flex-wrap: wrap;
+	align-items: center;
+	gap: 0.75rem;
+}
+
+.tsvd-composer__result {
+	color: var(--tsvd-chrome-text-muted, #646970);
+}
+
+.tsvd-composer__result.is-error {
+	color: var(--tsvd-anf-danger);
+	font-weight: 600;
+}
+
+/* ── Posted internal notes: same visual language as the note composer ── */
+.tsvd-chat__msg--note .tsvd-chat__bubble {
+	color: var(--tsvd-chrome-text, #3c434a);
+	background: var(--tsvd-anf-note-bg);
+	border: 1px dashed var(--tsvd-anf-control-border);
+}
+
+.tsvd-chat__msg--note .tsvd-chat__author {
+	display: inline-flex;
+	align-items: center;
+	gap: 0.25rem;
+	font-weight: 600;
+	color: var(--tsvd-chrome-text, #3c434a);
+}
+
+.tsvd-chat__msg--note .tsvd-chat__author .dashicons {
+	width: 1rem;
+	height: 1rem;
+	font-size: 1rem;
+}

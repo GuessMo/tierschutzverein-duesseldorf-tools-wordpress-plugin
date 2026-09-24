@@ -124,7 +124,7 @@ function tsvd_newsletter_editor_assets( $hook ) {
 		'tsvd-newsletter-editor',
 		TSVD_TOOLS_URL . 'assets/newsletter-editor.js',
 		array( 'jquery', 'jquery-ui-sortable', 'wp-util' ),
-		file_exists( $js ) ? (string) filemtime( $js ) : TSVD_TOOLS_VERSION,
+		file_exists( $js ) ? (string) filemtime( $js ) : TSVD_TOOLS_ASSET_VERSION,
 		true
 	);
 
@@ -143,7 +143,7 @@ function tsvd_newsletter_editor_assets( $hook ) {
 		'tsvd-newsletter-editor',
 		TSVD_TOOLS_URL . 'assets/newsletter-editor.css',
 		array(),
-		file_exists( $css ) ? (string) filemtime( $css ) : TSVD_TOOLS_VERSION
+		file_exists( $css ) ? (string) filemtime( $css ) : TSVD_TOOLS_ASSET_VERSION
 	);
 }
 
