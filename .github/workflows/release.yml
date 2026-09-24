@@ -13,8 +13,34 @@ env:
   DEPLOY_ARTIFACT_NAME: tsvd-tools-deploy
   DEPLOY_ARTIFACT_DIR: /tmp/tsvd-tools-deploy
 
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: false
+
 jobs:
+  guard:
+    runs-on: ubuntu-latest
+    outputs:
+      skip: ${{ steps.check.outputs.skip }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Skip duplicate run for an already released commit
+        id: check
+        run: |
+          git fetch --tags --force
+          if [ "$GITHUB_EVENT_NAME" = "push" ] && [ -n "$(git tag --contains "$GITHUB_SHA")" ]; then
+            echo "skip=true" >> "$GITHUB_OUTPUT"
+            echo "Commit $GITHUB_SHA is already released, skipping duplicate run."
+          else
+            echo "skip=false" >> "$GITHUB_OUTPUT"
+          fi
+
   release:
+    needs: guard
+    if: needs.guard.outputs.skip != 'true'
     runs-on: ubuntu-latest
     outputs:
       version: ${{ steps.version.outputs.new_version }}
