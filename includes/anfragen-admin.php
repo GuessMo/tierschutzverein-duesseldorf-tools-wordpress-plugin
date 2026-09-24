@@ -25,6 +25,7 @@ function tsvd_anfragen_admin_menu() {
 	add_action( 'admin_print_scripts-' . $hook, function () {
 		wp_enqueue_script( 'jquery' );
 		wp_enqueue_style( 'tsvd-tools-anfragen', TSVD_TOOLS_URL . 'assets/anfragen-admin.css', array(), TSVD_TOOLS_ASSET_VERSION );
+		wp_enqueue_script( 'tsvd-tools-anfragen-layout', TSVD_TOOLS_URL . 'assets/anfragen-layout.js', array(), TSVD_TOOLS_ASSET_VERSION, true );
 		wp_enqueue_script( 'tsvd-tools-anfragen-scroll', TSVD_TOOLS_URL . 'assets/anfragen-scroll.js', array(), TSVD_TOOLS_ASSET_VERSION, true );
 		wp_enqueue_script( 'tsvd-tools-anfragen-menus', TSVD_TOOLS_URL . 'assets/anfragen-menus.js', array(), TSVD_TOOLS_ASSET_VERSION, true );
 		wp_enqueue_style( 'tsvd-tools-anfragen-controls', TSVD_TOOLS_URL . 'assets/anfragen-controls.css', array( 'tsvd-tools-anfragen' ), TSVD_TOOLS_ASSET_VERSION );
