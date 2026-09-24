@@ -1,5 +1,5 @@
 /* ── WP-Core: Fließtext und Tabellenzellen (#2c3338 / #50575e) ── */
-#wpbody-content :where(p, strong, .widefat td, .widefat th) {
+#wpbody-content :where(p, strong, .widefat td, .widefat th, .health-check-accordion-panel li) {
     color: var(--tsvd-chrome-text);
 }
 
@@ -57,6 +57,7 @@
     .nav-menus-php .accordion-section-content,
     .nav-menus-php .accordion-trigger,
     .health-check-accordion-trigger,
+    .health-check-accordion-panel,
     .updates-table,
     .updates-table tr,
     .colspanchange,
