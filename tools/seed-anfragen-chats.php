@@ -183,7 +183,7 @@ foreach ( $conversations as $conv ) {
 	$assignee  = $assigned_login ? tsvd_seed_user_id( $assigned_login ) : 0;
 	$tier_name = isset( $tiers[ $tier_slug ] ) ? $tiers[ $tier_slug ] : $tier_slug;
 
-	$created_at = wp_date( 'Y-m-d H:i:s', time() - $days_ago * DAY_IN_SECONDS );
+	$created_at = wp_date( 'Y-m-d', time() - $days_ago * DAY_IN_SECONDS ) . ' 07:30:00';
 	$is_trash   = 'trash' === $status;
 
 	$wpdb->insert(
