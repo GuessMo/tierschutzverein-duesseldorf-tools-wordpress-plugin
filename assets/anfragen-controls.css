@@ -1,5 +1,6 @@
 /* ── Anfragen: tokens, inputs, filter layout, disclosure menus (WCAG 2.2 AA) ── */
 :root {
+	--tsvd-anf-warn: #7a5a00;
 	--tsvd-anf-control-h: 2.25rem;
 	--tsvd-anf-gap: 0.5rem;
 	--tsvd-anf-control-border: #787c82;
@@ -8,6 +9,7 @@
 }
 
 :root[data-theme="dark"] {
+	--tsvd-anf-warn: #f0c33c;
 	--tsvd-anf-control-border: #7d8187;
 	--tsvd-anf-note-bg: #2f2b1c;
 	--tsvd-anf-danger: #ff8080;
@@ -15,6 +17,7 @@
 
 @media (prefers-color-scheme: dark) {
 	:root:not([data-theme="light"]) {
+		--tsvd-anf-warn: #f0c33c;
 		--tsvd-anf-control-border: #7d8187;
 		--tsvd-anf-note-bg: #2f2b1c;
 		--tsvd-anf-danger: #ff8080;
@@ -139,4 +142,27 @@
 		flex-basis: 100%;
 		margin-left: 0;
 	}
+}
+
+/* ── Waiting time in the conversation list ── */
+.tsvd-msgr__wait {
+	display: inline-flex;
+	align-items: center;
+	gap: 0.125rem;
+}
+
+.tsvd-msgr__wait .dashicons {
+	width: 0.875rem;
+	height: 0.875rem;
+	font-size: 0.875rem;
+}
+
+.tsvd-msgr__wait--warn {
+	font-weight: 600;
+	color: var(--tsvd-anf-warn);
+}
+
+.tsvd-msgr__wait--alert {
+	font-weight: 600;
+	color: var(--tsvd-anf-danger);
 }

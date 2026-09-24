@@ -423,6 +423,8 @@ function tsvd_anfragen_render_sidebar( $status, $search, $selected, $pos = 'righ
 	$table = tsvd_anfragen_table_name();
 	$where = tsvd_anfragen_list_where( $status, $search, $breed );
 	$calc  = tsvd_anfragen_calc_status_sql( 'a' );
+	$waiting = tsvd_anfragen_waiting_since_sql( 'a' );
+	$activity = tsvd_anfragen_last_activity_sql( 'a' );
 	$total = (int) $wpdb->get_var( "SELECT COUNT(*) FROM {$table} a {$where}" );
 	$pages  = max( 1, (int) ceil( $total / TSVD_ANFRAGEN_PER_PAGE ) );
 	$paged  = max( 1, isset( $_GET['paged'] ) ? absint( $_GET['paged'] ) : 1 );
@@ -431,7 +433,7 @@ function tsvd_anfragen_render_sidebar( $status, $search, $selected, $pos = 'righ
 	}
 	$offset = ( $paged - 1 ) * TSVD_ANFRAGEN_PER_PAGE;
 	$rows   = $wpdb->get_results(
-		$wpdb->prepare( "SELECT a.*, {$calc} AS calc_status FROM {$table} a {$where} ORDER BY a.created_at DESC LIMIT %d OFFSET %d", TSVD_ANFRAGEN_PER_PAGE, $offset ),
+		$wpdb->prepare( "SELECT a.*, {$calc} AS calc_status, {$waiting} AS waiting_since, {$activity} AS last_activity FROM {$table} a {$where} ORDER BY last_activity DESC, a.id DESC LIMIT %d OFFSET %d", TSVD_ANFRAGEN_PER_PAGE, $offset ),
 		ARRAY_A
 	);
 
@@ -500,7 +502,12 @@ function tsvd_anfragen_render_sidebar( $status, $search, $selected, $pos = 'righ
 				echo '<span class="tsvd-msgr__dot" aria-hidden="true"></span><span class="screen-reader-text">' . esc_html__( 'Offen:', 'tsvd' ) . ' </span>';
 			}
 			echo esc_html( $row['applicant_name'] ) . '</span>';
-			echo '<span class="tsvd-msgr__time">' . esc_html( tsvd_anfragen_format_local( $row['created_at'], 'd.m.Y' ) ) . '</span></div>';
+			if ( $open && ! $spam ) {
+				tsvd_anfragen_render_wait_time( $row['waiting_since'] );
+			} else {
+				echo '<span class="tsvd-msgr__time">' . esc_html( tsvd_anfragen_format_local( $row['last_activity'], 'd.m.Y' ) ) . '</span>';
+			}
+			echo '</div>';
 			echo '<div class="tsvd-msgr__sub"><span>' . esc_html( $animal ? $animal : '—' ) . '</span>';
 			if ( $spam ) {
 				$label = isset( $status_labels[ $row['status'] ] ) ? $status_labels[ $row['status'] ] : $row['status'];

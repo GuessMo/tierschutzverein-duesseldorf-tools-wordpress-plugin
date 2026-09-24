@@ -4,7 +4,8 @@
  *
  * Idempotent: leert beim Lauf beide Anfragen-Tabellen und baut exakt
  * 19 Anfragen (open 11, answered 4, spam 2, blocked 1, trash 1) mit
- * Replies auf. Nur in der development-Umgebung ausführbar — sonst
+ * Replies auf. Zeiten wie im Produktivcode: created_at/sent_at in Ortszeit
+ * (current_time), scheduled_at in UTC. Nur in der development-Umgebung ausführbar — sonst
  * bricht das Skript ab, es sei denn TSVD_SEED=1 ist gesetzt.
  *
  * Aufruf: wp eval-file wp-content/plugins/tsv-tools/tools/seed-anfragen-chats.php
@@ -182,7 +183,7 @@ foreach ( $conversations as $conv ) {
 	$assignee  = $assigned_login ? tsvd_seed_user_id( $assigned_login ) : 0;
 	$tier_name = isset( $tiers[ $tier_slug ] ) ? $tiers[ $tier_slug ] : $tier_slug;
 
-	$created_at = gmdate( 'Y-m-d H:i:s', time() - $days_ago * DAY_IN_SECONDS );
+	$created_at = wp_date( 'Y-m-d H:i:s', time() - $days_ago * DAY_IN_SECONDS );
 	$is_trash   = 'trash' === $status;
 
 	$wpdb->insert(
@@ -212,11 +213,11 @@ foreach ( $conversations as $conv ) {
 		$sent_at      = null;
 		$scheduled_at = null;
 		if ( $scheduled_hours ) {
-			$scheduled_at = get_gmt_from_date( wp_date( 'Y-m-d H:i:s', time() + $scheduled_hours * HOUR_IN_SECONDS ) );
+			$scheduled_at = gmdate( 'Y-m-d H:i:s', time() + $scheduled_hours * HOUR_IN_SECONDS );
 		} else {
 			$local_stamp = wp_date( 'Y-m-d', time() - $r_days_ago * DAY_IN_SECONDS )
 				. ' ' . ( $time ?: '09:00' ) . ':00';
-			$sent_at = get_gmt_from_date( $local_stamp );
+			$sent_at = $local_stamp;
 		}
 
 		$wpdb->insert(

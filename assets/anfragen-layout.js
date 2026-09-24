@@ -9,13 +9,17 @@
 		frame.style.setProperty( '--tsvd-msgr-height', Math.max( MIN_HEIGHT, Math.round( px ) ) + 'px' );
 	}
 
+	function spaceBelow() {
+		var content = document.getElementById( 'wpbody-content' );
+		if ( ! content ) {
+			return 0;
+		}
+		return content.getBoundingClientRect().bottom - frame.getBoundingClientRect().bottom;
+	}
+
 	function fit() {
 		var top = frame.getBoundingClientRect().top + window.scrollY;
-		setHeight( window.innerHeight - top );
-		var overflow = document.documentElement.scrollHeight - window.innerHeight;
-		if ( overflow > 0 ) {
-			setHeight( frame.offsetHeight - overflow );
-		}
+		setHeight( window.innerHeight - top - spaceBelow() );
 	}
 
 	fit();

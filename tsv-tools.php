@@ -48,6 +48,7 @@ require_once TSVD_TOOLS_DIR . 'includes/anfragen-listener.php';
 require_once TSVD_TOOLS_DIR . 'includes/anfragen-imap-settings.php';
 require_once TSVD_TOOLS_DIR . 'includes/anfragen-imap-poll.php';
 require_once TSVD_TOOLS_DIR . 'includes/anfragen-admin-helpers.php';
+require_once TSVD_TOOLS_DIR . 'includes/anfragen-admin-waiting.php';
 require_once TSVD_TOOLS_DIR . 'includes/anfragen-admin-filters.php';
 require_once TSVD_TOOLS_DIR . 'includes/anfragen-admin-actions.php';
 require_once TSVD_TOOLS_DIR . 'includes/anfragen-admin-composer.php';
