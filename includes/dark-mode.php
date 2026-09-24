@@ -8,6 +8,12 @@ function tsvd_dark_mode_print_early_script() {
         return;
     }
     ?>
+<style id="tsvd-dark-mode-early">
+:root[data-theme="dark"] { color-scheme: dark; background: #18191b; }
+@media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) { color-scheme: dark; background: #18191b; }
+}
+</style>
 <script>
 (function() {
     var stored = localStorage.getItem('tsvd_admin_theme') || 'system';

@@ -34,7 +34,7 @@ function tsvd_anfragen_render_trash_actions( $id ) {
 function tsvd_anfragen_render_more_actions( $anfrage ) {
 	$id = (int) $anfrage['id'];
 	echo '<details class="tsvd-anf-more tsvd-anf-more--end">';
-	tsvd_anfragen_disclosure_summary( __( 'Weitere Aktionen', 'tsvd' ) );
+	tsvd_anfragen_overflow_summary( __( 'Weitere Aktionen', 'tsvd' ) );
 	echo '<div class="tsvd-anf-more__menu">';
 	if ( 'blocked' === $anfrage['status'] ) {
 		tsvd_anfragen_action_form( $id, 'tsvd_anfrage_unblock', 'tsvd_anfrage_unblock_', __( 'Blockierung aufheben', 'tsvd' ), 'dashicons-shield', 'tsvd-anf-btn--menu-item', __( 'Blockierung aufheben und wieder als offen markieren?', 'tsvd' ) );

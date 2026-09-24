@@ -25,6 +25,7 @@ function tsvd_anfragen_admin_menu() {
 	add_action( 'admin_print_scripts-' . $hook, function () {
 		wp_enqueue_script( 'jquery' );
 		wp_enqueue_style( 'tsvd-tools-anfragen', TSVD_TOOLS_URL . 'assets/anfragen-admin.css', array(), TSVD_TOOLS_ASSET_VERSION );
+		wp_enqueue_script( 'tsvd-tools-anfragen-scroll', TSVD_TOOLS_URL . 'assets/anfragen-scroll.js', array(), TSVD_TOOLS_ASSET_VERSION, true );
 		wp_enqueue_script( 'tsvd-tools-anfragen-menus', TSVD_TOOLS_URL . 'assets/anfragen-menus.js', array(), TSVD_TOOLS_ASSET_VERSION, true );
 		wp_enqueue_style( 'tsvd-tools-anfragen-controls', TSVD_TOOLS_URL . 'assets/anfragen-controls.css', array( 'tsvd-tools-anfragen' ), TSVD_TOOLS_ASSET_VERSION );
 		wp_enqueue_style( 'tsvd-tools-anfragen-button', TSVD_TOOLS_URL . 'assets/anfragen-button.css', array( 'tsvd-tools-anfragen-controls' ), TSVD_TOOLS_ASSET_VERSION );
@@ -383,7 +384,7 @@ function tsvd_anfragen_render_search_box( $status, $search, $breed = 0 ) {
 	echo '<p class="search-box">';
 	echo '<label class="screen-reader-text" for="tsvd-anfrage-search">' . esc_html__( 'Anfragen durchsuchen', 'tsvd' ) . '</label>';
 	echo '<input type="search" id="tsvd-anfrage-search" name="s" value="' . esc_attr( $search ) . '" placeholder="' . esc_attr__( 'Name, E-Mail, Telefon, Tier', 'tsvd' ) . '" />';
-	echo '<button type="submit" class="tsvd-anf-btn tsvd-anf-btn--icon tsvd-msgr__search-btn" title="' . esc_attr__( 'Anfragen durchsuchen', 'tsvd' ) . '" aria-label="' . esc_attr__( 'Anfragen durchsuchen', 'tsvd' ) . '"><span class="dashicons dashicons-search"></span></button>';
+	echo '<button type="submit" class="tsvd-anf-btn tsvd-anf-btn--ghost tsvd-anf-btn--icon tsvd-msgr__search-btn" title="' . esc_attr__( 'Anfragen durchsuchen', 'tsvd' ) . '" aria-label="' . esc_attr__( 'Anfragen durchsuchen', 'tsvd' ) . '"><span class="dashicons dashicons-search"></span></button>';
 	echo '</p></form>';
 }
 
@@ -451,7 +452,6 @@ function tsvd_anfragen_render_sidebar( $status, $search, $selected, $pos = 'righ
 	}
 	$opposite   = 'right' === $pos ? 'left' : 'right';
 	$toggle_url  = add_query_arg( array_merge( $keep, array( 'msgr_side' => $opposite ) ), $base_url );
-	$toggle_icon = 'right' === $pos ? 'dashicons-align-pull-left' : 'dashicons-align-pull-right';
 	$toggle_lbl  = 'right' === $pos ? __( 'Seitenleiste nach links', 'tsvd' ) : __( 'Seitenleiste nach rechts', 'tsvd' );
 
 	echo '<div class="tsvd-msgr__side">';
@@ -462,7 +462,7 @@ function tsvd_anfragen_render_sidebar( $status, $search, $selected, $pos = 'righ
 	tsvd_anfragen_help_btn( __( 'Liste aller eingehenden Anfragen. Ein Punkt vor dem Namen bedeutet: Die Anfrage ist offen und wartet auf eine Antwort. Klicke auf einen Eintrag, um die Konversation daneben zu öffnen. Darunter filterst Du nach Tierart, Status und nach Anfragen, die Dir zugewiesen sind.', 'tsvd' ) );
 	echo '</span>';
 	echo '<span class="tsvd-msgr__side-actions">';
-	echo '<a class="tsvd-anf-btn tsvd-anf-btn--icon tsvd-msgr__pos" href="' . esc_url( $toggle_url ) . '" title="' . esc_attr( $toggle_lbl ) . '" aria-label="' . esc_attr( $toggle_lbl ) . '"><span class="dashicons ' . esc_attr( $toggle_icon ) . '"></span></a>';
+	tsvd_anfragen_render_list_menu( $status, $search, $breed, $toggle_url, $toggle_lbl );
 	echo '</span></div>';
 
 	tsvd_anfragen_render_search_box( $status, $search, $breed );
