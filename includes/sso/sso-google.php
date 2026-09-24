@@ -73,5 +73,6 @@ add_action(
 		}
 		wp_safe_redirect( tsvd_sso_is_configured() ? tsvd_sso_start_url() : wp_login_url() );
 		exit;
-	}
+	},
+	1
 );
