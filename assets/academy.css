@@ -173,3 +173,26 @@ body.toplevel_page_tsvd-academy .update-nag {
 .tsvd-ac-reset {
 	margin-top: 1rem;
 }
+
+/* ── Buttons (links styled as buttons, shielded from global link color) ── */
+#wpbody-content .tsvd-ac a.button {
+	color: var(--tsvd-text);
+	background: var(--tsvd-surface);
+	border-color: var(--tsvd-border);
+}
+
+#wpbody-content .tsvd-ac a.button:hover {
+	color: var(--tsvd-text);
+	border-color: var(--tsvd-ac-accent);
+}
+
+#wpbody-content .tsvd-ac a.button-primary,
+#wpbody-content .tsvd-ac a.button-primary:hover {
+	color: var(--tsvd-on-accent);
+	background: var(--tsvd-ac-accent);
+	border-color: var(--tsvd-ac-accent);
+}
+
+#wpbody-content .tsvd-ac a.button-primary:hover {
+	background: color-mix(in srgb, var(--tsvd-ac-accent) 85%, #000);
+}
