@@ -1,0 +1,46 @@
+/* ── WP 7.1: 40px-Buttons in Layouts, die für 30px gebaut sind ── */
+#minor-publishing-actions {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    text-align: left;
+}
+
+#minor-publishing-actions > .clear {
+    display: none;
+}
+
+#minor-publishing-actions #save-action,
+#minor-publishing-actions #preview-action {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    float: none;
+}
+
+#minor-publishing-actions .button {
+    flex: 1 1 auto;
+}
+
+#minor-publishing-actions #save-action .spinner {
+    float: none;
+    margin: 0;
+}
+
+#minor-publishing-actions #save-action .spinner:not(.is-active) {
+    display: none;
+}
+
+#post-lock-dialog .post-locked-message p:has(> .button) {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: flex-end;
+    gap: 0.5rem;
+    clear: both;
+    margin: 0;
+    padding-top: 1rem;
+}
+
+#post-lock-dialog .post-locked-message p:has(> .button) > .button {
+    margin: 0;
+}

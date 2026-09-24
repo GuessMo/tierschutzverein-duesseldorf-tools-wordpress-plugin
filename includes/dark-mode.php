@@ -60,6 +60,7 @@ function tsvd_dark_mode_enqueue_assets($hook_suffix) {
         return;
     }
 
+    wp_enqueue_style('tsvd-admin-core-layout', TSVD_TOOLS_URL . 'assets/admin-core-layout.css', array(), tsvd_dark_mode_asset_version('assets/admin-core-layout.css'));
     wp_enqueue_style('tsvd-dark-mode', TSVD_TOOLS_URL . 'assets/dark-mode.css', array(), tsvd_dark_mode_asset_version('assets/dark-mode.css'));
     wp_enqueue_style('tsvd-dark-mode-menu', TSVD_TOOLS_URL . 'assets/dark-mode-menu.css', array(), tsvd_dark_mode_asset_version('assets/dark-mode-menu.css'));
     wp_enqueue_script('tsvd-dark-mode', TSVD_TOOLS_URL . 'assets/dark-mode.js', array(), tsvd_dark_mode_asset_version('assets/dark-mode.js'), true);
