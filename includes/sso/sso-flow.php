@@ -59,7 +59,6 @@ function tsvd_sso_start() {
 		'nonce'                 => $nonce,
 		'code_challenge'        => $challenge,
 		'code_challenge_method' => 'S256',
-		'hd'                    => tsvd_sso_hosted_domain(),
 		'prompt'                => 'select_account',
 	);
 	wp_redirect( TSVD_SSO_AUTH_ENDPOINT . '?' . http_build_query( $args ) );
