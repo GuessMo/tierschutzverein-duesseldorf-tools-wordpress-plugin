@@ -115,3 +115,10 @@
 #wpbody-content #templateside > ul {
     background-color: var(--tsvd-chrome-surface-subtle);
 }
+
+/* ── Zustand: nur lesbare Eingabefelder (hell + dunkel) ── */
+#wpbody-content :where(input[readonly]:not([type="checkbox"], [type="radio"]), textarea[readonly]) {
+    color: var(--tsvd-chrome-text-muted);
+    background-color: var(--tsvd-chrome-surface-subtle);
+    border-style: dashed;
+}
