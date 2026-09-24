@@ -79,12 +79,39 @@ function tsvd_academy_lessons_in_topic( $lessons, $topic ) {
 	);
 }
 
-function tsvd_academy_lesson_url( $post_id ) {
-	return add_query_arg(
-		array(
-			'page'   => TSVD_ACADEMY_PAGE,
-			'lesson' => (int) $post_id,
-		),
-		admin_url( 'admin.php' )
+function tsvd_academy_find_topic( $slug ) {
+	foreach ( tsvd_academy_visible_topics() as $topic ) {
+		if ( $topic->slug === $slug ) {
+			return $topic;
+		}
+	}
+	return null;
+}
+
+function tsvd_academy_lesson_topics( $post ) {
+	$terms = get_the_terms( $post, TSVD_ACADEMY_TAX );
+	return is_array( $terms ) ? $terms : array();
+}
+
+function tsvd_academy_recent_lessons( $lessons, $limit ) {
+	usort(
+		$lessons,
+		function ( $a, $b ) {
+			return strcmp( $b->post_modified_gmt, $a->post_modified_gmt );
+		}
 	);
+	return array_slice( $lessons, 0, $limit );
+}
+
+function tsvd_academy_overview_url( $args = array() ) {
+	$args = array_merge( array( 'page' => TSVD_ACADEMY_PAGE ), $args );
+	return add_query_arg( $args, admin_url( 'admin.php' ) );
+}
+
+function tsvd_academy_topic_url( $topic ) {
+	return tsvd_academy_overview_url( array( 'topic' => $topic->slug ) );
+}
+
+function tsvd_academy_lesson_url( $post_id ) {
+	return tsvd_academy_overview_url( array( 'lesson' => (int) $post_id ) );
 }

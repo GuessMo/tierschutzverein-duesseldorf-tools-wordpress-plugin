@@ -81,10 +81,13 @@ function tsvd_academy_guard_lesson() {
 }
 
 function tsvd_academy_enqueue_assets() {
-	wp_enqueue_style( 'tsvd-dashboards' );
-	if ( tsvd_academy_requested_lesson_id() ) {
-		wp_enqueue_style( 'wp-block-library' );
+	wp_enqueue_style( 'tsvd-academy', TSVD_TOOLS_URL . 'assets/academy.css', array( 'tsvd-dashboards' ), TSVD_TOOLS_VERSION );
+	wp_enqueue_style( 'tsvd-academy-cards', TSVD_TOOLS_URL . 'assets/academy-cards.css', array( 'tsvd-academy' ), TSVD_TOOLS_VERSION );
+	if ( ! tsvd_academy_requested_lesson_id() ) {
+		return;
 	}
+	wp_enqueue_style( 'wp-block-library' );
+	wp_enqueue_style( 'tsvd-academy-article', TSVD_TOOLS_URL . 'assets/academy-article.css', array( 'tsvd-academy' ), TSVD_TOOLS_VERSION );
 }
 
 function tsvd_academy_render_page() {

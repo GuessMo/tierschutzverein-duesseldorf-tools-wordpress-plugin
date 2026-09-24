@@ -1,0 +1,141 @@
+/* ── Academy: lesson and topic cards ── */
+.tsvd-ac-grid,
+.tsvd-ac-topics {
+	display: grid;
+	grid-template-columns: repeat(3, minmax(0, 1fr));
+	gap: 1rem;
+}
+
+@media (max-width: 70rem) {
+	.tsvd-ac-grid,
+	.tsvd-ac-topics {
+		grid-template-columns: repeat(2, minmax(0, 1fr));
+	}
+}
+
+@media (max-width: 40rem) {
+	.tsvd-ac-grid,
+	.tsvd-ac-topics {
+		grid-template-columns: minmax(0, 1fr);
+	}
+}
+
+.tsvd-ac-card,
+.tsvd-ac-topic {
+	position: relative;
+	background: var(--tsvd-surface);
+	border: 1px solid var(--tsvd-border);
+	transition: border-color 150ms ease-out, box-shadow 150ms ease-out;
+}
+
+.tsvd-ac-card {
+	display: flex;
+	flex-direction: column;
+	gap: 0.5rem;
+	padding: 1.125rem 1.25rem;
+}
+
+.tsvd-ac-card:hover,
+.tsvd-ac-topic:hover {
+	border-color: var(--tsvd-ac-accent);
+	box-shadow: var(--tsvd-ac-hover-shadow);
+}
+
+.tsvd-ac-card:has(.tsvd-ac-card__link:focus-visible),
+.tsvd-ac-topic:has(.tsvd-ac-card__link:focus-visible) {
+	outline: 2px solid var(--tsvd-ac-accent);
+	outline-offset: 2px;
+}
+
+.tsvd-ac .tsvd-ac-card__title,
+.tsvd-ac .tsvd-ac-topic__title {
+	margin: 0;
+	font-size: 1rem;
+	font-weight: 600;
+	line-height: 1.35;
+}
+
+#wpbody-content .tsvd-ac-card__link {
+	color: var(--tsvd-link, var(--tsvd-ac-accent));
+	text-decoration: none;
+}
+
+.tsvd-ac .tsvd-ac-card__link:focus-visible {
+	outline: none;
+}
+
+.tsvd-ac-card__link::after {
+	content: "";
+	position: absolute;
+	inset: 0;
+}
+
+.tsvd-ac-card:hover .tsvd-ac-card__link,
+.tsvd-ac-topic:hover .tsvd-ac-card__link {
+	text-decoration: underline;
+	text-underline-offset: 0.2em;
+}
+
+.tsvd-ac-card__excerpt {
+	display: -webkit-box;
+	margin: 0;
+	overflow: hidden;
+	font-size: 0.875rem;
+	line-height: 1.55;
+	color: var(--tsvd-text-muted);
+	-webkit-box-orient: vertical;
+	-webkit-line-clamp: 3;
+}
+
+.tsvd-ac-card__meta {
+	display: flex;
+	flex-direction: column;
+	align-items: flex-start;
+	gap: 0.5rem;
+	margin-top: auto;
+	padding-top: 0.75rem;
+}
+
+.tsvd-ac-tags {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 0.25rem;
+}
+
+.tsvd-ac-tag {
+	padding: 0.125rem 0.5rem;
+	font-size: 0.75rem;
+	background: var(--tsvd-ac-tint);
+	color: var(--tsvd-text);
+}
+
+.tsvd-ac-date {
+	font-size: 0.75rem;
+	color: var(--tsvd-text-muted);
+	font-variant-numeric: tabular-nums;
+}
+
+/* ── Topic cards ── */
+.tsvd-ac-topic {
+	display: flex;
+	gap: 0.875rem;
+	padding: 1rem 1.125rem;
+}
+
+.tsvd-ac-topic__icon.dashicons {
+	flex: none;
+	width: 2.5rem;
+	height: 2.5rem;
+	font-size: 1.25rem;
+	line-height: 2.5rem;
+	text-align: center;
+	color: var(--tsvd-on-accent);
+	background: var(--tsvd-ac-accent);
+}
+
+.tsvd-ac-topic__count,
+.tsvd-ac-topic__hint {
+	margin: 0.25rem 0 0;
+	font-size: 0.8125rem;
+	color: var(--tsvd-text-muted);
+}
