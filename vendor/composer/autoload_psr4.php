@@ -24,6 +24,7 @@ return array(
     'Illuminate\\Support\\' => array($vendorDir . '/illuminate/support', $vendorDir . '/illuminate/reflection', $vendorDir . '/illuminate/collections', $vendorDir . '/illuminate/macroable', $vendorDir . '/illuminate/conditionable'),
     'Illuminate\\Pagination\\' => array($vendorDir . '/illuminate/pagination'),
     'Illuminate\\Contracts\\' => array($vendorDir . '/illuminate/contracts'),
+    'Firebase\\JWT\\' => array($vendorDir . '/firebase/php-jwt/src'),
     'Doctrine\\Inflector\\' => array($vendorDir . '/doctrine/inflector/src'),
     'Carbon\\Doctrine\\' => array($vendorDir . '/carbonphp/carbon-doctrine-types/src/Carbon/Doctrine'),
     'Carbon\\' => array($vendorDir . '/nesbot/carbon/src/Carbon'),

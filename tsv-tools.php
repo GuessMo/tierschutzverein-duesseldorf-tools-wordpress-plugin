@@ -64,3 +64,4 @@ require_once TSVD_TOOLS_DIR . 'includes/newsletter-admin.php';
 require_once TSVD_TOOLS_DIR . 'includes/newsletter-send-metabox.php';
 require_once TSVD_TOOLS_DIR . 'includes/newsletter-sent-log-admin.php';
 require_once TSVD_TOOLS_DIR . 'includes/newsletter-dynamic-blocks-admin.php';
+require_once TSVD_TOOLS_DIR . 'includes/sso/sso-google.php';
