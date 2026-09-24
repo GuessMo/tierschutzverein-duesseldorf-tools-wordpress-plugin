@@ -56,7 +56,6 @@ body.toplevel_page_tsvd-academy .update-nag {
 /* ── Search ── */
 .tsvd-ac-search {
 	display: flex;
-	max-width: 44rem;
 }
 
 .tsvd-ac-search__field {
