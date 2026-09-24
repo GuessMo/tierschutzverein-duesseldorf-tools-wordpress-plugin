@@ -87,13 +87,13 @@ function tsvd_tools_ai_render_annotation_badges($def) {
     $badges = array();
 
     if (!empty($annotations['readonly'])) {
-        $badges[] = '<span style="color:#2271b1">' . esc_html__('Nur lesend', 'tsv-tools') . '</span>';
+        $badges[] = '<span class="tsvd-text-info">' . esc_html__('Nur lesend', 'tsv-tools') . '</span>';
     } else {
         $badges[] = '<span>' . esc_html__('Ändert Daten', 'tsv-tools') . '</span>';
     }
 
     if (!empty($annotations['destructive'])) {
-        $badges[] = '<span style="color:#b32d2e">' . esc_html__('Kann überschreiben/löschen', 'tsv-tools') . '</span>';
+        $badges[] = '<span class="tsvd-text-danger">' . esc_html__('Kann überschreiben/löschen', 'tsv-tools') . '</span>';
     }
 
     if (isset($annotations['idempotent']) && !empty($annotations['readonly']) === false) {

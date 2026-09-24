@@ -97,7 +97,7 @@ function tsvd_tools_render_admin_page() {
         <h2>Tier-Sync: Rassen & Farben aus JSON</h2>
         <p>Synchronisiert Tier-Rassen und Farben aus den JSON-Dateien im Theme-Verzeichnis in die WordPress-Taxonomien.</p>
 
-        <div class="tsvd-tools-info" style="margin:15px 0;padding:15px;background:#f8f8f8;border:1px solid #ddd;">
+        <div class="tsvd-tools-info tsvd-panel">
             <p><strong>Rassen-JSON:</strong> <?php echo $breeds_modified; ?> (<?php echo $breeds_count; ?> Rassen in DB) — Letzter Sync: <?php echo esc_html($breeds_last_sync); ?></p>
             <p><strong>Farben-JSON:</strong> <?php echo $colors_modified; ?> (<?php echo $colors_count; ?> Farben in DB) — Letzter Sync: <?php echo esc_html($colors_last_sync); ?></p>
             <p><strong>Diagnose:</strong> taxonomy_exists('animal_breed') = <strong><?php echo $tax_breed_exists; ?></strong> | DB COUNT: <?php echo $breeds_count; ?></p>
@@ -113,7 +113,7 @@ function tsvd_tools_render_admin_page() {
             <p><label><input type="checkbox" id="tsvd-tools-force-sync"> <strong>Force Sync</strong> (alle bestehenden Einträge löschen und neu importieren)</label></p>
         </div>
 
-        <div style="margin:20px 0;padding:15px;background:#fffbe6;border:1px solid #ddd;">
+        <div class="tsvd-panel tsvd-panel--note">
             <h3>Auto-Sync Webhook (für GitHub Actions)</h3>
             <p>Endpoint: <code id="tsvd-tools-endpoint"><?php echo rest_url('tsvd-tools/v1/sync'); ?></code></p>
             <p>

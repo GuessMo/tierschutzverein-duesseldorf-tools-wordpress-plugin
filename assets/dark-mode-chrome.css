@@ -2,6 +2,11 @@
     --tsvd-chrome-canvas: #f0f0f0;
     --tsvd-chrome-text: #3c434a;
     --tsvd-chrome-surface: #fff;
+    --tsvd-chrome-surface-subtle: #f6f7f7;
+    --tsvd-chrome-danger: #b32d2e;
+    --tsvd-chrome-success: #007017;
+    --tsvd-chrome-warning: #996800;
+    --tsvd-chrome-info: #2271b1;
     --tsvd-chrome-border: #c3c4c7;
     --tsvd-chrome-heading: #1d2327;
     --tsvd-chrome-text-muted: #646970;
@@ -20,6 +25,11 @@
     --tsvd-chrome-canvas: #18191b;
     --tsvd-chrome-text: #e3e5e8;
     --tsvd-chrome-surface: #26272b;
+    --tsvd-chrome-surface-subtle: #1f2023;
+    --tsvd-chrome-danger: #f86368;
+    --tsvd-chrome-success: #4ab866;
+    --tsvd-chrome-warning: #f0c33c;
+    --tsvd-chrome-info: #72aee6;
     --tsvd-chrome-border: #3c3f43;
     --tsvd-chrome-heading: #f0f0f1;
     --tsvd-chrome-text-muted: #9a9ea6;
@@ -39,6 +49,11 @@
         --tsvd-chrome-canvas: #18191b;
         --tsvd-chrome-text: #e3e5e8;
         --tsvd-chrome-surface: #26272b;
+        --tsvd-chrome-surface-subtle: #1f2023;
+        --tsvd-chrome-danger: #f86368;
+        --tsvd-chrome-success: #4ab866;
+        --tsvd-chrome-warning: #f0c33c;
+        --tsvd-chrome-info: #72aee6;
         --tsvd-chrome-border: #3c3f43;
         --tsvd-chrome-heading: #f0f0f1;
         --tsvd-chrome-text-muted: #9a9ea6;

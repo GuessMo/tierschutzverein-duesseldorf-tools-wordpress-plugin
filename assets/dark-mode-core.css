@@ -1,0 +1,116 @@
+/* ── WP-Core: Fließtext und Tabellenzellen (#2c3338 / #50575e) ── */
+#wpbody-content :where(p, strong, .widefat td, .widefat th) {
+    color: var(--tsvd-chrome-text);
+}
+
+/* ── WP-Core: gedämpfter Text (#646970 / #50575e) ── */
+#wpbody-content :where(
+    .description,
+    .form-wrap p,
+    .form-field p,
+    .subsubsub,
+    .count,
+    abbr,
+    .community-events-footer,
+    #dashboard_activity li > span,
+    .nonessential,
+    .howto,
+    .item-type,
+    .importer-desc,
+    .importer-action,
+    .theme-location-set
+) {
+    color: var(--tsvd-chrome-text-muted);
+}
+
+/* ── WP-Core: dunkler Text auf dunklem Grund (#1d2327 / #2c3338) ── */
+#wpbody-content :where(
+    label,
+    .form-wrap label,
+    #dashboard_activity h3,
+    .community-events .event-info-inner,
+    .community-events .event-time,
+    .community-events .event-title,
+    .site-health-issue-count-title,
+    .issue-count,
+    .importer-title,
+    .badge,
+    .components-text,
+    h1,
+    h2,
+    h3,
+    h4
+) {
+    color: var(--tsvd-chrome-heading);
+}
+
+/* ── WP-Core: helle Flächen (#fff) ── */
+#wpbody-content :where(
+    .plugin-card,
+    .wp-filter,
+    .popular-tags,
+    .theme,
+    .theme .theme-name,
+    .nav-menus-php #post-body,
+    .nav-menus-php .tabs-panel,
+    .nav-menus-php .accordion-section-title,
+    .nav-menus-php .accordion-section-content,
+    .nav-menus-php .accordion-trigger,
+    .health-check-accordion-trigger,
+    .updates-table,
+    .updates-table tr,
+    .colspanchange,
+    .components-item,
+    .card,
+    .manage-menus,
+    .menu-settings,
+    .health-check-header,
+    .theme-actions .button,
+    .update-message,
+    .notice-alt,
+    .widefat
+) {
+    color: var(--tsvd-chrome-text);
+    background-color: var(--tsvd-chrome-surface);
+}
+
+/* ── WP-Core: dezente Flächen (#f6f7f7 / #f8f8f8) ── */
+#wpbody-content :where(
+    .plugin-card-bottom,
+    .menu-item-handle,
+    #nav-menu-header,
+    #nav-menu-footer,
+    .bulk-select-button,
+    #templateside ul,
+    .importer-item,
+    .widefat.striped > tbody > :nth-child(odd),
+    .attachment .filename,
+    .color-option.selected
+) {
+    color: var(--tsvd-chrome-text);
+    background-color: var(--tsvd-chrome-surface-subtle);
+}
+
+/* ── WP-Core: Lösch-/Papierkorb-Links (#b32d2e) ── */
+#wpbody-content :where(.submitdelete, .row-actions .trash a, .row-actions .delete a) {
+    color: var(--tsvd-chrome-danger);
+}
+
+/* ── WP-Core-Regeln mit ID-Selektor (überstimmen :where) ── */
+#wpbody-content #dashboard-widgets h3,
+#wpbody-content #dashboard-widgets h4 {
+    color: var(--tsvd-chrome-heading);
+}
+
+#wpbody-content #nav-menu-footer .menu-delete {
+    color: var(--tsvd-chrome-danger);
+}
+
+#wpbody-content .nav-menus-php #post-body,
+#wpbody-content #menu-management #post-body {
+    background-color: var(--tsvd-chrome-surface);
+}
+
+#wpbody-content #templateside > ul {
+    background-color: var(--tsvd-chrome-surface-subtle);
+}

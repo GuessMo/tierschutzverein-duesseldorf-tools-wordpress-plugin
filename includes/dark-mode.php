@@ -3,7 +3,7 @@ if (!defined('ABSPATH')) exit;
 
 add_action('admin_head', 'tsvd_dark_mode_print_early_script', 1);
 function tsvd_dark_mode_print_early_script() {
-    if (tsvd_dark_mode_is_block_editor()) {
+    if (tsvd_dark_mode_is_light_only_screen()) {
         echo '<script>document.documentElement.setAttribute("data-theme","light");</script>';
         return;
     }
@@ -48,9 +48,15 @@ function tsvd_dark_mode_is_block_editor() {
     return $screen && method_exists($screen, 'is_block_editor') && $screen->is_block_editor();
 }
 
+function tsvd_dark_mode_is_light_only_screen() {
+    $component_screens = array('options-connectors.php', 'font-library.php');
+    $pagenow = isset($GLOBALS['pagenow']) ? $GLOBALS['pagenow'] : '';
+    return tsvd_dark_mode_is_block_editor() || in_array($pagenow, $component_screens, true);
+}
+
 add_action('admin_enqueue_scripts', 'tsvd_dark_mode_enqueue_assets');
 function tsvd_dark_mode_enqueue_assets($hook_suffix) {
-    if (tsvd_dark_mode_is_block_editor()) {
+    if (tsvd_dark_mode_is_light_only_screen()) {
         return;
     }
 
@@ -66,6 +72,8 @@ function tsvd_dark_mode_enqueue_assets($hook_suffix) {
     wp_enqueue_style('tsvd-dark-mode-tables', TSVD_TOOLS_URL . 'assets/dark-mode-tables.css', array('tsvd-dark-mode-chrome'), tsvd_dark_mode_asset_version('assets/dark-mode-tables.css'));
     wp_enqueue_style('tsvd-dark-mode-notices', TSVD_TOOLS_URL . 'assets/dark-mode-notices.css', array('tsvd-dark-mode-chrome'), tsvd_dark_mode_asset_version('assets/dark-mode-notices.css'));
     wp_enqueue_style('tsvd-dark-mode-dashboard', TSVD_TOOLS_URL . 'assets/dark-mode-dashboard.css', array('tsvd-dark-mode-chrome'), tsvd_dark_mode_asset_version('assets/dark-mode-dashboard.css'));
+    wp_enqueue_style('tsvd-admin-status', TSVD_TOOLS_URL . 'assets/admin-status.css', array('tsvd-dark-mode-chrome'), tsvd_dark_mode_asset_version('assets/admin-status.css'));
+    wp_enqueue_style('tsvd-dark-mode-core', TSVD_TOOLS_URL . 'assets/dark-mode-core.css', array('tsvd-dark-mode-chrome'), tsvd_dark_mode_asset_version('assets/dark-mode-core.css'));
     wp_enqueue_style('tsvd-dark-mode-editor', TSVD_TOOLS_URL . 'assets/dark-mode-editor.css', array('tsvd-dark-mode-chrome'), tsvd_dark_mode_asset_version('assets/dark-mode-editor.css'));
 }
 

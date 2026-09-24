@@ -148,15 +148,15 @@ function tsvd_r301_render_list() {
         . '</tr></thead><tbody>';
     foreach ( $redirects as $r ) {
         $reach     = tsvd_r301_target_reachable( $r['statusCode'], $r['target'] );
-        $reachCell = 'yes' === $reach ? '<span style="color:#227122">&#10003;</span>'
-            : ( 'no' === $reach ? '<span style="color:#b32d2e" title="Ziel nicht auf der neuen Seite gefunden">&#10007;</span>'
+        $reachCell = 'yes' === $reach ? '<span class="tsvd-text-success">&#10003;</span>'
+            : ( 'no' === $reach ? '<span class="tsvd-text-danger" title="Ziel nicht auf der neuen Seite gefunden">&#10007;</span>'
             : ( 'gone' === $reach ? '<span class="description">&ndash; (410)</span>' : '?' ) );
         $reachSort = in_array( $reach, array( 'yes', 'no', 'gone' ), true ) ? $reach : 'unknown';
         $del = '<form method="post" action="' . esc_url( admin_url( 'admin-post.php' ) ) . '" style="display:inline" onsubmit="return confirm(\'Redirect loeschen?\')">'
             . '<input type="hidden" name="action" value="tsvd_r301_delete">'
             . wp_nonce_field( 'tsvd_r301_delete', '_wpnonce', true, false )
             . '<input type="hidden" name="id" value="' . (int) $r['id'] . '">'
-            . '<button class="button-link delete" style="color:#b32d2e">Loeschen</button></form>';
+            . '<button class="button-link delete tsvd-text-danger">Loeschen</button></form>';
         echo '<tr>'
             . '<td><a href="' . esc_url( tsvd_r301_edit_url( (int) $r['id'] ) ) . '"><code>' . esc_html( $r['sourcePath'] ) . '</code></a></td>'
             . '<td><code>' . esc_html( $r['target'] ) . '</code></td>'
@@ -184,11 +184,11 @@ function tsvd_r301_render_list() {
     foreach ( $nf as $l ) {
         $m = tsvd_r301_find_match( $l['host'], $l['path'], $redirects );
         if ( $m ) {
-            $badge  = ! empty( $m['enabled'] ) ? '' : ' <span style="color:#b32d2e">(inaktiv)</span>';
+            $badge  = ! empty( $m['enabled'] ) ? '' : ' <span class="tsvd-text-danger">(inaktiv)</span>';
             $status = '&#8594; <code>' . esc_html( $m['target'] ) . '</code> (' . (int) $m['statusCode'] . ')' . $badge;
             $action = '<a href="' . esc_url( tsvd_r301_edit_url( (int) $m['id'] ) ) . '" class="button button-small">Bearbeiten</a>';
         } else {
-            $status = '<span style="color:#b32d2e">offen</span>';
+            $status = '<span class="tsvd-text-danger">offen</span>';
             $action = '<a href="' . esc_url( tsvd_r301_edit_url( 0, array( 'source' => $l['path'], 'domain' => $l['host'] ) ) ) . '" class="button button-small button-primary">Redirect anlegen</a>';
         }
         echo '<tr><td>' . esc_html( $l['host'] ) . '</td>'

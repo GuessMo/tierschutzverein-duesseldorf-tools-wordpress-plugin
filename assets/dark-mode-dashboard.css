@@ -20,7 +20,9 @@
 
 .activity-block,
 .community-events .activity-block.last,
+.community-events li,
 .community-events li:first-child,
+.community-events .event,
 .community-events-footer {
     border-color: var(--tsvd-chrome-border);
 }

@@ -1,0 +1,26 @@
+#wpbody-content .tsvd-text-danger {
+    color: var(--tsvd-chrome-danger);
+}
+
+#wpbody-content .tsvd-text-success {
+    color: var(--tsvd-chrome-success);
+}
+
+#wpbody-content .tsvd-text-warning {
+    color: var(--tsvd-chrome-warning);
+}
+
+#wpbody-content .tsvd-text-info {
+    color: var(--tsvd-chrome-info);
+}
+
+#wpbody-content .tsvd-panel {
+    margin: 1rem 0;
+    padding: 1rem;
+    background: var(--tsvd-chrome-surface-subtle);
+    border: 1px solid var(--tsvd-chrome-border);
+}
+
+#wpbody-content .tsvd-panel--note {
+    border-left: 4px solid var(--tsvd-chrome-warning);
+}
