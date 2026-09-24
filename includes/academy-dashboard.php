@@ -7,20 +7,32 @@ if ( ! defined( 'ABSPATH' ) ) {
 const TSVD_ACADEMY_RECENT_LIMIT = 5;
 
 function tsvd_academy_render_dashboard() {
-	$lessons = tsvd_academy_visible_lessons();
-	$topics  = tsvd_academy_visible_topics();
-	$hint    = __( 'Schulungen und Anleitungen für alle Mitarbeitenden. Wähle ein Thema und öffne eine Schulung.', 'tsvd' );
+	$term = tsvd_academy_search_term();
+	$hint = __( 'Schulungen und Anleitungen für alle Mitarbeitenden. Suche oder wähle ein Thema.', 'tsvd' );
 
 	echo '<div class="wrap tsvd-dash">';
 	tsvd_academy_render_heading( __( 'Academy', 'tsvd' ) );
+	tsvd_academy_render_search_form( $term );
 	echo '<p class="tsvd-dash-hint">' . esc_html( $hint ) . '</p>';
+	if ( '' !== $term ) {
+		tsvd_academy_render_search_results( $term );
+	} else {
+		tsvd_academy_render_overview();
+	}
+	echo '</div>';
+}
+
+function tsvd_academy_render_overview() {
+	$lessons = tsvd_academy_visible_lessons();
+	$topics  = tsvd_academy_visible_topics();
+
 	tsvd_academy_render_kpis( count( $lessons ), count( $topics ) );
 	echo '<div class="tsvd-grid">';
 	tsvd_academy_render_recent_card( $lessons );
 	foreach ( $topics as $topic ) {
 		tsvd_academy_render_topic_card( $topic, tsvd_academy_lessons_in_topic( $lessons, $topic ) );
 	}
-	echo '</div></div>';
+	echo '</div>';
 }
 
 function tsvd_academy_render_heading( $title ) {
