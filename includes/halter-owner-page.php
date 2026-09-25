@@ -15,7 +15,7 @@ function tsvd_owner_actions( $case ) {
 	}
 	return array(
 		'adopted' => __( 'Mein Tier ist vermittelt', 'tsv-tools' ),
-		'active'  => __( 'Mein Tier ist noch da, Anzeige weiter zeigen', 'tsv-tools' ),
+		'active'  => __( 'Noch da, weiter anzeigen', 'tsv-tools' ),
 		'paused'  => __( 'Anzeige pausieren', 'tsv-tools' ),
 	);
 }
@@ -85,16 +85,22 @@ function tsvd_owner_status_label( $animal_id ) {
 	return 'publish' === get_post_status( $animal_id ) ? $label : __( 'in Prüfung', 'tsv-tools' );
 }
 
+function tsvd_owner_page_title() {
+	return __( 'Mein Tier', 'tsv-tools' ) . ' – ' . get_bloginfo( 'name' );
+}
+
 function tsvd_owner_page_render( $animal_id, $token ) {
+	add_filter( 'pre_get_document_title', 'tsvd_owner_page_title' );
 	get_header();
 	echo '<h2 class="headline-1">' . esc_html__( 'Mein Tier', 'tsv-tools' ) . '</h2>';
-	echo '<div class="card card-full corner">';
+	echo '<div class="card card-static corner owner-page">';
 	if ( ! $animal_id ) {
 		echo '<p>' . esc_html__( 'Dieser Link ist ungültig oder abgelaufen. Bitte antworte auf eine unserer E-Mails, dann helfen wir Dir weiter.', 'tsv-tools' ) . '</p></div>';
 		get_footer();
 		return;
 	}
 	tsvd_owner_page_summary( $animal_id );
+	tsvd_owner_page_done_notice( $animal_id );
 	tsvd_owner_page_actions( $animal_id, $token );
 	tsvd_owner_page_request_form( $token );
 	echo '</div>';
@@ -102,35 +108,48 @@ function tsvd_owner_page_render( $animal_id, $token ) {
 }
 
 function tsvd_owner_page_summary( $animal_id ) {
-	$done    = isset( $_GET['done'] ) ? sanitize_key( $_GET['done'] ) : '';
-	$actions = tsvd_owner_actions( tsvd_halter_case( $animal_id ) );
-	echo '<h3>' . esc_html( tsvd_halter_animal_name( $animal_id ) ) . '</h3>';
-	echo '<p>' . esc_html( sprintf( __( 'Aktueller Stand: %s', 'tsv-tools' ), tsvd_owner_status_label( $animal_id ) ) ) . '</p>';
-	if ( isset( $actions[ $done ] ) || 'request' === $done ) {
-		echo '<p role="status"><strong>' . esc_html__( 'Danke, wir haben Deine Rückmeldung erhalten.', 'tsv-tools' ) . '</strong></p>';
+	echo '<div class="owner-page__head">';
+	if ( has_post_thumbnail( $animal_id ) ) {
+		echo get_the_post_thumbnail( $animal_id, 'thumbnail', array( 'class' => 'owner-page__image', 'alt' => '' ) );
 	}
+	echo '<div><h3 class="owner-page__name">' . esc_html( tsvd_halter_animal_name( $animal_id ) ) . '</h3>';
+	echo '<p class="owner-page__status">' . esc_html__( 'Aktueller Stand:', 'tsv-tools' ) . ' <strong>' . esc_html( tsvd_owner_status_label( $animal_id ) ) . '</strong></p>';
+	if ( 'publish' === get_post_status( $animal_id ) ) {
+		echo '<a href="' . esc_url( get_permalink( $animal_id ) ) . '">' . esc_html__( 'Anzeige ansehen', 'tsv-tools' ) . '</a>';
+	}
+	echo '</div></div>';
+}
+
+function tsvd_owner_page_done_notice( $animal_id ) {
+	$done = isset( $_GET['done'] ) ? sanitize_key( $_GET['done'] ) : '';
+	if ( ! isset( tsvd_owner_actions( tsvd_halter_case( $animal_id ) )[ $done ] ) && 'request' !== $done ) {
+		return;
+	}
+	echo '<div class="info-box info-box--success" role="status"><div class="info-box__text"><p>' . esc_html__( 'Danke, wir haben Deine Rückmeldung erhalten.', 'tsv-tools' ) . '</p></div></div>';
 }
 
 function tsvd_owner_page_actions( $animal_id, $token ) {
 	$preset = isset( $_GET['a'] ) ? sanitize_key( $_GET['a'] ) : '';
+	echo '<section><h4 class="owner-page__section">' . esc_html__( 'Was möchtest Du uns melden?', 'tsv-tools' ) . '</h4>';
+	echo '<form method="post" class="owner-page__actions">';
+	wp_nonce_field( 'tsvd_owner_' . $token );
+	echo '<input type="hidden" name="t" value="' . esc_attr( $token ) . '" />';
 	foreach ( tsvd_owner_actions( tsvd_halter_case( $animal_id ) ) as $key => $label ) {
-		$class = $key === $preset ? 'button' : 'button-text';
-		echo '<form method="post" class="mb-24">';
-		wp_nonce_field( 'tsvd_owner_' . $token );
-		echo '<input type="hidden" name="t" value="' . esc_attr( $token ) . '" />';
-		echo '<input type="hidden" name="owner_action" value="' . esc_attr( $key ) . '" />';
-		echo '<button type="submit" class="' . esc_attr( $class ) . '">' . esc_html( $label ) . '</button>';
-		echo '</form>';
+		$class = $key === $preset ? 'button' : 'button button-tertiary';
+		echo '<button type="submit" name="owner_action" value="' . esc_attr( $key ) . '" class="' . esc_attr( $class ) . '">' . esc_html( $label ) . '</button>';
 	}
+	echo '</form></section>';
 }
 
 function tsvd_owner_page_request_form( $token ) {
-	echo '<form method="post" class="form">';
+	echo '<form method="post" class="form owner-page__request">';
 	wp_nonce_field( 'tsvd_owner_' . $token );
 	echo '<input type="hidden" name="t" value="' . esc_attr( $token ) . '" />';
 	echo '<input type="hidden" name="owner_action" value="request" />';
-	echo '<div class="form-field"><label for="owner-request">' . esc_html__( 'Etwas an der Anzeige ändern? Schreib uns, was angepasst werden soll.', 'tsv-tools' ) . '</label>';
-	echo '<textarea id="owner-request" name="owner_request" class="form-field-input" rows="4"></textarea></div>';
-	echo '<button type="submit" class="button">' . esc_html__( 'Änderungswunsch senden', 'tsv-tools' ) . '</button>';
+	echo '<h4 class="owner-page__section">' . esc_html__( 'Etwas an der Anzeige ändern?', 'tsv-tools' ) . '</h4>';
+	echo '<div class="form-field form-field-textarea"><div class="form-field-input-wrapper">';
+	echo '<label for="owner-request">' . esc_html__( 'Schreib uns, was angepasst werden soll.', 'tsv-tools' ) . '</label>';
+	echo '<textarea id="owner-request" name="owner_request" rows="4" required></textarea></div></div>';
+	echo '<div class="form-submit"><div class="form-submit-action"><button type="submit" class="button">' . esc_html__( 'Änderungswunsch senden', 'tsv-tools' ) . '</button></div></div>';
 	echo '</form>';
 }
