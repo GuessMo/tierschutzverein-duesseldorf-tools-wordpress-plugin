@@ -5,6 +5,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 add_action( 'tsvd_anfrage_created', 'tsvd_listing_forward_new_inquiry', 20, 4 );
+add_filter( 'tsvd_owner_relay_forwarded', 'tsvd_listing_forwarded_in_request', 10, 2 );
 
 const TSVD_LISTING_KINDS = array( 'listing', 'sighting' );
 
@@ -60,7 +61,20 @@ function tsvd_listing_forward_new_inquiry( $anfrage_id, $kind, $animal_id, $subm
 	$headers  = array( 'Reply-To: ' . $anfrage['applicant_email'] );
 	if ( wp_mail( $contact['email'], $subject, tsvd_listing_forward_body( $anfrage, $submitted, $greeting ), $headers ) ) {
 		tsvd_listing_mark_forwarded( $anfrage_id );
+		tsvd_listing_forwarded_animals( (int) $animal_id );
 	}
+}
+
+function tsvd_listing_forwarded_animals( $animal_id = 0 ) {
+	static $forwarded = array();
+	if ( $animal_id ) {
+		$forwarded[ (int) $animal_id ] = true;
+	}
+	return $forwarded;
+}
+
+function tsvd_listing_forwarded_in_request( $forwarded, $animal_id ) {
+	return $forwarded || isset( tsvd_listing_forwarded_animals()[ (int) $animal_id ] );
 }
 
 function tsvd_listing_mark_forwarded( $anfrage_id ) {
