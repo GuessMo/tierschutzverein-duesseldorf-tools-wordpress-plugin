@@ -108,8 +108,9 @@ function tsvd_owner_page_render( $animal_id, $token ) {
 	get_footer();
 }
 
-function tsvd_owner_page_eyebrow() {
-	echo '<p class="owner-page__eyebrow">' . esc_html__( 'Mein Tier – Deine Anzeige verwalten', 'tsv-tools' ) . '</p>';
+function tsvd_owner_page_eyebrow( $animal_id = 0 ) {
+	$text = 'missing' === tsvd_halter_case( $animal_id ) ? __( 'Vermisstmeldung verwalten', 'tsv-tools' ) : __( 'Anzeige verwalten', 'tsv-tools' );
+	echo '<p class="owner-page__eyebrow">' . esc_html( $text ) . '</p>';
 }
 
 function tsvd_owner_page_image( $animal_id ) {
@@ -122,7 +123,7 @@ function tsvd_owner_page_image( $animal_id ) {
 }
 
 function tsvd_owner_page_summary( $animal_id ) {
-	tsvd_owner_page_eyebrow();
+	tsvd_owner_page_eyebrow( $animal_id );
 	echo '<h2 class="owner-page__name">' . esc_html( tsvd_halter_animal_name( $animal_id ) ) . '</h2>';
 	if ( function_exists( 'tsvd_render_card_badges_text' ) ) {
 		echo tsvd_render_card_badges_text( $animal_id );
