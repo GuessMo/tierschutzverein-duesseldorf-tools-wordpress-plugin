@@ -26,14 +26,7 @@ function tsvd_halter_relay_intro( $anfrage, $submitted ) {
 	$intro   = 'sighting' === $anfrage['kind']
 		? sprintf( __( '%1$s hat %2$s möglicherweise gesehen und schreibt:', 'tsv-tools' ), $first, $tier )
 		: sprintf( __( '%1$s interessiert sich für %2$s und schreibt:', 'tsv-tools' ), $first, $tier );
-	$extras = array();
-	foreach ( array( 'applicant_residence' => __( 'Wohnort', 'tsv-tools' ), 'applicant_housing' => __( 'Unterkunft', 'tsv-tools' ), 'applicant_outdoor' => __( 'Außenbereich', 'tsv-tools' ) ) as $key => $label ) {
-		if ( ! empty( $submitted[ $key ] ) && is_string( $submitted[ $key ] ) ) {
-			$extras[] = $label . ': ' . $submitted[ $key ];
-		}
-	}
-	$body = $intro . "\n\n" . ( '' !== $message ? $message : __( '(keine Nachricht)', 'tsv-tools' ) );
-	return $extras ? $body . "\n\n" . implode( "\n", $extras ) : $body;
+	return $intro . "\n\n" . ( '' !== $message ? $message : __( '(keine Nachricht)', 'tsv-tools' ) );
 }
 
 function tsvd_halter_relay_footer() {
