@@ -253,7 +253,8 @@ function tsvd_anfragen_breed_houses_visible() {
 		 INNER JOIN {$wpdb->term_taxonomy} tt ON tt.term_taxonomy_id = tr.term_taxonomy_id
 		 WHERE tt.taxonomy = 'animal_breed'
 		 AND ( tt.term_id IN ( {$in} ) OR tt.parent IN ( {$in} ) )
-		 AND a.deleted_at IS NULL AND a.status NOT IN ( 'spam', 'blocked' )"
+		 AND a.deleted_at IS NULL AND a.status NOT IN ( 'spam', 'blocked' )
+		 AND " . tsvd_anfragen_messenger_sql( 'a' )
 	);
 	$visible = array_flip( array_map( 'intval', $has_requests ) );
 
@@ -328,7 +329,7 @@ function tsvd_anfragen_calc_status( $anfrage ) {
 
 function tsvd_anfragen_list_where( $status, $search, $breed = 0 ) {
 	global $wpdb;
-	$clauses = array();
+	$clauses = array( tsvd_anfragen_messenger_sql( 'a' ) );
 	if ( 'trash' === $status ) {
 		$clauses[] = 'a.deleted_at IS NOT NULL';
 	} elseif ( 'mine' === $status ) {

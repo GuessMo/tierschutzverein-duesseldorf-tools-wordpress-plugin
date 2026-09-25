@@ -12,7 +12,7 @@ function tsvd_anfragen_stats_timelines() {
 		"SELECT a.id, a.created_at, r.direction, r.sent_at
 		 FROM {$table} a
 		 LEFT JOIN {$replies} r ON r.anfrage_id = a.id AND " . tsvd_anfragen_counted_reply_sql( 'r', 'a' ) . " AND r.sent_at IS NOT NULL
-		 WHERE a.deleted_at IS NULL AND a.status NOT IN ( 'spam', 'blocked' )
+		 WHERE a.deleted_at IS NULL AND a.status NOT IN ( 'spam', 'blocked' ) AND " . tsvd_anfragen_messenger_sql( 'a' ) . "
 		 ORDER BY a.id ASC, r.sent_at ASC, r.id ASC",
 		ARRAY_A
 	);

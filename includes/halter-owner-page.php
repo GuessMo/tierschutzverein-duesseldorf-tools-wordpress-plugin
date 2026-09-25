@@ -48,7 +48,7 @@ function tsvd_owner_page_handle_post( $animal_id, $token ) {
 		tsvd_halter_log( tsvd_halter_conversation_id( $animal_id ), 'in', __( 'Änderungswunsch über „Mein Tier“:', 'tsv-tools' ) . "\n" . $text, 'halter' );
 	}
 	if ( isset( tsvd_owner_actions( tsvd_halter_case( $animal_id ) )[ $action ] ) ) {
-		tsvd_owner_apply_action( $animal_id, $action );
+		tsvd_owner_needs_approval( $animal_id, $action ) ? tsvd_owner_request_approval( $animal_id, $action ) : tsvd_owner_apply_action( $animal_id, $action );
 	}
 	wp_safe_redirect( add_query_arg( array( 't' => $token, 'done' => 1 ), home_url( '/mein-tier/' ) ) );
 	exit;
@@ -81,6 +81,9 @@ function tsvd_owner_status_label( $animal_id ) {
 		$status = get_post_meta( $animal_id, 'animal_adoption_status', true );
 	}
 	$label = isset( $labels[ $status ] ) ? $labels[ $status ] : __( 'in Prüfung', 'tsv-tools' );
+	if ( function_exists( 'tsvd_owner_pending_action' ) && 'active' === tsvd_owner_pending_action( $animal_id ) ) {
+		$label .= ' ' . __( '(wieder online stellen angefragt)', 'tsv-tools' );
+	}
 	return 'publish' === get_post_status( $animal_id ) ? $label : __( 'in Prüfung', 'tsv-tools' );
 }
 

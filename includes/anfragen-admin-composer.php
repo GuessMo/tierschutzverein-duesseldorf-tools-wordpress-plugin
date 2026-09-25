@@ -25,14 +25,6 @@ function tsvd_anfragen_composer_texts( $anfrage ) {
 			'hint'   => __( 'Nur für das Team sichtbar. Geht nicht an die interessierte Person.', 'tsvd' ),
 		),
 	);
-	if ( function_exists( 'tsvd_halter_relay_anfrage' ) && tsvd_halter_relay_anfrage( $anfrage ) ) {
-		$texts = array_merge( array_slice( $texts, 0, 1 ), array( 'halter' => array(
-			'tab'    => __( 'An Halter/Besitzer', 'tsvd' ),
-			'label'  => __( 'Nachricht an den Halter/Besitzer', 'tsvd' ),
-			'button' => __( 'An Halter/Besitzer senden', 'tsvd' ),
-			'hint'   => __( 'Geht vom Vereinspostfach an den Halter/Besitzer. Seine Antwort darauf geht wie jede Antwort auch an die interessierte Person. Für Absprachen nur mit dem Halter nutze seine Halter-Unterhaltung.', 'tsvd' ),
-		) ), array_slice( $texts, 1 ) );
-	}
 	return $texts;
 }
 

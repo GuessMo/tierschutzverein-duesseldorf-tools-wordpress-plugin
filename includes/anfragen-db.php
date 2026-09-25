@@ -16,7 +16,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-const TSVD_ANFRAGEN_DB_VERSION = '5';
+const TSVD_ANFRAGEN_DB_VERSION = '6';
 
 function tsvd_anfragen_table_name() {
 	global $wpdb;
@@ -33,7 +33,36 @@ function tsvd_anfragen_maybe_upgrade_db() {
 		return;
 	}
 	tsvd_anfragen_create_tables();
+	tsvd_anfragen_migrate_listing_kind();
 	update_option( 'tsvd_anfragen_db_version', TSVD_ANFRAGEN_DB_VERSION );
+}
+
+function tsvd_anfragen_messenger_sql( $alias = 'a' ) {
+	return "{$alias}.kind NOT IN ( 'listing', 'sighting' )";
+}
+
+function tsvd_anfragen_migrate_listing_kind() {
+	global $wpdb;
+	if ( ! function_exists( 'tsvd_halter_case' ) ) {
+		return;
+	}
+	$table   = tsvd_anfragen_table_name();
+	$replies = tsvd_anfragen_replies_table_name();
+	$rows    = $wpdb->get_results(
+		"SELECT a.id, a.animal_id FROM {$table} a WHERE a.kind = 'inquiry' AND a.animal_id IS NOT NULL
+		 AND NOT EXISTS ( SELECT 1 FROM {$replies} r WHERE r.anfrage_id = a.id AND r.user_id IS NOT NULL )",
+		ARRAY_A
+	);
+	foreach ( $rows as $row ) {
+		if ( '' !== tsvd_halter_case( (int) $row['animal_id'] ) ) {
+			$wpdb->update( $table, array( 'kind' => 'listing' ), array( 'id' => (int) $row['id'] ) );
+		}
+	}
+	$wpdb->query(
+		"UPDATE {$table} a SET a.status = 'forwarded'
+		 WHERE a.kind IN ( 'listing', 'sighting' ) AND a.status IN ( 'open', 'answered' )
+		 AND EXISTS ( SELECT 1 FROM {$replies} r WHERE r.anfrage_id = a.id AND r.direction = 'out' AND r.party = 'halter' )"
+	);
 }
 add_action( 'admin_init', 'tsvd_anfragen_maybe_upgrade_db' );
 add_action( 'init', 'tsvd_anfragen_maybe_upgrade_db' );

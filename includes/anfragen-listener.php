@@ -29,7 +29,7 @@ function tsvd_anfragen_submission_kind( $form_id, $animal_id ) {
 		return 'sighting';
 	}
 	if ( function_exists( 'tsvd_halter_case' ) && '' !== tsvd_halter_case( (int) $animal_id ) ) {
-		return 'inquiry';
+		return 'listing';
 	}
 	return get_post_meta( $form_id, '_tsvd_form_persist_inquiry', true ) ? 'inquiry' : '';
 }

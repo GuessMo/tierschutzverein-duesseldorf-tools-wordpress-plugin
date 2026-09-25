@@ -98,6 +98,7 @@ function tsvd_anfragen_render_conversation( $id ) {
 	}
 
 	tsvd_anfragen_render_animal_card( (int) $anfrage['animal_id'] );
+	do_action( 'tsvd_anfragen_after_animal_card', $anfrage );
 
 	tsvd_anfragen_render_replies( $wpdb, $replies_table, $anfrage );
 	if ( ! empty( $anfrage['deleted_at'] ) ) {
@@ -389,9 +390,6 @@ function tsvd_anfragen_chat_script() {
  * @return bool Ob wp_mail den Versand angenommen hat.
  */
 function tsvd_anfragen_mail_reply( $anfrage, $body, $party = 'applicant' ) {
-	if ( 'halter' === $party ) {
-		return tsvd_halter_mail_from_team( $anfrage, $body );
-	}
 	$reply_to = get_post_meta( (int) $anfrage['form_id'], '_tsvd_form_recipient', true );
 	$reply_to = is_email( $reply_to ) ? $reply_to : get_option( 'admin_email' );
 	$headers  = array( 'Reply-To: ' . $reply_to );
