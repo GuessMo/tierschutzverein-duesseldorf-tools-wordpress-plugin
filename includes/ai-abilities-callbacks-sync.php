@@ -71,7 +71,7 @@ function tsvd_tools_ai_sync_export_post($post, $with_media) {
         'post_status'   => $post->post_status,
         'post_date'     => $post->post_date,
         'post_modified' => $post->post_modified,
-        'meta'          => get_post_meta($post->ID),
+        'meta'          => tsvd_tools_ai_sync_strip_personal_meta(get_post_meta($post->ID)),
         'terms'         => $terms,
         'attachments'   => $with_media ? tsvd_tools_ai_sync_collect_attachments($post) : array(),
     );
@@ -206,6 +206,16 @@ function tsvd_tools_ai_sync_build_ref_map() {
         }
     }
     return $map;
+}
+
+function tsvd_tools_ai_sync_personal_meta_pattern() {
+    return '/^(animal_private_contact_|_tsvd_owner_)/';
+}
+
+function tsvd_tools_ai_sync_strip_personal_meta($meta) {
+    return array_filter((array) $meta, function ($key) {
+        return ! preg_match(tsvd_tools_ai_sync_personal_meta_pattern(), (string) $key);
+    }, ARRAY_FILTER_USE_KEY);
 }
 
 function tsvd_tools_ai_sync_sensitive_pattern() {
