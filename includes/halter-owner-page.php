@@ -91,31 +91,47 @@ function tsvd_owner_page_title() {
 function tsvd_owner_page_render( $animal_id, $token ) {
 	add_filter( 'pre_get_document_title', 'tsvd_owner_page_title' );
 	get_header();
-	echo '<h2 class="headline-1">' . esc_html__( 'Mein Tier', 'tsv-tools' ) . '</h2>';
-	echo '<div class="card card-static corner owner-page">';
 	if ( ! $animal_id ) {
+		echo '<div class="card card-static corner owner-page owner-page--invalid">';
+		tsvd_owner_page_eyebrow();
 		echo '<p>' . esc_html__( 'Dieser Link ist ungültig oder abgelaufen. Bitte antworte auf eine unserer E-Mails, dann helfen wir Dir weiter.', 'tsv-tools' ) . '</p></div>';
 		get_footer();
 		return;
 	}
+	echo '<article class="card card-static corner owner-page">';
+	tsvd_owner_page_image( $animal_id );
+	echo '<div class="owner-page__content">';
 	tsvd_owner_page_summary( $animal_id );
 	tsvd_owner_page_done_notice();
 	tsvd_owner_page_form( $animal_id, $token );
-	echo '</div>';
+	echo '</div></article>';
 	get_footer();
 }
 
+function tsvd_owner_page_eyebrow() {
+	echo '<p class="owner-page__eyebrow">' . esc_html__( 'Mein Tier – Deine Anzeige verwalten', 'tsv-tools' ) . '</p>';
+}
+
+function tsvd_owner_page_image( $animal_id ) {
+	$image = function_exists( 'tsvd_get_responsive_thumbnail' )
+		? tsvd_get_responsive_thumbnail( $animal_id, 'animal-detail', array( 'class' => 'owner-page__image', 'sizes' => '(max-width: 768px) 100vw, 360px' ) )
+		: get_the_post_thumbnail( $animal_id, 'large', array( 'class' => 'owner-page__image' ) );
+	if ( $image ) {
+		echo '<div class="owner-page__media">' . $image . '</div>';
+	}
+}
+
 function tsvd_owner_page_summary( $animal_id ) {
-	echo '<div class="owner-page__head">';
-	if ( has_post_thumbnail( $animal_id ) ) {
-		echo get_the_post_thumbnail( $animal_id, 'thumbnail', array( 'class' => 'owner-page__image', 'alt' => '' ) );
+	tsvd_owner_page_eyebrow();
+	echo '<h2 class="owner-page__name">' . esc_html( tsvd_halter_animal_name( $animal_id ) ) . '</h2>';
+	if ( function_exists( 'tsvd_render_card_badges_text' ) ) {
+		echo tsvd_render_card_badges_text( $animal_id );
 	}
-	echo '<div><h3 class="owner-page__name">' . esc_html( tsvd_halter_animal_name( $animal_id ) ) . '</h3>';
-	echo '<p class="owner-page__status">' . esc_html__( 'Aktueller Stand:', 'tsv-tools' ) . ' <strong>' . esc_html( tsvd_owner_status_label( $animal_id ) ) . '</strong></p>';
+	echo '<p class="owner-page__status">' . esc_html__( 'Aktueller Stand:', 'tsv-tools' ) . ' <strong>' . esc_html( tsvd_owner_status_label( $animal_id ) ) . '</strong>';
 	if ( 'publish' === get_post_status( $animal_id ) ) {
-		echo '<a href="' . esc_url( get_permalink( $animal_id ) ) . '">' . esc_html__( 'Anzeige ansehen', 'tsv-tools' ) . '</a>';
+		echo ' · <a href="' . esc_url( get_permalink( $animal_id ) ) . '">' . esc_html__( 'Anzeige ansehen', 'tsv-tools' ) . '</a>';
 	}
-	echo '</div></div>';
+	echo '</p>';
 }
 
 function tsvd_owner_page_done_notice() {
