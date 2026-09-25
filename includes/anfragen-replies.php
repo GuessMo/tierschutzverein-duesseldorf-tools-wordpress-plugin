@@ -9,7 +9,7 @@ function tsvd_anfragen_send_delay() {
 	return (int) apply_filters( 'tsvd_anfragen_send_delay', max( 0, $delay ) );
 }
 
-function tsvd_anfragen_schedule_reply( $id, $body, $user_id = 0 ) {
+function tsvd_anfragen_schedule_reply( $id, $body, $user_id = 0, $party = 'applicant' ) {
 	if ( '' === trim( $body ) ) {
 		return new WP_Error( 'empty_body', __( 'Antworttext darf nicht leer sein.', 'tsvd' ) );
 	}
@@ -19,13 +19,13 @@ function tsvd_anfragen_schedule_reply( $id, $body, $user_id = 0 ) {
 	if ( ! $anfrage ) {
 		return new WP_Error( 'not_found', __( 'Anfrage nicht gefunden.', 'tsvd' ) );
 	}
-	if ( ! is_email( $anfrage['applicant_email'] ) ) {
+	if ( ! is_email( tsvd_anfragen_party_email( $anfrage, $party ) ) ) {
 		return new WP_Error( 'invalid_email', __( 'Keine gültige E-Mail-Adresse hinterlegt.', 'tsvd' ) );
 	}
 
 	$delay = tsvd_anfragen_send_delay();
 	if ( $delay <= 0 ) {
-		return tsvd_anfragen_send_reply( $id, $body, $user_id );
+		return tsvd_anfragen_send_reply( $id, $body, $user_id, $party );
 	}
 
 	$when = time() + $delay;
@@ -35,11 +35,12 @@ function tsvd_anfragen_schedule_reply( $id, $body, $user_id = 0 ) {
 			'anfrage_id'   => $id,
 			'user_id'      => $user_id ?: null,
 			'direction'    => 'out',
+			'party'        => $party,
 			'body'         => $body,
 			'sent_at'      => null,
 			'scheduled_at' => gmdate( 'Y-m-d H:i:s', $when ),
 		),
-		array( '%d', '%d', '%s', '%s', '%s', '%s' )
+		array( '%d', '%d', '%s', '%s', '%s', '%s', '%s' )
 	);
 	wp_schedule_single_event( $when, 'tsvd_anfragen_dispatch', array( (int) $wpdb->insert_id ) );
 	return true;
@@ -59,7 +60,7 @@ function tsvd_anfragen_dispatch_reply( $reply_id ) {
 	if ( ! $anfrage ) {
 		return;
 	}
-	tsvd_anfragen_mail_reply( $anfrage, $reply['body'] );
+	tsvd_anfragen_mail_reply( $anfrage, $reply['body'], 'halter' === $reply['party'] ? 'halter' : 'applicant' );
 	$now = current_time( 'mysql' );
 	$wpdb->update( $rt, array( 'sent_at' => $now, 'scheduled_at' => null ), array( 'id' => $reply_id ), array( '%s', '%s' ), array( '%d' ) );
 	$wpdb->update( $table, array( 'status' => 'answered', 'updated_at' => $now ), array( 'id' => $anfrage['id'] ), array( '%s', '%s' ), array( '%d' ) );

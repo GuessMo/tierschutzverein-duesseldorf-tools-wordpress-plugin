@@ -165,10 +165,17 @@ function tsvd_anfragen_payload_facts( $anfrage, $skip = array() ) {
 
 function tsvd_anfragen_reply_author( $reply, $applicant_name ) {
 	$direction = $reply['direction'];
+	$is_halter = 'halter' === ( $reply['party'] ?? '' );
 	if ( 'in' === $direction ) {
+		if ( $is_halter ) {
+			return __( 'Halter/Besitzer', 'tsvd' );
+		}
 		return '' !== $applicant_name ? $applicant_name : __( 'Interessierte Person', 'tsvd' );
 	}
-	$name = tsvd_anfragen_user_label( (int) $reply['user_id'] );
+	$name = (int) $reply['user_id'] ? tsvd_anfragen_user_label( (int) $reply['user_id'] ) : __( 'System', 'tsvd' );
+	if ( $is_halter && 'out' === $direction ) {
+		return sprintf( __( '%s → Halter/Besitzer', 'tsvd' ), $name );
+	}
 	if ( 'note' === $direction ) {
 		return sprintf( __( 'Interne Notiz · %s', 'tsvd' ), $name );
 	}
@@ -381,7 +388,10 @@ function tsvd_anfragen_chat_script() {
  * @param string $body    Antworttext (bereits sanitiert erwartet).
  * @return bool Ob wp_mail den Versand angenommen hat.
  */
-function tsvd_anfragen_mail_reply( $anfrage, $body ) {
+function tsvd_anfragen_mail_reply( $anfrage, $body, $party = 'applicant' ) {
+	if ( 'halter' === $party ) {
+		return tsvd_halter_mail_from_team( $anfrage, $body );
+	}
 	$reply_to = get_post_meta( (int) $anfrage['form_id'], '_tsvd_form_recipient', true );
 	$reply_to = is_email( $reply_to ) ? $reply_to : get_option( 'admin_email' );
 	$headers  = array( 'Reply-To: ' . $reply_to );
@@ -393,7 +403,7 @@ function tsvd_anfragen_mail_reply( $anfrage, $body ) {
 	return wp_mail( $anfrage['applicant_email'], $subject, $body, $headers );
 }
 
-function tsvd_anfragen_send_reply( $id, $body, $user_id = 0 ) {
+function tsvd_anfragen_send_reply( $id, $body, $user_id = 0, $party = 'applicant' ) {
 	if ( '' === trim( $body ) ) {
 		return new WP_Error( 'empty_body', __( 'Antworttext darf nicht leer sein.', 'tsvd' ) );
 	}
@@ -404,11 +414,11 @@ function tsvd_anfragen_send_reply( $id, $body, $user_id = 0 ) {
 	if ( ! $anfrage ) {
 		return new WP_Error( 'not_found', __( 'Anfrage nicht gefunden.', 'tsvd' ) );
 	}
-	if ( ! is_email( $anfrage['applicant_email'] ) ) {
+	if ( ! is_email( tsvd_anfragen_party_email( $anfrage, $party ) ) ) {
 		return new WP_Error( 'invalid_email', __( 'Keine gültige E-Mail-Adresse hinterlegt.', 'tsvd' ) );
 	}
 
-	if ( ! tsvd_anfragen_mail_reply( $anfrage, $body ) ) {
+	if ( ! tsvd_anfragen_mail_reply( $anfrage, $body, $party ) ) {
 		return new WP_Error( 'mail_failed', __( 'E-Mail konnte nicht gesendet werden.', 'tsvd' ) );
 	}
 
@@ -419,10 +429,11 @@ function tsvd_anfragen_send_reply( $id, $body, $user_id = 0 ) {
 			'anfrage_id' => $id,
 			'user_id'    => $user_id ?: null,
 			'direction'  => 'out',
+			'party'      => $party,
 			'body'       => $body,
 			'sent_at'    => $now,
 		),
-		array( '%d', '%d', '%s', '%s', '%s' )
+		array( '%d', '%d', '%s', '%s', '%s', '%s' )
 	);
 
 	$wpdb->update(
@@ -448,13 +459,13 @@ function tsvd_ajax_anfrage_reply() {
 	}
 
 	$body = isset( $_POST['body'] ) ? sanitize_textarea_field( wp_unslash( $_POST['body'] ) ) : '';
-	$mode = ( isset( $_POST['mode'] ) && 'note' === $_POST['mode'] ) ? 'note' : 'reply';
+	$mode = isset( $_POST['mode'] ) && in_array( $_POST['mode'], array( 'note', 'halter' ), true ) ? $_POST['mode'] : 'reply';
 
 	if ( 'note' === $mode ) {
 		$result  = tsvd_anfragen_add_note( $id, $body, get_current_user_id() );
 		$success = __( 'Notiz gespeichert.', 'tsvd' );
 	} else {
-		$result  = tsvd_anfragen_schedule_reply( $id, $body, get_current_user_id() );
+		$result  = tsvd_anfragen_schedule_reply( $id, $body, get_current_user_id(), 'halter' === $mode ? 'halter' : 'applicant' );
 		$success = tsvd_anfragen_send_delay() > 0 ? __( 'Antwort geplant.', 'tsvd' ) : __( 'Antwort gesendet.', 'tsvd' );
 	}
 

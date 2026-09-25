@@ -144,7 +144,8 @@ function tsvd_anfragen_imap_poll() {
             // fälschlich einer fremden Anfrage zugeordnet wird.
             $sender_address = $message->from->first();
             $sender = $sender_address ? strtolower((string) $sender_address->mail) : '';
-            if ($sender === '' || $sender !== strtolower((string) $anfrage['applicant_email'])) {
+            $party = tsvd_halter_resolve_party($anfrage, $sender);
+            if ($party === '') {
                 continue;
             }
 
@@ -157,26 +158,7 @@ function tsvd_anfragen_imap_poll() {
                 $body = __('(Leerer Antworttext, siehe Original-Mail im Postfach)', 'tsv-tools');
             }
 
-            $now = current_time('mysql');
-            $wpdb->insert(
-                tsvd_anfragen_replies_table_name(),
-                array(
-                    'anfrage_id' => $anfrage_id,
-                    'user_id'    => null,
-                    'direction'  => 'in',
-                    'body'       => $body,
-                    'sent_at'    => $now,
-                ),
-                array('%d', '%d', '%s', '%s', '%s')
-            );
-
-            $wpdb->update(
-                $table,
-                array('status' => 'open', 'updated_at' => $now),
-                array('id' => $anfrage_id),
-                array('%s', '%s'),
-                array('%d')
-            );
+            tsvd_anfragen_receive($anfrage, $party, $body);
 
             $message->setFlag('Seen');
         }

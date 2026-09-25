@@ -16,13 +16,18 @@ function tsvd_anfragen_wait_thresholds() {
 	);
 }
 
+function tsvd_anfragen_counted_reply_sql( $reply_alias, $anfrage_alias ) {
+	return "( ( {$reply_alias}.direction = 'in' AND NOT ( {$reply_alias}.party IS NOT NULL AND {$anfrage_alias}.kind IN ( 'inquiry', 'sighting' ) ) )
+		OR ( {$reply_alias}.direction = 'out' AND NOT ( {$reply_alias}.user_id IS NULL AND {$anfrage_alias}.kind = 'halter' ) ) )";
+}
+
 function tsvd_anfragen_waiting_since_sql( $alias = 'a' ) {
 	$replies = tsvd_anfragen_replies_table_name();
 	return "COALESCE(
 		(SELECT MIN(i.sent_at) FROM {$replies} i
-		 WHERE i.anfrage_id = {$alias}.id AND i.direction = 'in'
+		 WHERE i.anfrage_id = {$alias}.id AND i.direction = 'in' AND " . tsvd_anfragen_counted_reply_sql( 'i', $alias ) . "
 		 AND i.sent_at > COALESCE(
-			(SELECT MAX(o.sent_at) FROM {$replies} o WHERE o.anfrage_id = {$alias}.id AND o.direction = 'out'),
+			(SELECT MAX(o.sent_at) FROM {$replies} o WHERE o.anfrage_id = {$alias}.id AND o.direction = 'out' AND " . tsvd_anfragen_counted_reply_sql( 'o', $alias ) . "),
 			'1970-01-01 00:00:00')),
 		{$alias}.created_at)";
 }

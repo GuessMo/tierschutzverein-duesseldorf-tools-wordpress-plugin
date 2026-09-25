@@ -11,7 +11,7 @@ function tsvd_anfragen_composer_texts( $anfrage ) {
 	$hint  = $delay > 0
 		? sprintf( _n( 'Geht per E-Mail an %1$s, Signatur wird angehängt. Versand nach %2$d Minute, bis dahin kannst Du abbrechen.', 'Geht per E-Mail an %1$s, Signatur wird angehängt. Versand nach %2$d Minuten, bis dahin kannst Du abbrechen.', $delay, 'tsvd' ), $email, $delay )
 		: sprintf( __( 'Geht sofort per E-Mail an %s, Signatur wird angehängt.', 'tsvd' ), $email );
-	return array(
+	$texts = array(
 		'reply' => array(
 			'tab'    => sprintf( __( 'Antwort an %s', 'tsvd' ), $first ),
 			'label'  => sprintf( __( 'Antwort an %s', 'tsvd' ), $anfrage['applicant_name'] ),
@@ -25,6 +25,15 @@ function tsvd_anfragen_composer_texts( $anfrage ) {
 			'hint'   => __( 'Nur für das Team sichtbar. Geht nicht an die interessierte Person.', 'tsvd' ),
 		),
 	);
+	if ( function_exists( 'tsvd_halter_relay_anfrage' ) && tsvd_halter_relay_anfrage( $anfrage ) ) {
+		$texts = array_merge( array_slice( $texts, 0, 1 ), array( 'halter' => array(
+			'tab'    => __( 'An Halter/Besitzer', 'tsvd' ),
+			'label'  => __( 'Nachricht an den Halter/Besitzer', 'tsvd' ),
+			'button' => __( 'An Halter/Besitzer senden', 'tsvd' ),
+			'hint'   => __( 'Geht vom Vereinspostfach an den Halter/Besitzer. Seine Antwort darauf geht wie jede Antwort auch an die interessierte Person. Für Absprachen nur mit dem Halter nutze seine Halter-Unterhaltung.', 'tsvd' ),
+		) ), array_slice( $texts, 1 ) );
+	}
+	return $texts;
 }
 
 function tsvd_anfragen_render_reply_form( $anfrage ) {
@@ -40,7 +49,7 @@ function tsvd_anfragen_render_reply_form( $anfrage ) {
 	foreach ( $texts as $mode => $text ) {
 		$pressed = 'reply' === $mode ? 'true' : 'false';
 		echo '<button type="button" class="tsvd-anf-btn tsvd-composer__mode" data-mode="' . esc_attr( $mode ) . '" aria-pressed="' . esc_attr( $pressed ) . '">'
-			. '<span class="dashicons ' . ( 'reply' === $mode ? 'dashicons-email-alt' : 'dashicons-lock' ) . '" aria-hidden="true"></span>'
+			. '<span class="dashicons ' . tsvd_anfragen_composer_icon( $mode ) . '" aria-hidden="true"></span>'
 			. esc_html( $text['tab'] ) . '</button>';
 	}
 	echo '</div>';
@@ -64,4 +73,9 @@ function tsvd_anfragen_composer_script( $texts ) {
 	);
 	wp_enqueue_script( 'tsvd-anfragen-composer', TSVD_TOOLS_URL . 'assets/anfragen-composer.js', array( 'jquery' ), TSVD_TOOLS_ASSET_VERSION, true );
 	wp_localize_script( 'tsvd-anfragen-composer', 'tsvdComposer', $strings );
+}
+
+function tsvd_anfragen_composer_icon( $mode ) {
+	$icons = array( 'reply' => 'dashicons-email-alt', 'halter' => 'dashicons-admin-users', 'note' => 'dashicons-lock' );
+	return isset( $icons[ $mode ] ) ? $icons[ $mode ] : 'dashicons-email-alt';
 }

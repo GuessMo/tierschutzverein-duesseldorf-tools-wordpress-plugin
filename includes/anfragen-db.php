@@ -16,7 +16,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-const TSVD_ANFRAGEN_DB_VERSION = '4';
+const TSVD_ANFRAGEN_DB_VERSION = '5';
 
 function tsvd_anfragen_table_name() {
 	global $wpdb;
@@ -36,6 +36,7 @@ function tsvd_anfragen_maybe_upgrade_db() {
 	update_option( 'tsvd_anfragen_db_version', TSVD_ANFRAGEN_DB_VERSION );
 }
 add_action( 'admin_init', 'tsvd_anfragen_maybe_upgrade_db' );
+add_action( 'init', 'tsvd_anfragen_maybe_upgrade_db' );
 
 function tsvd_anfragen_create_tables() {
 	global $wpdb;
@@ -53,6 +54,7 @@ function tsvd_anfragen_create_tables() {
 		applicant_phone VARCHAR(64) NOT NULL DEFAULT '',
 		payload LONGTEXT NOT NULL,
 		status VARCHAR(20) NOT NULL DEFAULT 'open',
+		kind VARCHAR(20) NOT NULL DEFAULT 'inquiry',
 		assigned_user_id BIGINT UNSIGNED NULL,
 		created_at DATETIME NOT NULL,
 		updated_at DATETIME NOT NULL,
@@ -67,6 +69,7 @@ function tsvd_anfragen_create_tables() {
 		anfrage_id BIGINT UNSIGNED NOT NULL,
 		user_id BIGINT UNSIGNED NULL,
 		direction VARCHAR(10) NOT NULL DEFAULT 'out',
+		party VARCHAR(20) NULL,
 		body LONGTEXT NOT NULL,
 		sent_at DATETIME NULL,
 		scheduled_at DATETIME NULL,
