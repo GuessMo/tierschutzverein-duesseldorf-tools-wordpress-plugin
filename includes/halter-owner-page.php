@@ -15,8 +15,8 @@ function tsvd_owner_actions( $case ) {
 	}
 	return array(
 		'adopted' => __( 'Mein Tier ist vermittelt', 'tsv-tools' ),
-		'active'  => __( 'Noch da, weiter anzeigen', 'tsv-tools' ),
-		'paused'  => __( 'Anzeige pausieren', 'tsv-tools' ),
+		'active'  => __( 'Mein Tier ist noch da, die Anzeige bleibt online', 'tsv-tools' ),
+		'paused'  => __( 'Anzeige vorerst pausieren', 'tsv-tools' ),
 	);
 }
 
@@ -42,16 +42,15 @@ function tsvd_owner_page_handle_post( $animal_id, $token ) {
 		return;
 	}
 	$action = isset( $_POST['owner_action'] ) ? sanitize_key( $_POST['owner_action'] ) : '';
+	$text   = isset( $_POST['owner_request'] ) ? trim( sanitize_textarea_field( wp_unslash( $_POST['owner_request'] ) ) ) : '';
 	$GLOBALS['tsvd_halter_suppress'] = true;
-	if ( 'request' === $action ) {
-		$text = isset( $_POST['owner_request'] ) ? sanitize_textarea_field( wp_unslash( $_POST['owner_request'] ) ) : '';
-		if ( '' !== trim( $text ) ) {
-			tsvd_halter_log( tsvd_halter_conversation_id( $animal_id ), 'in', __( 'Änderungswunsch über „Mein Tier“:', 'tsv-tools' ) . "\n" . $text, 'halter' );
-		}
-	} elseif ( isset( tsvd_owner_actions( tsvd_halter_case( $animal_id ) )[ $action ] ) ) {
+	if ( '' !== $text ) {
+		tsvd_halter_log( tsvd_halter_conversation_id( $animal_id ), 'in', __( 'Änderungswunsch über „Mein Tier“:', 'tsv-tools' ) . "\n" . $text, 'halter' );
+	}
+	if ( isset( tsvd_owner_actions( tsvd_halter_case( $animal_id ) )[ $action ] ) ) {
 		tsvd_owner_apply_action( $animal_id, $action );
 	}
-	wp_safe_redirect( add_query_arg( array( 't' => $token, 'done' => $action ), home_url( '/mein-tier/' ) ) );
+	wp_safe_redirect( add_query_arg( array( 't' => $token, 'done' => 1 ), home_url( '/mein-tier/' ) ) );
 	exit;
 }
 
@@ -100,9 +99,8 @@ function tsvd_owner_page_render( $animal_id, $token ) {
 		return;
 	}
 	tsvd_owner_page_summary( $animal_id );
-	tsvd_owner_page_done_notice( $animal_id );
-	tsvd_owner_page_actions( $animal_id, $token );
-	tsvd_owner_page_request_form( $token );
+	tsvd_owner_page_done_notice();
+	tsvd_owner_page_form( $animal_id, $token );
 	echo '</div>';
 	get_footer();
 }
@@ -120,36 +118,51 @@ function tsvd_owner_page_summary( $animal_id ) {
 	echo '</div></div>';
 }
 
-function tsvd_owner_page_done_notice( $animal_id ) {
-	$done = isset( $_GET['done'] ) ? sanitize_key( $_GET['done'] ) : '';
-	if ( ! isset( tsvd_owner_actions( tsvd_halter_case( $animal_id ) )[ $done ] ) && 'request' !== $done ) {
+function tsvd_owner_page_done_notice() {
+	if ( empty( $_GET['done'] ) ) {
 		return;
 	}
 	echo '<div class="info-box info-box--success" role="status"><div class="info-box__text"><p>' . esc_html__( 'Danke, wir haben Deine Rückmeldung erhalten.', 'tsv-tools' ) . '</p></div></div>';
 }
 
-function tsvd_owner_page_actions( $animal_id, $token ) {
-	$preset = isset( $_GET['a'] ) ? sanitize_key( $_GET['a'] ) : '';
-	echo '<section><h4 class="owner-page__section">' . esc_html__( 'Was möchtest Du uns melden?', 'tsv-tools' ) . '</h4>';
-	echo '<form method="post" class="owner-page__actions">';
-	wp_nonce_field( 'tsvd_owner_' . $token );
-	echo '<input type="hidden" name="t" value="' . esc_attr( $token ) . '" />';
-	foreach ( tsvd_owner_actions( tsvd_halter_case( $animal_id ) ) as $key => $label ) {
-		$class = $key === $preset ? 'button' : 'button button-tertiary';
-		echo '<button type="submit" name="owner_action" value="' . esc_attr( $key ) . '" class="' . esc_attr( $class ) . '">' . esc_html( $label ) . '</button>';
-	}
-	echo '</form></section>';
+function tsvd_owner_page_current_action( $animal_id ) {
+	$map = array(
+		'for_adoption'     => 'active',
+		'not_for_adoption' => 'paused',
+		'adopted'          => 'adopted',
+		'missing'          => 'still_missing',
+		'found'            => 'still_missing',
+		'reunited'         => 'reunited',
+	);
+	$key    = 'missing' === tsvd_halter_case( $animal_id ) ? 'animal_missing_status' : 'animal_adoption_status';
+	$status = (string) get_post_meta( $animal_id, $key, true );
+	return isset( $map[ $status ] ) ? $map[ $status ] : '';
 }
 
-function tsvd_owner_page_request_form( $token ) {
-	echo '<form method="post" class="form owner-page__request">';
+function tsvd_owner_page_preset( $animal_id, $actions ) {
+	$preset = isset( $_GET['a'] ) ? sanitize_key( $_GET['a'] ) : '';
+	return isset( $actions[ $preset ] ) ? $preset : tsvd_owner_page_current_action( $animal_id );
+}
+
+function tsvd_owner_page_form( $animal_id, $token ) {
+	echo '<form method="post" class="form owner-page__form">';
 	wp_nonce_field( 'tsvd_owner_' . $token );
 	echo '<input type="hidden" name="t" value="' . esc_attr( $token ) . '" />';
-	echo '<input type="hidden" name="owner_action" value="request" />';
-	echo '<h4 class="owner-page__section">' . esc_html__( 'Etwas an der Anzeige ändern?', 'tsv-tools' ) . '</h4>';
+	tsvd_owner_page_status_field( $animal_id );
 	echo '<div class="form-field form-field-textarea"><div class="form-field-input-wrapper">';
-	echo '<label for="owner-request">' . esc_html__( 'Schreib uns, was angepasst werden soll.', 'tsv-tools' ) . '</label>';
-	echo '<textarea id="owner-request" name="owner_request" rows="4" required></textarea></div></div>';
-	echo '<div class="form-submit"><div class="form-submit-action"><button type="submit" class="button">' . esc_html__( 'Änderungswunsch senden', 'tsv-tools' ) . '</button></div></div>';
+	echo '<label for="owner-request">' . esc_html__( 'Möchtest Du etwas an der Anzeige ändern? (optional)', 'tsv-tools' ) . '</label>';
+	echo '<textarea id="owner-request" name="owner_request" rows="4"></textarea></div></div>';
+	echo '<div class="form-submit"><div class="form-submit-action"><button type="submit" class="button">' . esc_html__( 'Rückmeldung senden', 'tsv-tools' ) . '</button></div></div>';
 	echo '</form>';
+}
+
+function tsvd_owner_page_status_field( $animal_id ) {
+	$actions = tsvd_owner_actions( tsvd_halter_case( $animal_id ) );
+	$checked = tsvd_owner_page_preset( $animal_id, $actions );
+	echo '<div class="form-field form-field-radio"><fieldset class="form-radio-group">';
+	echo '<legend>' . esc_html__( 'Wie ist der Stand?', 'tsv-tools' ) . '</legend>';
+	foreach ( $actions as $key => $label ) {
+		echo '<label class="form-radio-label"><input type="radio" name="owner_action" value="' . esc_attr( $key ) . '"' . checked( $checked, $key, false ) . ' /> ' . esc_html( $label ) . '</label>';
+	}
+	echo '</fieldset></div>';
 }
