@@ -41,6 +41,7 @@ function tsvd_anfragen_imap_save_settings() {
     update_option('tsvd_anfragen_imap_port', absint($_POST['tsvd_anfragen_imap_port'] ?? 993));
     update_option('tsvd_anfragen_imap_username', sanitize_text_field($_POST['tsvd_anfragen_imap_username'] ?? ''));
     update_option('tsvd_anfragen_imap_folder', sanitize_text_field($_POST['tsvd_anfragen_imap_folder'] ?? 'INBOX'));
+    update_option('tsvd_anfragen_imap_spam_folder', sanitize_text_field(wp_unslash($_POST['tsvd_anfragen_imap_spam_folder'] ?? '')));
     update_option('tsvd_anfragen_send_delay', absint($_POST['tsvd_anfragen_send_delay'] ?? 120));
     tsvd_anfragen_save_wait_settings();
     tsvd_halter_save_responsible_settings();
@@ -95,6 +96,13 @@ function tsvd_render_anfragen_imap_settings_tab() {
         <tr>
             <th><label for="tsvd_anfragen_imap_folder"><?php esc_html_e('Ordner', 'tsv-tools'); ?></label></th>
             <td><input type="text" id="tsvd_anfragen_imap_folder" name="tsvd_anfragen_imap_folder" value="<?php echo esc_attr($s['folder']); ?>" /></td>
+        </tr>
+        <tr>
+            <th><label for="tsvd_anfragen_imap_spam_folder"><?php esc_html_e('Spam-Ordner', 'tsv-tools'); ?></label></th>
+            <td>
+                <input type="text" id="tsvd_anfragen_imap_spam_folder" name="tsvd_anfragen_imap_spam_folder" value="<?php echo esc_attr(tsvd_anfragen_imap_spam_folder()); ?>" />
+                <p class="description"><?php esc_html_e('Wird stündlich nach Antworten zu Anfragen durchsucht. Treffer erscheinen in der Anfragen-Ansicht zur Freigabe durch einen Admin. Leer = Spam-Ordner nicht durchsuchen. Bei Gmail: [Gmail]/Spam.', 'tsv-tools'); ?></p>
+            </td>
         </tr>
         <tr>
             <th><label for="tsvd_anfragen_send_delay"><?php esc_html_e('Verzögerung Mailversand (Sekunden)', 'tsv-tools'); ?></label></th>

@@ -184,6 +184,8 @@ function tsvd_anfragen_render_page() {
 		echo '<div class="notice notice-success is-dismissible"><p>' . esc_html__( 'Anfrage als Spam markiert.', 'tsvd' ) . '</p></div>';
 	}
 
+	do_action( 'tsvd_anfragen_before_messenger' );
+
 	echo '<div class="tsvd-msgr tsvd-msgr--' . esc_attr( $pos ) . '">';
 	tsvd_anfragen_render_sidebar( $status, $search, $selected, $pos, $breed );
 	echo '<div class="tsvd-msgr__main">';

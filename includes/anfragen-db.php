@@ -16,7 +16,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-const TSVD_ANFRAGEN_DB_VERSION = '6';
+const TSVD_ANFRAGEN_DB_VERSION = '8';
 
 function tsvd_anfragen_table_name() {
 	global $wpdb;
@@ -108,6 +108,8 @@ function tsvd_anfragen_create_tables() {
 	) {$charset_collate};" );
 
 	$wpdb->query( "ALTER TABLE {$replies_table} MODIFY sent_at DATETIME NULL" );
+
+	tsvd_anfragen_create_candidates_table( $charset_collate );
 
 	tsvd_anfragen_migrate_status_values( $table );
 }

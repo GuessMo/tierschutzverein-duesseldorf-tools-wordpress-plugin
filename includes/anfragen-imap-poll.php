@@ -116,54 +116,30 @@ function tsvd_anfragen_imap_poll() {
         return;
     }
 
-    global $wpdb;
-    $table = tsvd_anfragen_table_name();
-
     try {
         $folder = $client->getFolder($s['folder']);
-        $messages = $folder->messages()->whereUnseen()->get();
-
-        foreach ($messages as $message) {
-            $subject = (string) $message->subject->first();
-
-            // Referenz-Token "#<id>" aus dem Betreff der Antwort-Mail
-            // (siehe tsvd_ajax_anfrage_reply()) — ohne erkennbaren Bezug bleibt
-            // die Nachricht ungelesen, für manuelle Sichtung im echten Postfach.
-            if (!preg_match('/#(\d+)/', $subject, $m)) {
-                continue;
-            }
-            $anfrage_id = (int) $m[1];
-
-            $anfrage = $wpdb->get_row($wpdb->prepare("SELECT * FROM {$table} WHERE id = %d", $anfrage_id), ARRAY_A);
-            if (!$anfrage) {
-                continue;
-            }
-
-            // Nur akzeptieren, wenn der Absender zur hinterlegten Anfrage passt —
-            // verhindert, dass eine beliebige Mail mit passender Betreffzeile
-            // fälschlich einer fremden Anfrage zugeordnet wird.
-            $sender_address = $message->from->first();
-            $sender = $sender_address ? strtolower((string) $sender_address->mail) : '';
-            if ($sender === '' || strtolower((string) $anfrage['applicant_email']) !== $sender) {
-                continue;
-            }
-
-            $body = trim((string) $message->getTextBody());
-            if ($body === '') {
-                $body = trim(wp_strip_all_tags((string) $message->getHTMLBody()));
-            }
-            $body = tsvd_anfragen_imap_strip_quote($body);
-            if ($body === '') {
-                $body = __('(Leerer Antworttext, siehe Original-Mail im Postfach)', 'tsv-tools');
-            }
-
-            tsvd_anfragen_receive($anfrage, '', $body);
-
-            $message->setFlag('Seen');
+        foreach ($folder->messages()->whereUnseen()->get() as $message) {
+            tsvd_anfragen_imap_handle_inbox_mail($message, $folder->path);
         }
+        tsvd_anfragen_imap_collect_spam($client);
+        tsvd_anfragen_candidates_purge_decided();
 
         $client->disconnect();
     } catch (\Throwable $e) {
         error_log('TSVD Anfragen IMAP poll error: ' . $e->getMessage());
     }
+}
+
+function tsvd_anfragen_imap_handle_inbox_mail($message, $folder_path) {
+    $match = tsvd_anfragen_match_mail($message);
+    if (!$match['anfrage']) {
+        return;
+    }
+    if (!$match['is_exact']) {
+        $candidate = tsvd_anfragen_candidate_from_mail($message, $match['anfrage'], $folder_path);
+        tsvd_anfragen_candidate_insert($candidate);
+        return;
+    }
+    tsvd_anfragen_receive($match['anfrage'], '', tsvd_anfragen_mail_body($message));
+    $message->setFlag('Seen');
 }
