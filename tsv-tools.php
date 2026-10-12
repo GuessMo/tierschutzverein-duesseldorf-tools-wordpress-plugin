@@ -80,6 +80,7 @@ require_once TSVD_TOOLS_DIR . 'includes/newsletter-sent-log.php';
 require_once TSVD_TOOLS_DIR . 'includes/newsletter-block-rte.php';
 require_once TSVD_TOOLS_DIR . 'includes/newsletter-block-image.php';
 require_once TSVD_TOOLS_DIR . 'includes/newsletter-block-updates.php';
+require_once TSVD_TOOLS_DIR . 'includes/newsletter-block-academy.php';
 require_once TSVD_TOOLS_DIR . 'includes/newsletter-render.php';
 require_once TSVD_TOOLS_DIR . 'includes/newsletter-editor.php';
 require_once TSVD_TOOLS_DIR . 'includes/newsletter-send.php';

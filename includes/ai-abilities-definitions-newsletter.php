@@ -8,7 +8,7 @@ function tsvd_tools_ai_get_ability_definitions_newsletter() {
 	return array(
 		'tsv-tools/create-newsletter' => array(
 			'label'               => __( 'Newsletter anlegen', 'tsv-tools' ),
-			'description'         => __( 'Legt einen Newsletter (tsvd_newsletter) als Entwurf an, mit Bloecken. Blocktypen: rte (data.html), image (data.id, data.alt), website-updates (dynamisch, data leer).', 'tsv-tools' ),
+			'description'         => __( 'Legt einen Newsletter (tsvd_newsletter) als Entwurf an, mit Bloecken. Blocktypen: rte (data.html), image (data.id, data.alt), website-updates und academy-updates (dynamisch, data leer).', 'tsv-tools' ),
 			'category'            => 'tsv-tools-animals',
 			'input_schema'        => array(
 				'type'                 => 'object',
@@ -16,7 +16,7 @@ function tsvd_tools_ai_get_ability_definitions_newsletter() {
 					'title'  => array( 'type' => 'string', 'description' => 'Betreff/Titel des Newsletters.' ),
 					'blocks' => array(
 						'type'        => 'array',
-						'description' => 'Geordnete Bloecke, je {type, data}. type: rte|image|website-updates.',
+						'description' => 'Geordnete Bloecke, je {type, data}. type: rte|image|website-updates|academy-updates.',
 						'items'       => array( 'type' => 'object' ),
 					),
 				),
