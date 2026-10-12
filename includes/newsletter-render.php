@@ -23,9 +23,12 @@ function tsvd_newsletter_email_document( $subject, $inner_html ) {
 		$logo_html = '<img src="' . esc_url( $logo_url ) . '" alt="' . esc_attr( $site )
 			. '" style="max-height:72px;width:auto;display:inline-block;">';
 	} else {
-		$logo_html = '<img src="' . esc_url( TSVD_TOOLS_URL . 'assets/newsletter-logo.png' )
+		$logo_html = '<img class="tsvd-mail-logo-light" src="' . esc_url( TSVD_TOOLS_URL . 'assets/newsletter-logo.png' )
 			. '" alt="' . esc_attr( $site )
-			. '" width="72" height="72" style="width:72px;height:72px;max-width:72px;display:inline-block;">';
+			. '" width="72" height="72" style="width:72px;height:72px;max-width:72px;display:inline-block;">'
+			. '<img class="tsvd-mail-logo-dark" src="' . esc_url( TSVD_TOOLS_URL . 'assets/newsletter-logo-dark.png' )
+			. '" alt="' . esc_attr( $site )
+			. '" width="72" height="72" style="display:none;width:0;height:0;max-height:0;overflow:hidden;mso-hide:all;">';
 	}
 
 	$head  = '<!DOCTYPE html><html lang="de" xmlns="http://www.w3.org/1999/xhtml">';
@@ -41,6 +44,9 @@ function tsvd_newsletter_email_document( $subject, $inner_html ) {
 		. '.tsvd-mail-content,.tsvd-mail-content *{color:#e3e5e8 !important;}'
 		. '.tsvd-mail-content a{color:#8aa8ff !important;}'
 		. '.tsvd-mail-footer{color:#9a9ea6 !important;}'
+		. '.tsvd-mail-logo-light{display:none !important;}'
+		. '.tsvd-mail-logo-dark{display:inline-block !important;width:72px !important;'
+		. 'height:72px !important;max-height:72px !important;}'
 		. '}</style>';
 	$head .= '</head>';
 
