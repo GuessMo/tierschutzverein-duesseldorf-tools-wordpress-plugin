@@ -1,0 +1,240 @@
+{
+  "intro": {
+    "title": "Warum eine neue Website?",
+    "lead": "Die Website des Vereins ist von Grund auf neu aufgebaut. Hier steht kurz, warum. Weiter unten kannst Du Dich durch alle Bausteine klicken und sehen, wie sie zusammenspielen.",
+    "cards": [
+      {
+        "tone": "old",
+        "icon": "warning",
+        "title": "Bisher",
+        "points": [
+          "Die alte Website hat eine Agentur mit eigener, nicht offener Software gebaut.",
+          "Sie läuft auf PHP 5.6. Für diese Version gibt es seit dem 31.12.2018 keine Sicherheitsupdates mehr.",
+          "Sie lässt sich nicht aktualisieren. Jede Änderung hängt an der Agentur.",
+          "Neu entdeckte Sicherheitslücken werden dort nicht mehr geschlossen."
+        ]
+      },
+      {
+        "tone": "new",
+        "icon": "yes-alt",
+        "title": "Jetzt",
+        "points": [
+          "WordPress ist freie Software, weit verbreitet und bekommt regelmäßig Sicherheitsupdates.",
+          "Die Website läuft auf einer gepflegten PHP-Version (aktuell {php}). Ein Wechsel auf eine neuere Version ist ein Routine-Update.",
+          "Server und Programmcode gehören dem Verein. Es gibt keine Abhängigkeit von einer Agentur.",
+          "Jede Änderung ist dokumentiert und lässt sich zurücknehmen."
+        ]
+      },
+      {
+        "tone": "safe",
+        "icon": "shield",
+        "title": "Was es sicherer macht",
+        "points": [
+          "Cloudflare filtert Angriffe heraus, bevor sie unseren Server erreichen.",
+          "Alle Seiten laufen verschlüsselt (HTTPS, das Schloss im Browser).",
+          "Die Programme auf dem Server laufen getrennt voneinander in eigenen Containern.",
+          "Anmeldung mit dem Google-Vereinskonto. Rollen legen fest, wer was darf.",
+          "Zugangsdaten liegen im Passwortmanager statt in Mails oder Tabellen."
+        ]
+      }
+    ],
+    "standards": {
+      "title": "Offene Web-Standards",
+      "text": "Die neue Website baut auf offenen, frei dokumentierten Standards auf. Jede Webentwicklerin und jeder Webentwickler kann daran weiterarbeiten. Der Verein ist an keine Firma gebunden.",
+      "items": [
+        "HTML, CSS und JavaScript für alles, was im Browser zu sehen ist",
+        "PHP und MariaDB für WordPress und die Inhalte",
+        "DNS und HTTPS für Adressen und Verschlüsselung",
+        "Docker für den Betrieb auf dem Server",
+        "Inhalte lassen sich jederzeit exportieren: über den WordPress-Export oder die offene Schnittstelle (REST-API)"
+      ]
+    }
+  },
+  "map": {
+    "title": "So hängt alles zusammen",
+    "hint": "Klicke auf einen Baustein. Darunter erscheint, was er macht, wofür wir ihn brauchen, wo er verwaltet wird und was passiert, wenn er ausfällt."
+  },
+  "questions": {
+    "what": "Was ist das?",
+    "why": "Wofür brauchen wir es?",
+    "where": "Wo wird es verwaltet?",
+    "outage": "Was merkt man, wenn es ausfällt?"
+  },
+  "zones": [
+    { "id": "internet", "title": "Im Internet", "nodes": ["visitor", "cloudflare"] },
+    { "id": "server", "title": "Unser Server bei Hetzner", "nodes": ["server", "proxy", "wordpress", "database", "route301", "vaultwarden"] },
+    { "id": "services", "title": "Dienste anderer Anbieter", "nodes": ["google", "allinkl", "github"] }
+  ],
+  "nodes": {
+    "visitor": {
+      "icon": "admin-users",
+      "title": "Besucherinnen und Besucher",
+      "short": "Menschen, die die Website öffnen",
+      "what": "Alle, die tierschutzverein-duesseldorf.de aufrufen: am Handy, am Tablet oder am Computer.",
+      "why": "Für sie ist die Website da. Sie finden Tiere, nehmen Kontakt auf, spenden und informieren sich.",
+      "where": "Hier gibt es nichts zu verwalten. Wie viele Menschen kommen und was sie lesen, zeigt Skylark im Dashboard.",
+      "outage": "Kommt niemand an, liegt der Fehler bei einer der Stationen dahinter."
+    },
+    "cloudflare": {
+      "icon": "cloud",
+      "title": "Cloudflare",
+      "short": "Adressbuch und Schutzschild",
+      "what": "Cloudflare verwaltet die Adressen tierschutzverein-duesseldorf.de und tierschutzverein-duesseldorf.info. Wer die Adresse eintippt, erfährt von Cloudflare, wo die Website liegt. Jeder Besuch läuft zuerst durch Cloudflare.",
+      "why": "Cloudflare filtert Angriffe und lästige Programme heraus, bevor sie unseren Server erreichen. Außerdem sorgt es für die verschlüsselte Verbindung.",
+      "where": "Im Cloudflare-Konto. Dort werden auch die Adress-Einträge (DNS) gepflegt.",
+      "outage": "Die Website ist nicht erreichbar oder zeigt eine Fehlerseite von Cloudflare."
+    },
+    "server": {
+      "icon": "building",
+      "title": "Hetzner-Server",
+      "short": "Der Rechner, auf dem alles läuft",
+      "what": "Ein gemieteter Server beim Anbieter Hetzner. Darauf laufen mehrere Programme getrennt voneinander in eigenen Containern (Docker), wie Wohnungen in einem Haus.",
+      "why": "Ein eigener Server gibt dem Verein volle Kontrolle über Updates, Sicherheit und Daten.",
+      "where": "Admins verwalten ihn über eine verschlüsselte Fernverbindung (SSH). Eine Übersicht der Container zeigt das Programm Arcane.",
+      "outage": "Alles, was hier läuft, fällt gleichzeitig aus: Website, Weiterleitungen und Passwortmanager."
+    },
+    "proxy": {
+      "icon": "randomize",
+      "title": "Pförtner",
+      "short": "Leitet jede Anfrage weiter",
+      "what": "Der Nginx Proxy Manager nimmt alle Anfragen an den Server entgegen. Er schaut, welche Adresse gefragt ist, und reicht sie an das passende Programm weiter.",
+      "why": "So laufen mehrere Dienste auf einem Server, sauber getrennt und jeweils unter ihrer eigenen Adresse.",
+      "where": "Auf dem Server, nur für Admins.",
+      "outage": "Keine der Adressen auf dem Server antwortet."
+    },
+    "wordpress": {
+      "icon": "wordpress",
+      "title": "WordPress",
+      "short": "Website und Redaktionssystem",
+      "what": "WordPress baut die Seiten, die Besucher sehen. Es ist auch das Dashboard, in dem ihr Tiere, Beiträge, Projekte und Newsletter pflegt. Das Aussehen kommt aus unserem eigenen Theme, Zusatzfunktionen kommen aus eigenen Plugins.",
+      "why": "WordPress ist freie Software (Open Source). Sicherheitsupdates kommen regelmäßig, viele Fachleute kennen es, und der Verein ist an keine Agentur gebunden.",
+      "where": "Im Dashboard. Was gerade installiert ist, steht unten im Abschnitt „So ist WordPress aufgebaut“.",
+      "outage": "Die Website zeigt eine Fehlermeldung, das Dashboard ist nicht erreichbar."
+    },
+    "database": {
+      "icon": "database",
+      "title": "Datenbank",
+      "short": "Das Gedächtnis der Website",
+      "what": "In der Datenbank (MariaDB) liegen alle Inhalte als Daten: Texte, Tiere, Einstellungen, Benutzerkonten und Anfragen. Bilder liegen als Dateien auf dem Server.",
+      "why": "WordPress holt sich bei jedem Seitenaufruf die passenden Inhalte von hier.",
+      "where": "Direkter Zugriff ist nicht nötig. Alles läuft über das Dashboard.",
+      "outage": "WordPress zeigt eine Fehlermeldung zur Datenbank-Verbindung statt der Seite."
+    },
+    "route301": {
+      "icon": "redo",
+      "title": "Route301",
+      "short": "Leitet alte Adressen um",
+      "what": "Die alte Website hatte andere Adressen, zum Beispiel tierheim-duesseldorf.de/de/jagd. Route301 kennt für alte Adressen die passende neue Seite und schickt Besucher und Suchmaschinen automatisch dorthin.",
+      "why": "Alte Links, Lesezeichen und Google-Treffer führen weiter ans Ziel statt auf eine Fehlerseite. Die Zahl 301 bedeutet „dauerhaft umgezogen“. So übernimmt Google die Bekanntheit der alten Seiten.",
+      "where": "In der eigenen Oberfläche unter route301.tierschutzverein-duesseldorf.info und im Dashboard unter TSV Tools → Redirects. Aktiv wird Route301 erst, wenn die alte Adresse tierheim-duesseldorf.de auf unseren Server umgestellt ist. Bis dahin läuft die alte Seite unverändert weiter.",
+      "outage": "Alte Links landen auf einer Fehlerseite statt auf der neuen Seite."
+    },
+    "vaultwarden": {
+      "icon": "lock",
+      "title": "Passwortmanager",
+      "short": "Tresor für Zugangsdaten",
+      "what": "Vaultwarden ist ein eigener Passwortmanager, der mit den Bitwarden-Apps funktioniert. Zugangsdaten liegen dort verschlüsselt und lassen sich gezielt mit einzelnen Personen teilen.",
+      "why": "Passwörter gehören nicht in Mails, auf Zettel oder in Tabellen.",
+      "where": "In den Bitwarden-Apps oder im Browser, mit eigenem Konto.",
+      "outage": "Gespeicherte Zugänge lassen sich vorübergehend nicht abrufen."
+    },
+    "google": {
+      "icon": "google",
+      "title": "Google Workspace",
+      "short": "Konten, Anmeldung, Mail-Versand",
+      "what": "Eure Vereinskonten mit Gmail, Kalender und Drive. Mit diesem Konto meldet ihr euch auch im Dashboard an. Formulare der Website verschicken ihre Mails über Google.",
+      "why": "Ein Konto für Mail, Kalender und die Anmeldung im Dashboard.",
+      "where": "In der Google-Admin-Konsole, nur für Admins.",
+      "outage": "Die Anmeldung mit Google und der Mail-Versand der Formulare funktionieren nicht."
+    },
+    "allinkl": {
+      "icon": "email-alt",
+      "title": "All-Inkl",
+      "short": "Alte Website und Mail-Eingang",
+      "what": "Beim Anbieter All-Inkl liegen die alte Website tierheim-duesseldorf.de und ihr Redaktionssystem. Außerdem kommen dort alle E-Mails an, die an eine Adresse @tierschutzverein-duesseldorf.de geschickt werden.",
+      "why": "Bis zur Umstellung bleibt die alte Seite hier erreichbar. Postfächer und Weiterleitungen für eingehende Mail werden hier eingerichtet.",
+      "where": "Im Kundenmenü von All-Inkl (KAS).",
+      "outage": "Eingehende E-Mails kommen nicht an, die alte Website ist nicht erreichbar."
+    },
+    "github": {
+      "icon": "editor-code",
+      "title": "GitHub",
+      "short": "Bauplan und Veröffentlichung",
+      "what": "Der Programmcode von Theme und Plugins liegt bei GitHub, mit der vollständigen Geschichte aller Änderungen. Jede freigegebene Änderung wird dort automatisch gebaut und auf den Server übertragen.",
+      "why": "Jede Änderung ist nachvollziehbar und lässt sich zurücknehmen. Niemand muss Dateien von Hand hochladen.",
+      "where": "Im GitHub-Konto, nur für die Entwicklung.",
+      "outage": "Die laufende Website ist nicht betroffen. Nur neue Änderungen können vorübergehend nicht veröffentlicht werden."
+    }
+  },
+  "paths": {
+    "title": "Schritt für Schritt",
+    "hint": "Wähle einen Weg und gehe ihn mit „Weiter“ durch. Der jeweilige Baustein wird im Schaubild oben markiert.",
+    "previous": "Zurück",
+    "next": "Weiter",
+    "step": "Schritt %1$d von %2$d",
+    "items": [
+      {
+        "id": "visit",
+        "title": "Jemand öffnet die Website",
+        "steps": [
+          { "node": "visitor", "text": "Jemand tippt tierschutzverein-duesseldorf.de ein oder klickt einen Link." },
+          { "node": "cloudflare", "text": "Cloudflare verrät dem Browser, wo die Website liegt, und prüft die Anfrage auf Angriffe." },
+          { "node": "server", "text": "Die Anfrage erreicht unseren Server bei Hetzner." },
+          { "node": "proxy", "text": "Der Pförtner erkennt die Adresse und reicht die Anfrage an WordPress weiter." },
+          { "node": "wordpress", "text": "WordPress baut die gewünschte Seite zusammen." },
+          { "node": "database", "text": "Die Inhalte dafür holt WordPress aus der Datenbank." },
+          { "node": "visitor", "text": "Die fertige Seite geht verschlüsselt zurück und erscheint im Browser." }
+        ]
+      },
+      {
+        "id": "redirect",
+        "title": "Jemand ruft eine alte Adresse auf",
+        "steps": [
+          { "node": "visitor", "text": "Jemand klickt einen alten Link, zum Beispiel tierheim-duesseldorf.de/de/jagd." },
+          { "node": "allinkl", "text": "Heute zeigt die alte Adresse noch auf All-Inkl. Dort antwortet die alte Website." },
+          { "node": "route301", "text": "Nach der Umstellung zeigt die alte Adresse auf unseren Server. Route301 findet die neue Seite und antwortet: dauerhaft umgezogen (301)." },
+          { "node": "wordpress", "text": "Der Browser öffnet automatisch die neue Seite, hier /projekte/jagd-im-visier/." }
+        ]
+      },
+      {
+        "id": "mail",
+        "title": "E-Mails und Kontaktformulare",
+        "steps": [
+          { "node": "visitor", "text": "Jemand schreibt eine E-Mail an eine Adresse @tierschutzverein-duesseldorf.de." },
+          { "node": "allinkl", "text": "Die Mail kommt zuerst bei All-Inkl an. Dort liegt sie im Postfach oder wird weitergeleitet." },
+          { "node": "google", "text": "Ist eine Weiterleitung eingerichtet, landet die Mail im Google-Postfach." },
+          { "node": "wordpress", "text": "Schickt jemand ein Formular auf der Website ab, speichert WordPress die Anfrage." },
+          { "node": "google", "text": "Die Benachrichtigung dazu verschickt WordPress über Google." }
+        ]
+      },
+      {
+        "id": "release",
+        "title": "Eine Änderung geht live",
+        "steps": [
+          { "node": "github", "text": "Die Entwicklung speichert eine Änderung bei GitHub." },
+          { "node": "github", "text": "Nach der Freigabe baut GitHub automatisch eine neue Version." },
+          { "node": "server", "text": "Die neue Version wird automatisch auf den Server übertragen." },
+          { "node": "wordpress", "text": "WordPress nutzt ab sofort die neue Version." },
+          { "node": "cloudflare", "text": "Eine automatische Kontrolle prüft, ob die Website danach antwortet." }
+        ]
+      }
+    ]
+  },
+  "wordpress": {
+    "title": "So ist WordPress aufgebaut",
+    "lead": "Diese Angaben liest die Seite direkt aus der laufenden Installation. Sie sind also immer aktuell.",
+    "versions": "Versionen",
+    "theme": "Theme (Aussehen)",
+    "plugins": "Aktive Plugins (Zusatzfunktionen)",
+    "public_types": "Inhalte, die Besucher sehen",
+    "internal_types": "Interne Inhalte (nur im Dashboard)",
+    "roles": "Rollen (wer was darf)",
+    "plugin_texts": {
+      "TSV Tools": "Werkzeugkasten des Vereins: Anfragen-Verwaltung, Academy, Newsletter, Weiterleitungen und Anmeldung mit Google.",
+      "TSVD Mailer": "Verschickt die E-Mails der Website über Google und zeigt eine Versandstatistik.",
+      "Skylark Analytics": "Eigene Besucherstatistik. Die Daten bleiben auf unserem Server.",
+      "Klaro Consent Wordpress Plugin": "Der Cookie-Hinweis: Besucher entscheiden, welchen Diensten sie zustimmen.",
+      "TSV Wartungsmodus & Redirect-Tester": "Zeigt vor dem Start eine Wartungsseite und testet Weiterleitungen."
+    }
+  }
+}
