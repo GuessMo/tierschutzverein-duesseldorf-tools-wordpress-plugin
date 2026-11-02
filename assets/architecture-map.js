@@ -34,6 +34,10 @@
 			step.classList.toggle('is-done', position < index);
 			step.toggleAttribute('aria-current', position === index);
 		});
+		path.querySelectorAll('.tsvd-am-path__dot').forEach((dot, position) => {
+			dot.classList.toggle('is-current', position === index);
+			dot.classList.toggle('is-done', position < index);
+		});
 		path.dataset.index = String(index);
 		updateNav(root, path, index, steps.length);
 		if (shouldSelect) {

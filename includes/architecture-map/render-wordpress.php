@@ -30,7 +30,8 @@ function tsvd_architecture_map_render_wordpress( array $texts ) {
 	return tsvd_architecture_map_section(
 		$texts['title'],
 		$texts['lead'],
-		'<div class="tsvd-am-wp">' . $groups . '</div>',
+		'<details class="tsvd-am-more"><summary class="tsvd-am-more__toggle">' . esc_html( $texts['toggle'] )
+			. '</summary><div class="tsvd-am-wp">' . $groups . '</div></details>',
 		'tsvd-am-wordpress'
 	);
 }

@@ -1,17 +1,16 @@
 {
   "intro": {
     "title": "Warum eine neue Website?",
-    "lead": "Die Website des Vereins ist von Grund auf neu aufgebaut. Hier steht kurz, warum. Weiter unten kannst Du Dich durch alle Bausteine klicken und sehen, wie sie zusammenspielen.",
-    "cards": [
+    "lead": "Die Website des Vereins ist komplett neu aufgebaut: sicherer, unabhängig von einer Agentur und auf offenen Standards. Weiter unten kannst Du Dich durch alle Bausteine klicken.",
+    "compare": [
       {
         "tone": "old",
         "icon": "warning",
         "title": "Bisher",
         "points": [
-          "Die alte Website hat eine Agentur mit eigener, nicht offener Software gebaut.",
-          "Sie läuft auf PHP 5.6. Für diese Version gibt es seit dem 31.12.2018 keine Sicherheitsupdates mehr.",
-          "Sie lässt sich nicht aktualisieren. Jede Änderung hängt an der Agentur.",
-          "Neu entdeckte Sicherheitslücken werden dort nicht mehr geschlossen."
+          "Software einer Agentur, nicht offen",
+          "PHP 5.6: keine Sicherheitsupdates seit dem 31.12.2018",
+          "Nicht aktualisierbar, jede Änderung läuft über die Agentur"
         ]
       },
       {
@@ -19,34 +18,50 @@
         "icon": "yes-alt",
         "title": "Jetzt",
         "points": [
-          "WordPress ist freie Software, weit verbreitet und bekommt regelmäßig Sicherheitsupdates.",
-          "Die Website läuft auf einer gepflegten PHP-Version (aktuell {php}). Ein Wechsel auf eine neuere Version ist ein Routine-Update.",
-          "Server und Programmcode gehören dem Verein. Es gibt keine Abhängigkeit von einer Agentur.",
-          "Jede Änderung ist dokumentiert und lässt sich zurücknehmen."
-        ]
-      },
-      {
-        "tone": "safe",
-        "icon": "shield",
-        "title": "Was es sicherer macht",
-        "points": [
-          "Cloudflare filtert Angriffe heraus, bevor sie unseren Server erreichen.",
-          "Alle Seiten laufen verschlüsselt (HTTPS, das Schloss im Browser).",
-          "Die Programme auf dem Server laufen getrennt voneinander in eigenen Containern.",
-          "Anmeldung mit dem Google-Vereinskonto. Rollen legen fest, wer was darf.",
-          "Zugangsdaten liegen im Passwortmanager statt in Mails oder Tabellen."
+          "WordPress: freie Software mit regelmäßigen Sicherheitsupdates",
+          "Gepflegte PHP-Version (aktuell {php}), Updates sind Routine",
+          "Server und Programmcode gehören dem Verein"
         ]
       }
     ],
+    "safety": {
+      "title": "Was es sicherer macht",
+      "items": [
+        {
+          "icon": "shield",
+          "title": "Schutzschild",
+          "text": "Cloudflare filtert Angriffe, bevor sie unseren Server erreichen."
+        },
+        {
+          "icon": "lock",
+          "title": "Verschlüsselt",
+          "text": "Alle Seiten laufen über HTTPS, das Schloss im Browser."
+        },
+        {
+          "icon": "grid-view",
+          "title": "Getrennt",
+          "text": "Jedes Programm läuft in einem eigenen Container."
+        },
+        {
+          "icon": "admin-users",
+          "title": "Klare Rollen",
+          "text": "Anmeldung mit dem Vereinskonto, Rollen regeln, wer was darf."
+        }
+      ]
+    },
     "standards": {
       "title": "Offene Web-Standards",
-      "text": "Die neue Website baut auf offenen, frei dokumentierten Standards auf. Jede Webentwicklerin und jeder Webentwickler kann daran weiterarbeiten. Der Verein ist an keine Firma gebunden.",
-      "items": [
-        "HTML, CSS und JavaScript für alles, was im Browser zu sehen ist",
-        "PHP und MariaDB für WordPress und die Inhalte",
-        "DNS und HTTPS für Adressen und Verschlüsselung",
-        "Docker für den Betrieb auf dem Server",
-        "Inhalte lassen sich jederzeit exportieren: über den WordPress-Export oder die offene Schnittstelle (REST-API)"
+      "text": "Alles baut auf frei dokumentierten Standards auf. Jede Webentwicklerin und jeder Webentwickler kann daran weiterarbeiten, und die Inhalte lassen sich jederzeit exportieren.",
+      "chips": [
+        "HTML",
+        "CSS",
+        "JavaScript",
+        "PHP",
+        "MariaDB",
+        "DNS",
+        "HTTPS",
+        "Docker",
+        "REST-API"
       ]
     }
   },
@@ -61,9 +76,35 @@
     "outage": "Was merkt man, wenn es ausfällt?"
   },
   "zones": [
-    { "id": "internet", "title": "Im Internet", "nodes": ["visitor", "cloudflare"] },
-    { "id": "server", "title": "Unser Server bei Hetzner", "nodes": ["server", "proxy", "wordpress", "database", "route301", "vaultwarden"] },
-    { "id": "services", "title": "Dienste anderer Anbieter", "nodes": ["google", "allinkl", "github"] }
+    {
+      "id": "internet",
+      "title": "Im Internet",
+      "nodes": [
+        "visitor",
+        "cloudflare"
+      ]
+    },
+    {
+      "id": "server",
+      "title": "Unser Server bei Hetzner",
+      "nodes": [
+        "server",
+        "proxy",
+        "wordpress",
+        "database",
+        "route301",
+        "vaultwarden"
+      ]
+    },
+    {
+      "id": "services",
+      "title": "Dienste anderer Anbieter",
+      "nodes": [
+        "google",
+        "allinkl",
+        "github"
+      ]
+    }
   ],
   "nodes": {
     "visitor": {
@@ -177,45 +218,108 @@
         "id": "visit",
         "title": "Jemand öffnet die Website",
         "steps": [
-          { "node": "visitor", "text": "Jemand tippt tierschutzverein-duesseldorf.de ein oder klickt einen Link." },
-          { "node": "cloudflare", "text": "Cloudflare verrät dem Browser, wo die Website liegt, und prüft die Anfrage auf Angriffe." },
-          { "node": "server", "text": "Die Anfrage erreicht unseren Server bei Hetzner." },
-          { "node": "proxy", "text": "Der Pförtner erkennt die Adresse und reicht die Anfrage an WordPress weiter." },
-          { "node": "wordpress", "text": "WordPress baut die gewünschte Seite zusammen." },
-          { "node": "database", "text": "Die Inhalte dafür holt WordPress aus der Datenbank." },
-          { "node": "visitor", "text": "Die fertige Seite geht verschlüsselt zurück und erscheint im Browser." }
+          {
+            "node": "visitor",
+            "text": "Jemand tippt tierschutzverein-duesseldorf.de ein oder klickt einen Link."
+          },
+          {
+            "node": "cloudflare",
+            "text": "Cloudflare verrät dem Browser, wo die Website liegt, und prüft die Anfrage auf Angriffe."
+          },
+          {
+            "node": "server",
+            "text": "Die Anfrage erreicht unseren Server bei Hetzner."
+          },
+          {
+            "node": "proxy",
+            "text": "Der Pförtner erkennt die Adresse und reicht die Anfrage an WordPress weiter."
+          },
+          {
+            "node": "wordpress",
+            "text": "WordPress baut die gewünschte Seite zusammen."
+          },
+          {
+            "node": "database",
+            "text": "Die Inhalte dafür holt WordPress aus der Datenbank."
+          },
+          {
+            "node": "visitor",
+            "text": "Die fertige Seite geht verschlüsselt zurück und erscheint im Browser."
+          }
         ]
       },
       {
         "id": "redirect",
         "title": "Jemand ruft eine alte Adresse auf",
         "steps": [
-          { "node": "visitor", "text": "Jemand klickt einen alten Link, zum Beispiel tierheim-duesseldorf.de/de/jagd." },
-          { "node": "allinkl", "text": "Heute zeigt die alte Adresse noch auf All-Inkl. Dort antwortet die alte Website." },
-          { "node": "route301", "text": "Nach der Umstellung zeigt die alte Adresse auf unseren Server. Route301 findet die neue Seite und antwortet: dauerhaft umgezogen (301)." },
-          { "node": "wordpress", "text": "Der Browser öffnet automatisch die neue Seite, hier /projekte/jagd-im-visier/." }
+          {
+            "node": "visitor",
+            "text": "Jemand klickt einen alten Link, zum Beispiel tierheim-duesseldorf.de/de/jagd."
+          },
+          {
+            "node": "allinkl",
+            "text": "Heute zeigt die alte Adresse noch auf All-Inkl. Dort antwortet die alte Website."
+          },
+          {
+            "node": "route301",
+            "text": "Nach der Umstellung zeigt die alte Adresse auf unseren Server. Route301 findet die neue Seite und antwortet: dauerhaft umgezogen (301)."
+          },
+          {
+            "node": "wordpress",
+            "text": "Der Browser öffnet automatisch die neue Seite, hier /projekte/jagd-im-visier/."
+          }
         ]
       },
       {
         "id": "mail",
         "title": "E-Mails und Kontaktformulare",
         "steps": [
-          { "node": "visitor", "text": "Jemand schreibt eine E-Mail an eine Adresse @tierschutzverein-duesseldorf.de." },
-          { "node": "allinkl", "text": "Die Mail kommt zuerst bei All-Inkl an. Dort liegt sie im Postfach oder wird weitergeleitet." },
-          { "node": "google", "text": "Ist eine Weiterleitung eingerichtet, landet die Mail im Google-Postfach." },
-          { "node": "wordpress", "text": "Schickt jemand ein Formular auf der Website ab, speichert WordPress die Anfrage." },
-          { "node": "google", "text": "Die Benachrichtigung dazu verschickt WordPress über Google." }
+          {
+            "node": "visitor",
+            "text": "Jemand schreibt eine E-Mail an eine Adresse @tierschutzverein-duesseldorf.de."
+          },
+          {
+            "node": "allinkl",
+            "text": "Die Mail kommt zuerst bei All-Inkl an. Dort liegt sie im Postfach oder wird weitergeleitet."
+          },
+          {
+            "node": "google",
+            "text": "Ist eine Weiterleitung eingerichtet, landet die Mail im Google-Postfach."
+          },
+          {
+            "node": "wordpress",
+            "text": "Schickt jemand ein Formular auf der Website ab, speichert WordPress die Anfrage."
+          },
+          {
+            "node": "google",
+            "text": "Die Benachrichtigung dazu verschickt WordPress über Google."
+          }
         ]
       },
       {
         "id": "release",
         "title": "Eine Änderung geht live",
         "steps": [
-          { "node": "github", "text": "Die Entwicklung speichert eine Änderung bei GitHub." },
-          { "node": "github", "text": "Nach der Freigabe baut GitHub automatisch eine neue Version." },
-          { "node": "server", "text": "Die neue Version wird automatisch auf den Server übertragen." },
-          { "node": "wordpress", "text": "WordPress nutzt ab sofort die neue Version." },
-          { "node": "cloudflare", "text": "Eine automatische Kontrolle prüft, ob die Website danach antwortet." }
+          {
+            "node": "github",
+            "text": "Die Entwicklung speichert eine Änderung bei GitHub."
+          },
+          {
+            "node": "github",
+            "text": "Nach der Freigabe baut GitHub automatisch eine neue Version."
+          },
+          {
+            "node": "server",
+            "text": "Die neue Version wird automatisch auf den Server übertragen."
+          },
+          {
+            "node": "wordpress",
+            "text": "WordPress nutzt ab sofort die neue Version."
+          },
+          {
+            "node": "cloudflare",
+            "text": "Eine automatische Kontrolle prüft, ob die Website danach antwortet."
+          }
         ]
       }
     ]
@@ -235,6 +339,7 @@
       "Skylark Analytics": "Eigene Besucherstatistik. Die Daten bleiben auf unserem Server.",
       "Klaro Consent Wordpress Plugin": "Der Cookie-Hinweis: Besucher entscheiden, welchen Diensten sie zustimmen.",
       "TSV Wartungsmodus & Redirect-Tester": "Zeigt vor dem Start eine Wartungsseite und testet Weiterleitungen."
-    }
+    },
+    "toggle": "Technische Details anzeigen"
   }
 }

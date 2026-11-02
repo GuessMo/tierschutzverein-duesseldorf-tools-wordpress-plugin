@@ -5,7 +5,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 const TSVD_ARCHITECTURE_MAP_BLOCK      = 'tsvd/architecture-map';
-const TSVD_ARCHITECTURE_MAP_CAPABILITY = 'manage_options';
+const TSVD_ARCHITECTURE_MAP_CAPABILITY = 'read';
 
 add_action( 'init', 'tsvd_architecture_map_register_block' );
 

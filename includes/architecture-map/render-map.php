@@ -38,10 +38,8 @@ function tsvd_architecture_map_render_node( $node_id, array $node ) {
 	return '<button type="button" class="tsvd-am-node" data-node="' . esc_attr( $node_id ) . '"'
 		. ' aria-controls="tsvd-am-panel-' . esc_attr( $node_id ) . '" aria-expanded="false">'
 		. tsvd_architecture_map_icon( $node['icon'] )
-		. '<span class="tsvd-am-node__text">'
 		. '<span class="tsvd-am-node__title">' . esc_html( $node['title'] ) . '</span>'
-		. '<span class="tsvd-am-node__short">' . esc_html( $node['short'] ) . '</span>'
-		. '</span></button>';
+		. '</button>';
 }
 
 function tsvd_architecture_map_render_panels( array $nodes, array $questions ) {
@@ -62,6 +60,7 @@ function tsvd_architecture_map_render_panel( $node_id, array $node, array $quest
 		. ' data-panel="' . esc_attr( $node_id ) . '">'
 		. '<h3 class="tsvd-am-panel__title">' . tsvd_architecture_map_icon( $node['icon'] )
 		. esc_html( $node['title'] ) . '</h3>'
+		. '<p class="tsvd-am-panel__short">' . esc_html( $node['short'] ) . '</p>'
 		. '<dl class="tsvd-am-panel__facts">' . $facts . '</dl>'
 		. '</section>';
 }

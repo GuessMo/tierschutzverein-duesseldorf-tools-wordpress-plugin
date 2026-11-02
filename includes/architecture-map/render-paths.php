@@ -20,21 +20,26 @@ function tsvd_architecture_map_render_paths( array $paths, array $nodes ) {
 
 function tsvd_architecture_map_render_path( array $path, array $paths, array $nodes ) {
 	$steps = '';
+	$dots  = '';
 	foreach ( $path['steps'] as $step ) {
+		$node   = $nodes[ $step['node'] ];
 		$steps .= '<li class="tsvd-am-step" data-node="' . esc_attr( $step['node'] ) . '">'
-			. '<span class="tsvd-am-step__node">' . esc_html( $nodes[ $step['node'] ]['title'] ) . '</span> '
+			. '<span class="tsvd-am-step__node">' . tsvd_architecture_map_icon( $node['icon'] )
+			. esc_html( $node['title'] ) . '</span> '
 			. '<span class="tsvd-am-step__text">' . esc_html( $step['text'] ) . '</span></li>';
+		$dots  .= '<li class="tsvd-am-path__dot"></li>';
 	}
 	return '<div class="tsvd-am-path" data-path-panel="' . esc_attr( $path['id'] ) . '" data-index="0">'
 		. tsvd_architecture_map_heading( 3, $path['title'], 'tsvd-am-path__title' )
 		. '<ol class="tsvd-am-path__steps">' . $steps . '</ol>'
-		. tsvd_architecture_map_render_path_nav( $paths )
+		. tsvd_architecture_map_render_path_nav( $paths, $dots )
 		. '</div>';
 }
 
-function tsvd_architecture_map_render_path_nav( array $paths ) {
+function tsvd_architecture_map_render_path_nav( array $paths, $dots ) {
 	return '<div class="tsvd-am-path__nav">'
 		. '<button type="button" class="button" data-step="previous">' . esc_html( $paths['previous'] ) . '</button>'
+		. '<ol class="tsvd-am-path__dots" aria-hidden="true">' . $dots . '</ol>'
 		. '<span class="tsvd-am-path__count" aria-live="polite"></span>'
 		. '<button type="button" class="button button-primary" data-step="next">' . esc_html( $paths['next'] ) . '</button>'
 		. '</div>';
