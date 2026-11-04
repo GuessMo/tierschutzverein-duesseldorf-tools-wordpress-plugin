@@ -79,9 +79,68 @@
 		return own === label || element.textContent.trim() === label;
 	}
 
+	function isHeading( node ) {
+		return node && /^(LEGEND|LABEL|STRONG|H3|H4|SPAN)$/.test( node.tagName )
+			&& ! node.querySelector( 'input, select, textarea' ) && '' !== node.textContent.trim();
+	}
+
+	function headingBefore( field ) {
+		var node = field;
+		for ( var depth = 0; node && depth < 5; depth++ ) {
+			for ( var sibling = node.previousElementSibling; sibling; sibling = sibling.previousElementSibling ) {
+				if ( isHeading( sibling ) ) {
+					return sibling;
+				}
+				var inner = 'P' === sibling.tagName ? sibling.querySelector( ':scope > strong' ) : null;
+				if ( inner && isHeading( inner ) && ! sibling.querySelector( 'input, select, textarea' ) ) {
+					return inner;
+				}
+			}
+			node = node.parentElement;
+			if ( node && 'FIELDSET' === node.tagName ) {
+				return node.querySelector( 'legend' );
+			}
+		}
+		return null;
+	}
+
+	function pickField( name ) {
+		var fields = document.querySelectorAll( '#post-body [name="' + name + '"], #post-body [name="' + name + '[]"]' );
+		var visible = Array.prototype.filter.call( fields, function ( field ) {
+			return 'hidden' !== field.type;
+		} );
+		return { field: visible[ 0 ] || fields[ 0 ], isGroup: fields.length > 1 };
+	}
+
+	function fieldHost( name ) {
+		var picked = pickField( name );
+		var field = picked.field;
+		if ( ! field ) {
+			return null;
+		}
+		var isOption = picked.isGroup || 'radio' === field.type;
+		var label = field.id ? document.querySelector( 'label[for="' + field.id + '"]' ) : null;
+		if ( label && ! isOption ) {
+			return label;
+		}
+		if ( 'checkbox' === field.type && ! isOption && field.closest( 'label' ) ) {
+			return field.closest( 'label' );
+		}
+		var start = isOption && label ? label : field.closest( 'label' ) || field;
+		return headingBefore( start );
+	}
+
+	function targetHosts( target ) {
+		if ( target.field ) {
+			var host = fieldHost( target.field );
+			return host ? [ host ] : [];
+		}
+		return document.querySelectorAll( target.selector );
+	}
+
 	function inject() {
 		config.targets.forEach( function ( target ) {
-			document.querySelectorAll( target.selector ).forEach( function ( element ) {
+			Array.prototype.forEach.call( targetHosts( target ), function ( element ) {
 				if ( element.querySelector( '.tsvd-help-wrap' ) || ! matchesLabel( element, target.label ) ) {
 					return;
 				}

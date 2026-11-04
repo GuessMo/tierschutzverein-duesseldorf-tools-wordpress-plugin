@@ -23,11 +23,6 @@ function tsvd_help_post_type_texts() {
 	return array(
 		'post'                 => array(),
 		'page'                 => array(),
-		'animals'              => array(
-			'heading'               => __( 'Hier bearbeitest Du ein Tier. Oben wählst Du, ob es ein Vermittlungstier oder ein vermisstes Tier ist. Unter „Tierdaten“ stehen Beschreibung und Merkmale, unter „Status“ Vermittlung, Halterdaten und Tier der Woche. Rechts setzt Du Profilbild und Rasse.', 'tsvd' ),
-			'animal_breed_selection' => __( 'Wähle Tierart und Rasse, auch mehrere. Die Suche oben filtert die Liste. Die Tierart bestimmt, in welchem Bereich (Hund, Katze, Kleintier, Vogel) das Tier erscheint.', 'tsvd' ),
-			'animal_title_permalink' => __( 'Titel und Link des Tiers entstehen automatisch aus Name, Rasse und Datum. Nach einer Namens- oder Rasseänderung erzeugst Du sie mit „Titel neu generieren“ neu.', 'tsvd' ),
-		),
 		'staff'                => array(
 			'heading'                => __( 'Ein Eintrag für die Seite „Team“. Name, Foto, Abteilung und Position erscheinen in den Mitarbeiter-Listen der Website.', 'tsvd' ),
 			'tsvd_staff_linked_user' => __( 'Verknüpft diesen Eintrag mit einem Benutzerkonto der Website. Dann erscheint dieses Profil als Autorin oder Autor unter Beiträgen dieser Person.', 'tsvd' ),
@@ -71,20 +66,10 @@ function tsvd_help_post_type_texts() {
 	);
 }
 
-function tsvd_help_animal_section_texts() {
-	$fieldsets = '#post-body-content legend';
-	$sections  = '#post-body-content h3';
-	return array(
-		tsvd_help_label( $fieldsets, __( 'Lebensabschnitt', 'tsvd' ), __( 'Altersgruppe des Tiers: Jungtier, Erwachsen oder Senior.', 'tsvd' ) ),
-		tsvd_help_label( $fieldsets, __( 'Vermittler', 'tsvd' ), __( 'Tierschutzverein: das Tier lebt im Tierheim. Privat: eine Privatperson vermittelt, der Verein stellt nur die Anzeige ein.', 'tsvd' ) ),
-		tsvd_help_label( $fieldsets, __( 'Vermittlungsstatus', 'tsvd' ), __( 'Nur „Zu vermitteln“ zeigt das Tier in der Vermittlung auf der Website. Nach der Vermittlung „Vermittelt“ wählen.', 'tsvd' ) ),
-		tsvd_help_label( $fieldsets, __( 'Vermisste Tiere', 'tsvd' ), __( 'Status der Vermisst-Meldung: vermisst, gefunden oder wieder zuhause. Erscheint nur, wenn oben „Vermisstes Tier“ gewählt ist.', 'tsvd' ) ),
-		tsvd_help_label( $sections, __( 'Halter Kontaktdaten', 'tsvd' ), __( 'Nur bei privater Vermittlung: An diese E-Mail-Adresse gehen Benachrichtigungen und weitergeleitete Anfragen zum Tier.', 'tsvd' ) ),
-		tsvd_help_label( $sections, __( 'Tier der Woche', 'tsvd' ), __( 'Aktivieren und Jahr und Kalenderwoche wählen. Dann wird für diese Woche automatisch ein Artikel „Tier der Woche“ veröffentlicht.', 'tsvd' ) ),
-	);
-}
-
 function tsvd_help_editor_targets( $post_type ) {
+	if ( 'animals' === $post_type ) {
+		return tsvd_help_animal_targets();
+	}
 	$all = tsvd_help_post_type_texts();
 	if ( ! isset( $all[ $post_type ] ) ) {
 		return array();
@@ -93,9 +78,6 @@ function tsvd_help_editor_targets( $post_type ) {
 	$targets = array();
 	foreach ( $texts as $key => $text ) {
 		$targets[] = 'heading' === $key ? tsvd_help_heading( $text ) : tsvd_help_box( $key, $text );
-	}
-	if ( 'animals' === $post_type ) {
-		$targets = array_merge( $targets, tsvd_help_animal_section_texts() );
 	}
 	return $targets;
 }

@@ -5,6 +5,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 require_once __DIR__ . '/help-texts.php';
+require_once __DIR__ . '/help-texts-animals.php';
 
 function tsvd_help_editor_enqueue( $hook ) {
 	if ( 'post.php' !== $hook && 'post-new.php' !== $hook ) {
@@ -33,6 +34,13 @@ function tsvd_help_heading( $text ) {
 	return array(
 		'selector' => '.wrap > h1.wp-heading-inline',
 		'text'     => $text,
+	);
+}
+
+function tsvd_help_field( $name, $text ) {
+	return array(
+		'field' => $name,
+		'text'  => $text,
 	);
 }
 

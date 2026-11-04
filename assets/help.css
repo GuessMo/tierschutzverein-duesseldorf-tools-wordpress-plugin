@@ -35,7 +35,7 @@
 	position: fixed;
 	z-index: 99999;
 	min-width: 17.5rem;
-	max-width: 20rem;
+	max-width: 24rem;
 	padding: 0.625rem 0.75rem;
 	background: var(--tsvd-chrome-surface, #fff);
 	border: 1px solid var(--tsvd-chrome-border, #c3c4c7);
@@ -47,7 +47,7 @@
 	letter-spacing: normal;
 	color: var(--tsvd-chrome-text, #3c434a);
 	text-transform: none;
-	white-space: normal;
+	white-space: pre-line;
 	text-align: left;
 }
 
