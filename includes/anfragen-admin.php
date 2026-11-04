@@ -24,7 +24,8 @@ function tsvd_anfragen_admin_menu() {
 	);
 	add_action( 'admin_print_scripts-' . $hook, function () {
 		wp_enqueue_script( 'jquery' );
-		wp_enqueue_style( 'tsvd-tools-anfragen', TSVD_TOOLS_URL . 'assets/anfragen-admin.css', array(), TSVD_TOOLS_ASSET_VERSION );
+		wp_enqueue_style( 'tsvd-tools-anfragen', TSVD_TOOLS_URL . 'assets/anfragen-admin.css', array( 'tsvd-help' ), TSVD_TOOLS_ASSET_VERSION );
+		tsvd_help_enqueue();
 		wp_enqueue_script( 'tsvd-tools-anfragen-layout', TSVD_TOOLS_URL . 'assets/anfragen-layout.js', array(), TSVD_TOOLS_ASSET_VERSION, true );
 		wp_enqueue_script( 'tsvd-tools-anfragen-scroll', TSVD_TOOLS_URL . 'assets/anfragen-scroll.js', array(), TSVD_TOOLS_ASSET_VERSION, true );
 		wp_enqueue_script( 'tsvd-tools-anfragen-menus', TSVD_TOOLS_URL . 'assets/anfragen-menus.js', array(), TSVD_TOOLS_ASSET_VERSION, true );
@@ -79,71 +80,11 @@ function tsvd_anfragen_sidebar_pos() {
 }
 
 function tsvd_anfragen_help_btn( $text ) {
-	echo '<span class="tsvd-help-wrap">';
-	static $index = 0;
-	$pop_id = 'tsvd-help-pop-' . ( ++$index );
-	echo '<button type="button" class="tsvd-help-doc" data-help="' . esc_attr( $text ) . '" aria-label="' . esc_attr( __( 'Hilfe', 'tsvd' ) ) . '" aria-expanded="false" aria-controls="' . esc_attr( $pop_id ) . '"><span class="dashicons dashicons-editor-help" aria-hidden="true"></span></button>';
-	echo '<span class="tsvd-help-pop" id="' . esc_attr( $pop_id ) . '" role="note" hidden></span>';
-	echo '</span>';
+	echo tsvd_help_btn_html( $text );
 }
 
 function tsvd_anfragen_help_script() {
-	static $done = false;
-	if ( $done ) {
-		return;
-	}
-	$done = true;
-	?>
-	<script>
-	(function () {
-		var pop;
-		function position( btn ) {
-			var wrap = btn.closest( '.tsvd-help-wrap' );
-			var r = wrap.getBoundingClientRect();
-			var w = pop.offsetWidth, h = pop.offsetHeight;
-			var x = Math.min( r.left, document.documentElement.clientWidth - w - 12 );
-			var y = r.bottom + 6;
-			pop.style.left = Math.max( 10, x ) + 'px';
-			pop.style.top = ( y + h > document.documentElement.clientHeight ? r.top - h - 6 : y ) + 'px';
-		}
-		function close() {
-			if ( ! pop ) return;
-			pop.hidden = true;
-			var open = document.querySelector( '.tsvd-help-doc.is-open' );
-			if ( open ) { open.classList.remove( 'is-open' ); open.setAttribute( 'aria-expanded', 'false' ); }
-		}
-		document.addEventListener( 'click', function ( e ) {
-			var btn = e.target.closest( '.tsvd-help-doc' );
-			if ( btn ) {
-				e.stopPropagation();
-				var wrap = btn.closest( '.tsvd-help-wrap' );
-				var wasOpen = ! wrap.querySelector( '.tsvd-help-pop' ).hidden;
-				close();
-				if ( ! wasOpen ) {
-					pop = wrap.querySelector( '.tsvd-help-pop' );
-					pop.textContent = btn.getAttribute( 'data-help' );
-					pop.hidden = false;
-					btn.classList.add( 'is-open' );
-					btn.setAttribute( 'aria-expanded', 'true' );
-					position( btn );
-				}
-				return;
-			}
-			if ( e.target.closest( '.tsvd-help-pop' ) ) return;
-			close();
-		} );
-		document.addEventListener( 'keydown', function ( e ) {
-			if ( 'Escape' === e.key ) close();
-		} );
-		window.addEventListener( 'resize', function () {
-			if ( pop && ! pop.hidden ) {
-				var btn = pop.closest( '.tsvd-help-wrap' ).querySelector( '.tsvd-help-doc' );
-				position( btn );
-			}
-		} );
-	})();
-	</script>
-	<?php
+	tsvd_help_enqueue();
 }
 
 function tsvd_anfragen_render_page() {

@@ -61,6 +61,8 @@ require_once TSVD_TOOLS_DIR . 'includes/anfragen-imap-poll.php';
 require_once TSVD_TOOLS_DIR . 'includes/anfragen-candidates-db.php';
 require_once TSVD_TOOLS_DIR . 'includes/anfragen-mail-match.php';
 require_once TSVD_TOOLS_DIR . 'includes/anfragen-imap-candidates.php';
+require_once TSVD_TOOLS_DIR . 'includes/help/help-button.php';
+require_once TSVD_TOOLS_DIR . 'includes/help/help-editor.php';
 require_once TSVD_TOOLS_DIR . 'includes/anfragen-admin-helpers.php';
 require_once TSVD_TOOLS_DIR . 'includes/anfragen-admin-waiting.php';
 require_once TSVD_TOOLS_DIR . 'includes/anfragen-stats-data.php';
