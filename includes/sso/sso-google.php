@@ -52,9 +52,24 @@ add_action(
 			return;
 		}
 		printf(
-			'<p style="margin-bottom:16px"><a class="button button-large" style="width:100%%;text-align:center" href="%s">%s</a></p>',
+			'<p class="tsvd-sso-login"><a class="button button-large" href="%s">%s</a></p>',
 			esc_url( tsvd_sso_start_url() ),
 			esc_html__( 'Mit Google anmelden', 'tsvd' )
+		);
+	}
+);
+
+add_action(
+	'login_enqueue_scripts',
+	function () {
+		if ( ! tsvd_sso_is_configured() ) {
+			return;
+		}
+		wp_enqueue_style(
+			'tsvd-sso-login',
+			TSVD_TOOLS_URL . 'assets/sso-login.css',
+			array(),
+			TSVD_TOOLS_ASSET_VERSION
 		);
 	}
 );

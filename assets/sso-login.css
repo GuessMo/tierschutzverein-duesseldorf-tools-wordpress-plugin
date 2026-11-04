@@ -1,0 +1,13 @@
+body.login #loginform > :not(.tsvd-sso-login),
+body.login #nav {
+	display: none;
+}
+
+body.login .tsvd-sso-login {
+	margin: 0;
+}
+
+body.login .tsvd-sso-login .button {
+	width: 100%;
+	text-align: center;
+}
