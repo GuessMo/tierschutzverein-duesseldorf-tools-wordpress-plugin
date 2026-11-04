@@ -105,7 +105,11 @@
 	}
 
 	function pickField( name ) {
-		var fields = document.querySelectorAll( '#post-body [name="' + name + '"], #post-body [name="' + name + '[]"]' );
+		var scopes = [ '#post-body', '.edit-post-meta-boxes-area' ];
+		var selector = scopes.map( function ( scope ) {
+			return scope + ' [name="' + name + '"], ' + scope + ' [name="' + name + '[]"]';
+		} ).join( ', ' );
+		var fields = document.querySelectorAll( selector );
 		var visible = Array.prototype.filter.call( fields, function ( field ) {
 			return 'hidden' !== field.type;
 		} );

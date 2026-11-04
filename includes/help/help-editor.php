@@ -5,7 +5,6 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 require_once __DIR__ . '/help-texts.php';
-require_once __DIR__ . '/help-texts-animals.php';
 
 function tsvd_help_editor_enqueue( $hook ) {
 	if ( 'post.php' !== $hook && 'post-new.php' !== $hook ) {

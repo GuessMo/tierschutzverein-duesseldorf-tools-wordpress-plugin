@@ -68,13 +68,6 @@ function tsvd_help_animal_status_field_texts() {
 }
 
 function tsvd_help_animal_targets() {
-	$targets = array();
-	foreach ( tsvd_help_animal_box_texts() as $key => $text ) {
-		$targets[] = 'heading' === $key ? tsvd_help_heading( $text ) : tsvd_help_box( $key, $text );
-	}
 	$fields = array_merge( tsvd_help_animal_data_field_texts(), tsvd_help_animal_status_field_texts() );
-	foreach ( $fields as $name => $text ) {
-		$targets[] = tsvd_help_field( $name, $text );
-	}
-	return $targets;
+	return tsvd_help_build_targets( tsvd_help_animal_box_texts(), $fields );
 }
