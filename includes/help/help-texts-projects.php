@@ -7,7 +7,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 function tsvd_help_project_boxes() {
 	$seo = tsvd_help_seo_texts();
 	return array(
-		'heading'                   => __( "Was: Hier pflegst Du ein Projekt.\nWarum: Daraus entsteht die Projektseite mit Kopfbild, Text, Meilensteinen, Spendenbox, Impressionen, Social Media, Downloads und Formular – in dieser Reihenfolge.\nWo: Der Projekttext darf höchstens so viele Zeilen haben wie unter Projekte → Einstellungen festgelegt (Standard 10); darüber lässt sich nicht speichern.", 'tsvd' ),
+		'heading'                   => __( "Was: Hier pflegst Du ein Projekt.\nWarum: Daraus entsteht die Projektseite mit Kopfbild, Text, Meilensteinen, Spendenbox, Impressionen, Social Media, Downloads und Formular – in dieser Reihenfolge.\nWo: Der Projekttext darf höchstens so viele Zeilen haben wie unter Projekte → Einstellungen festgelegt; die Grenze steht unter dem Textfeld. Darüber lässt sich nicht speichern.", 'tsvd' ),
 		'submitdiv'                 => tsvd_help_submit_text(),
 		'tsvd_seo_score'            => $seo['box'],
 		'tsvd_project_images'       => __( "Was: Kopfbild der Projektseite und optional ein Logo.\nWarum: Das Desktop-Bild ist das Gesicht des Projekts in allen Übersichten.\nWo: Kopf der Projektseite, Kachel im Projekt-Archiv und in Teaser-Blöcken. Projekte haben kein eigenes Beitragsbild – beim Teilen in sozialen Netzwerken erscheint deshalb das allgemeine Standardbild.", 'tsvd' ),
