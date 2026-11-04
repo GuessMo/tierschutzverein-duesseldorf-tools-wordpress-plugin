@@ -122,3 +122,32 @@
     background-color: var(--tsvd-chrome-surface-subtle);
     border-style: dashed;
 }
+
+/* ── WP-Core-Editoren: Permalink-Zeile, Titel-Platzhalter, Kategorie-Reiter ── */
+#wpbody-content #edit-slug-box,
+#wpbody-content #titlediv #title-prompt-text {
+    color: var(--tsvd-chrome-text-muted);
+}
+
+#wpbody-content ul.category-tabs li.tabs,
+#wpbody-content .wp-tab-active {
+    background-color: var(--tsvd-chrome-surface);
+    border-color: var(--tsvd-chrome-border) var(--tsvd-chrome-border) var(--tsvd-chrome-surface);
+}
+
+#wpbody-content ul.category-tabs li.tabs a {
+    color: var(--tsvd-chrome-heading);
+}
+
+/* ── WP-Core: TinyMCE-Auswahlliste („Absatz“) ── */
+.mce-toolbar .mce-btn .mce-txt {
+    color: var(--tsvd-chrome-text) !important;
+}
+
+/* ── WP-Core: deaktivierte Primär-Buttons (#e2e2e2 mit !important) ── */
+.wp-core-ui .button-primary.disabled,
+.wp-core-ui .button-primary:disabled {
+    background: var(--tsvd-chrome-canvas) !important;
+    color: var(--tsvd-chrome-text-muted) !important;
+    border-color: var(--tsvd-chrome-border) !important;
+}
