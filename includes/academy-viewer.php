@@ -46,11 +46,17 @@ function tsvd_academy_render_article_header( $post ) {
 	echo '<span class="tsvd-ac-date">' . esc_html__( 'Aktualisiert am', 'tsvd' ) . ' ';
 	tsvd_academy_render_modified_time( $post );
 	echo '</span>';
+	tsvd_academy_render_print_button();
 	if ( current_user_can( 'edit_post', $post->ID ) ) {
 		echo '<a class="button button-small" href="' . esc_url( get_edit_post_link( $post->ID ) ) . '">'
 			. esc_html__( 'Bearbeiten', 'tsvd' ) . '</a>';
 	}
 	echo '</div></header>';
+}
+
+function tsvd_academy_render_print_button() {
+	echo '<button type="button" class="button button-small tsvd-ac-print">'
+		. esc_html__( 'Als PDF speichern', 'tsvd' ) . '</button>';
 }
 
 function tsvd_academy_related_lessons( $post ) {

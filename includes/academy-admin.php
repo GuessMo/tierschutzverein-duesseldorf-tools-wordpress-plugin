@@ -88,7 +88,9 @@ function tsvd_academy_enqueue_assets() {
 	}
 	wp_enqueue_style( 'wp-block-library' );
 	wp_enqueue_style( 'tsvd-academy-article', TSVD_TOOLS_URL . 'assets/academy-article.css', array( 'tsvd-academy' ), TSVD_TOOLS_ASSET_VERSION );
+	wp_enqueue_style( 'tsvd-academy-print', TSVD_TOOLS_URL . 'assets/academy-print.css', array( 'tsvd-academy-article' ), TSVD_TOOLS_ASSET_VERSION, 'print' );
 	wp_enqueue_script( 'tsvd-academy-toc', TSVD_TOOLS_URL . 'assets/academy-toc.js', array(), TSVD_TOOLS_ASSET_VERSION, true );
+	wp_enqueue_script( 'tsvd-academy-print', TSVD_TOOLS_URL . 'assets/academy-print.js', array(), TSVD_TOOLS_ASSET_VERSION, true );
 }
 
 function tsvd_academy_render_page() {

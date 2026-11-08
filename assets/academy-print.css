@@ -1,0 +1,145 @@
+/* ── Academy: Druck- und PDF-Ansicht ── */
+@page {
+	margin: 16mm 14mm;
+}
+
+body.toplevel_page_tsvd-academy {
+	background: #fff !important;
+}
+
+html.wp-toolbar {
+	padding-top: 0 !important;
+}
+
+#adminmenumain,
+#wpadminbar,
+#wpfooter,
+#screen-meta,
+#screen-meta-links,
+.update-nag,
+.notice,
+.tsvd-ac-breadcrumb,
+.tsvd-ac-toc,
+.tsvd-ac-section,
+.tsvd-ac-print,
+.tsvd-ac-article__meta .button {
+	display: none !important;
+}
+
+#wpcontent,
+#wpbody,
+#wpbody-content {
+	margin: 0 !important;
+	padding: 0 !important;
+	float: none !important;
+	width: auto !important;
+}
+
+.wrap.tsvd-ac {
+	max-width: none;
+	margin: 0;
+	padding: 0;
+}
+
+.tsvd-ac-article-layout {
+	display: block;
+	margin: 0;
+}
+
+.tsvd-ac-article,
+.tsvd-ac-article__header {
+	padding: 0;
+	margin: 0;
+	border: 0;
+	background: #fff;
+}
+
+#wpbody-content .tsvd-ac .tsvd-ac-article__title,
+#wpbody-content .tsvd-ac .tsvd-ac-prose,
+#wpbody-content .tsvd-ac .tsvd-ac-prose :is(h2, h3, h4, p, li, strong, em, td, th) {
+	color: #000;
+}
+
+.tsvd-ac-article__header {
+	padding-bottom: 6mm;
+	margin-bottom: 6mm;
+	border-bottom: 1px solid #c3c4c7;
+}
+
+.tsvd-ac .tsvd-ac-article__title {
+	font-size: 18pt;
+	line-height: 1.2;
+}
+
+.tsvd-ac-article__meta {
+	margin-top: 3mm;
+	font-size: 9pt;
+	color: #50575e;
+}
+
+#wpbody-content .tsvd-ac-article__meta a {
+	color: #50575e;
+	text-decoration: none;
+}
+
+.tsvd-ac-prose {
+	max-width: none;
+	font-size: 10.5pt;
+	line-height: 1.55;
+}
+
+.tsvd-ac .tsvd-ac-prose h2 {
+	margin: 7mm 0 2.5mm;
+	font-size: 13pt;
+	break-after: avoid-page;
+}
+
+.tsvd-ac-prose p,
+.tsvd-ac-prose li {
+	orphans: 3;
+	widows: 3;
+}
+
+.tsvd-ac-prose figure,
+.tsvd-ac-prose img,
+.tsvd-ac-prose table,
+.tsvd-ac-prose blockquote {
+	break-inside: avoid;
+}
+
+.tsvd-ac-prose img {
+	max-width: 100% !important;
+	max-height: 100mm;
+	height: auto;
+	border: 1px solid #c3c4c7;
+}
+
+.tsvd-ac-prose figcaption {
+	margin-top: 2mm;
+	font-size: 9pt;
+	color: #50575e;
+	text-align: left;
+}
+
+.tsvd-ac-prose blockquote {
+	margin: 4mm 0;
+	padding: 2mm 4mm;
+	border-left: 2pt solid #2271b1;
+	background: #f6f7f7;
+}
+
+.tsvd-ac-prose blockquote p:last-child {
+	margin-bottom: 0;
+}
+
+.tsvd-ac-prose code {
+	padding: 0 1mm;
+	border: 1px solid #dcdcde;
+	background: #f6f7f7;
+	font-size: 9.5pt;
+}
+
+#wpbody-content .tsvd-ac-prose a {
+	color: #000;
+	text-decoration: underline;
+}
