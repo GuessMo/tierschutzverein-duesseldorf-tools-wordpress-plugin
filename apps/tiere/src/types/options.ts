@@ -50,5 +50,6 @@ export interface AnimalOptions {
   missing_fields: MissingFieldOption[];
   requirement_sets: Record<string, RequirementSet>;
   adoption_sources: ValueLabel[];
+  help: Record<string, string>;
   caps: AnimalCaps;
 }

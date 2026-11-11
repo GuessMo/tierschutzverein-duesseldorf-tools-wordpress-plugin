@@ -15,6 +15,7 @@ function tsvd_at_rest_options() {
 			'missing_fields'    => tsvd_at_missing_fields(),
 			'requirement_sets'  => tsvd_at_requirement_sets(),
 			'adoption_sources'  => tsvd_at_adoption_sources(),
+			'help'              => (object) tsvd_at_help_texts(),
 			'caps'              => array(
 				'publish' => tsvd_at_can_publish(),
 				'upload'  => current_user_can( 'upload_files' ),

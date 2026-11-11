@@ -1,4 +1,5 @@
 import { FormError } from "@/components/common";
+import { HelpPopover } from "@/components/help";
 import { GalleryList } from "./GalleryList";
 import type { ImageGalleryProps } from "./media.types";
 import { NoUploadHint } from "./NoUploadHint";
@@ -14,7 +15,10 @@ export function ImageGallery(props: ImageGalleryProps) {
   };
   return (
     <fieldset className="flex flex-col gap-3" aria-busy={isUploading}>
-      <legend className="mb-3 text-sm font-medium">{label}</legend>
+      <legend className="mb-3 flex items-center gap-1 text-sm font-medium">
+        {label}
+        <HelpPopover fieldId={id} label={label} />
+      </legend>
       {images.length > 1 && (
         <p className="text-sm text-muted-foreground">
           Reihenfolge wie auf der Website. Zum Umsortieren ein Bild ziehen oder die Pfeile nutzen.

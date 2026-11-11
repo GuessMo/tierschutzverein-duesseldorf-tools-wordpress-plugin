@@ -5,6 +5,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 require_once __DIR__ . '/animals-tool-access.php';
+require_once __DIR__ . '/animals-tool-help.php';
 require_once __DIR__ . '/animals-tool-image.php';
 require_once __DIR__ . '/animals-tool-terms.php';
 require_once __DIR__ . '/animals-tool-list.php';

@@ -1,10 +1,12 @@
 import { ToggleGroup, ToggleGroupItem } from "@web-app-kit/frontend/ui";
+import { HelpPopover } from "@/components/help";
 import { RECORD_TYPES } from "@/config/labels";
 import type { RecordType } from "@/types";
 import type { RecordTypeSwitchProps } from "./editor.types";
 
 export function RecordTypeSwitch({ value, onChange }: RecordTypeSwitchProps) {
   return (
+    <div className="flex items-center gap-1">
     <ToggleGroup
       type="single"
       variant="outline"
@@ -19,5 +21,7 @@ export function RecordTypeSwitch({ value, onChange }: RecordTypeSwitchProps) {
         </ToggleGroupItem>
       ))}
     </ToggleGroup>
+    <HelpPopover fieldId="animal-record-type" label="Art des Eintrags" />
+    </div>
   );
 }

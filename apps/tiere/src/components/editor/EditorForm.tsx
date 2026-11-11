@@ -1,5 +1,6 @@
 import { useRef } from "react";
 import { PageContainer } from "@web-app-kit/frontend/ui";
+import { HelpTexts } from "@/components/help";
 import { useSaveShortcut, useUnsavedWarning } from "@/hooks";
 import type { EditorFormProps } from "./editor.types";
 import { EditorHeader } from "./EditorHeader";
@@ -17,6 +18,7 @@ export function EditorForm({ options, record: initial }: EditorFormProps) {
   useUnsavedWarning(isDirty);
 
   return (
+    <HelpTexts.Provider value={options.help}>
     <form
       ref={formRef}
       onSubmit={form.handleSubmit}
@@ -36,5 +38,6 @@ export function EditorForm({ options, record: initial }: EditorFormProps) {
         onRestore={form.restore}
       />
     </form>
+    </HelpTexts.Provider>
   );
 }

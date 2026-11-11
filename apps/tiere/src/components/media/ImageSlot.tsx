@@ -1,6 +1,7 @@
 import { IconPhoto } from "@tabler/icons-react";
 import { Button } from "@web-app-kit/frontend/ui";
 import { FormError } from "@/components/common";
+import { HelpPopover } from "@/components/help";
 import type { ImageSlotProps } from "./media.types";
 import { NoUploadHint } from "./NoUploadHint";
 import { UploadButton } from "./UploadButton";
@@ -15,7 +16,10 @@ export function ImageSlot(props: ImageSlotProps) {
   };
   return (
     <fieldset className="flex flex-col gap-3" aria-busy={isUploading}>
-      <legend className="mb-3 text-sm font-medium">{label}</legend>
+      <legend className="mb-3 flex items-center gap-1 text-sm font-medium">
+        {label}
+        <HelpPopover fieldId={id} label={label} />
+      </legend>
       <div className="flex flex-wrap items-end gap-4">
         {image ? (
           <img src={image.large || image.thumb} alt={image.alt} className="h-40 w-auto max-w-full rounded-md border object-cover" />

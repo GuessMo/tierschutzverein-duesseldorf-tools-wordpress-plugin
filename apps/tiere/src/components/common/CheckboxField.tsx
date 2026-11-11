@@ -1,4 +1,5 @@
 import { Checkbox, Label } from "@web-app-kit/frontend/ui";
+import { HelpPopover } from "@/components/help";
 import type { CheckboxFieldProps } from "./common.types";
 
 export function CheckboxField({ id, label, checked, hint, onCheckedChange }: CheckboxFieldProps) {
@@ -13,9 +14,12 @@ export function CheckboxField({ id, label, checked, hint, onCheckedChange }: Che
         onCheckedChange={(next) => onCheckedChange(next === true)}
       />
       <div className="flex flex-col gap-1">
-        <Label htmlFor={id} className="font-normal">
-          {label}
-        </Label>
+        <div className="flex items-center gap-1">
+          <Label htmlFor={id} className="font-normal">
+            {label}
+          </Label>
+          <HelpPopover fieldId={id} label={label} />
+        </div>
         {hint && (
           <p id={hintId} className="text-xs text-muted-foreground">
             {hint}
