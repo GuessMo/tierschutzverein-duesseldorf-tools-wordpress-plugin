@@ -1,4 +1,4 @@
-import { Checkbox } from "@/components/ui/checkbox";
+import { Checkbox } from "@web-app-kit/frontend/ui";
 import { flattenTerms } from "@/lib/terms";
 import type { TermGroupProps } from "./entries.types";
 

@@ -1,4 +1,4 @@
-import { Skeleton } from "@/components/ui/skeleton";
+import { Skeleton } from "@web-app-kit/frontend/ui";
 
 export function LoadingRows({ count = 4, label }: { count?: number; label: string }) {
   return (
