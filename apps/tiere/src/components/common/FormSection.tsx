@@ -3,7 +3,10 @@ import type { FormSectionProps } from "./common.types";
 export function FormSection({ id, title, description, children }: FormSectionProps) {
   const headingId = `${id}-heading`;
   return (
-    <section aria-labelledby={headingId} className="flex flex-col gap-5 border-t pt-8">
+    <section
+      aria-labelledby={headingId}
+      className="flex flex-col gap-5 border-t pt-8 first:border-t-0 first:pt-0"
+    >
       <div className="flex flex-col gap-1">
         <h2 id={headingId} className="text-base font-semibold">
           {title}

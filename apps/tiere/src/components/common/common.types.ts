@@ -49,6 +49,11 @@ export interface CheckboxFieldProps {
   onCheckedChange: (checked: boolean) => void;
 }
 
+export interface CopyValueProps {
+  label: string;
+  value: string;
+}
+
 export interface FormSectionProps {
   id: string;
   title: string;

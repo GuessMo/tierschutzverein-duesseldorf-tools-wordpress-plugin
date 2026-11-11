@@ -16,13 +16,16 @@ export function withSpecies(species: SpeciesOption | undefined): number[] {
   return species ? [species.id] : [];
 }
 
-export function toggleBreed(species: SpeciesOption, termIds: number[], breedId: number): number[] {
-  const breeds = termIds.filter((id) => id !== species.id);
-  const next = breeds.includes(breedId)
-    ? breeds.filter((id) => id !== breedId)
-    : [...breeds, breedId];
-  return [species.id, ...next];
+const KIND_SPECIES = ["amphibian", "insect", "reptile", "spider"];
+
+export function breedLabel(species: SpeciesOption): string {
+  return KIND_SPECIES.includes(species.slug) ? "Art" : "Rasse";
 }
+
+export function withBreeds(species: SpeciesOption, breedIds: number[]): number[] {
+  return [species.id, ...breedIds];
+}
+
 
 export function requirementSet(
   options: AnimalOptions,

@@ -1,30 +1,23 @@
-import { FormSection, SelectField } from "@/components/common";
-import { RECORD_TYPES } from "@/config/labels";
-import type { RecordType } from "@/types";
+import { FormSection } from "@/components/common";
 import type { SectionProps } from "../editor.types";
 import { AdoptionFields } from "./AdoptionFields";
 import { ContactFields } from "./ContactFields";
 import { MissingFields } from "./MissingFields";
 
 export function StatusSection(props: SectionProps) {
-  const { draft, onChange } = props;
+  const { draft } = props;
   const isMissing = draft.record_type === "vermisst";
   const showContact = isMissing || draft.mediator === "privat";
   return (
     <FormSection
       id="status"
-      title="Status und Vermittlung"
-      description="Lege fest, ob das Tier vermittelt wird oder als vermisst gemeldet ist."
+      title={isMissing ? "Stand der Meldung" : "Status und Vermittlung"}
+      description={
+        isMissing
+          ? "Halte fest, ob das Tier noch vermisst wird oder wieder zu Hause ist."
+          : "Lege fest, wer vermittelt und wie weit die Vermittlung ist."
+      }
     >
-      <div className="grid gap-4 sm:grid-cols-2">
-        <SelectField
-          id="animal-record-type"
-          label="Art des Eintrags"
-          value={draft.record_type}
-          options={RECORD_TYPES}
-          onValueChange={(value) => onChange({ record_type: value as RecordType })}
-        />
-      </div>
       {isMissing ? <MissingFields {...props} /> : <AdoptionFields {...props} />}
       {showContact && <ContactFields {...props} />}
     </FormSection>

@@ -1,5 +1,5 @@
 import type { FormEvent } from "react";
-import type { AnimalDraft, AnimalOptions, AnimalRecord, DraftPatch } from "@/types";
+import type { AnimalDraft, AnimalOptions, AnimalRecord, DraftPatch, RecordType } from "@/types";
 
 export interface AnimalEditorProps {
   options: AnimalOptions;
@@ -25,8 +25,18 @@ export interface InterestSectionProps extends SectionProps {
   record: AnimalRecord | null;
 }
 
-export interface EditorHeaderProps {
-  name: string;
+export interface EditorHeaderProps extends SectionProps {
+  record: AnimalRecord | null;
+}
+
+export interface RecordTypeSwitchProps {
+  value: RecordType;
+  onChange: (value: RecordType) => void;
+}
+
+export interface EditorTabsProps {
+  section: SectionProps;
+  media: MediaSectionProps;
   record: AnimalRecord | null;
 }
 

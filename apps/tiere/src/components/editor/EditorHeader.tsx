@@ -1,8 +1,22 @@
-import { IconArrowLeft, IconExternalLink } from "@tabler/icons-react";
+import { IconArrowLeft, IconExternalLink, IconPaw } from "@tabler/icons-react";
 import { Button } from "@web-app-kit/frontend/ui";
+import { CopyValue, StateBadge } from "@/components/common";
 import { LIST_HASH } from "@/hooks";
-import type { AnimalRecord } from "@/types";
+import { stateOf } from "@/lib";
+import type { AnimalImage, AnimalRecord } from "@/types";
 import type { EditorHeaderProps } from "./editor.types";
+import { RecordTypeSwitch } from "./RecordTypeSwitch";
+
+function HeaderImage({ image }: { image: AnimalImage | null }) {
+  if (image) {
+    return <img src={image.large || image.thumb} alt="" className="size-28 rounded-xl object-cover" />;
+  }
+  return (
+    <span className="flex size-28 items-center justify-center rounded-xl bg-muted text-muted-foreground">
+      <IconPaw aria-hidden className="size-10" stroke={1.5} />
+    </span>
+  );
+}
 
 function RecordLinks({ record }: { record: AnimalRecord }) {
   const pageUrl = record.permalink || record.preview_url;
@@ -16,7 +30,7 @@ function RecordLinks({ record }: { record: AnimalRecord }) {
           </a>
         </Button>
       )}
-      <Button asChild variant="ghost" size="sm">
+      <Button asChild variant="outline" size="sm">
         <a href={record.legacy_edit_url} target="_blank" rel="noreferrer">
           Im alten Editor öffnen
         </a>
@@ -25,8 +39,8 @@ function RecordLinks({ record }: { record: AnimalRecord }) {
   );
 }
 
-export function EditorHeader({ name, record }: EditorHeaderProps) {
-  const title = record ? name.trim() || "Ohne Namen" : "Neues Tier";
+export function EditorHeader({ draft, options, record, onChange }: EditorHeaderProps) {
+  const title = record ? draft.name.trim() || "Ohne Namen" : "Neues Tier";
   return (
     <header className="flex flex-col gap-4">
       <Button asChild variant="ghost" size="sm" className="self-start">
@@ -35,13 +49,22 @@ export function EditorHeader({ name, record }: EditorHeaderProps) {
           Alle Tiere
         </a>
       </Button>
-      <div className="flex flex-col gap-1">
-        <h1 className="text-xl font-semibold">{title}</h1>
-        {record?.internal_id && (
-          <p className="text-sm text-muted-foreground tabular-nums">
-            Tier-ID {record.internal_id}
-          </p>
-        )}
+      <div className="flex flex-col gap-4 sm:flex-row sm:items-start">
+        <HeaderImage image={draft.featured_image} />
+        <div className="flex min-w-0 flex-col gap-3">
+          <div className="flex flex-wrap items-center gap-3">
+            <h1 className="text-2xl font-semibold">{title}</h1>
+            <StateBadge status={stateOf(draft, options)} />
+          </div>
+          <div className="flex flex-wrap gap-x-4 gap-y-1">
+            {record?.internal_id && <CopyValue label="Tier-ID" value={record.internal_id} />}
+            {draft.teo_id && <CopyValue label="Teo-ID" value={draft.teo_id} />}
+          </div>
+          <RecordTypeSwitch
+            value={draft.record_type}
+            onChange={(record_type) => onChange({ record_type })}
+          />
+        </div>
       </div>
       {record && <RecordLinks record={record} />}
     </header>

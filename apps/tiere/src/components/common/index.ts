@@ -1,5 +1,6 @@
 export { AnimalThumb } from "./AnimalThumb";
 export { CheckboxField } from "./CheckboxField";
+export { CopyValue } from "./CopyValue";
 export { ErrorMessage } from "./ErrorMessage";
 export { Field } from "./Field";
 export { FormError } from "./FormError";

@@ -7,4 +7,11 @@ export {
   MISSING_PREFIX,
 } from "./filterAnimals";
 export { speciesOptions, stateOf, stateOptions } from "./stateOptions";
-export { isDog, requirementSet, selectedSpecies, toggleBreed, withSpecies } from "./species";
+export {
+  breedLabel,
+  isDog,
+  requirementSet,
+  selectedSpecies,
+  withBreeds,
+  withSpecies,
+} from "./species";
