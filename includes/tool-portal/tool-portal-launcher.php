@@ -4,12 +4,35 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-const TSVD_TOOL_PORTAL_WEBSITE_CAP = 'edit_posts';
+function tsvd_tool_portal_admin_links() {
+	return array(
+		'website' => array(
+			'title'  => __( 'Website', 'tsvd' ),
+			'page'   => '',
+			'symbol' => 'world',
+			'cap'    => 'edit_posts',
+		),
+		'skylark' => array(
+			'title'  => __( 'Skylark', 'tsvd' ),
+			'page'   => 'skylark-analytics',
+			'symbol' => 'chart',
+			'cap'    => 'manage_options',
+		),
+		'academy' => array(
+			'title'  => __( 'Academy', 'tsvd' ),
+			'page'   => 'tsvd-academy',
+			'symbol' => 'school',
+			'cap'    => 'read',
+		),
+	);
+}
 
 function tsvd_tool_portal_launcher_items() {
 	$items = array();
-	if ( current_user_can( TSVD_TOOL_PORTAL_WEBSITE_CAP ) ) {
-		$items[] = tsvd_tool_portal_website_item();
+	foreach ( tsvd_tool_portal_admin_links() as $slug => $link ) {
+		if ( current_user_can( $link['cap'] ) ) {
+			$items[] = tsvd_tool_portal_admin_link_item( $slug, $link );
+		}
 	}
 	foreach ( tsvd_tool_portal_tools() as $slug => $tool ) {
 		if ( current_user_can( tsvd_tool_portal_cap( $slug ) ) ) {
@@ -19,12 +42,13 @@ function tsvd_tool_portal_launcher_items() {
 	return $items;
 }
 
-function tsvd_tool_portal_website_item() {
+function tsvd_tool_portal_admin_link_item( $slug, $link ) {
+	$url = '' === $link['page'] ? admin_url() : admin_url( 'admin.php?page=' . $link['page'] );
 	return array(
-		'slug'   => 'website',
-		'title'  => __( 'Website', 'tsvd' ),
-		'url'    => admin_url(),
-		'symbol' => 'world',
+		'slug'   => $slug,
+		'title'  => $link['title'],
+		'url'    => $url,
+		'symbol' => $link['symbol'],
 	);
 }
 
