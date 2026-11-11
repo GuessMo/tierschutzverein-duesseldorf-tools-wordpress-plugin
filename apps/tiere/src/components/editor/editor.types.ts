@@ -27,6 +27,7 @@ export interface InterestSectionProps extends SectionProps {
 
 export interface EditorHeaderProps extends SectionProps {
   record: AnimalRecord | null;
+  isDirty: boolean;
 }
 
 export interface RecordTypeSwitchProps {
@@ -45,6 +46,7 @@ export interface SaveBarProps {
   options: AnimalOptions;
   record: AnimalRecord | null;
   isBusy: boolean;
+  isDirty: boolean;
   error: string | null;
   onChange: (patch: DraftPatch) => void;
   onRestore: () => void;
@@ -54,6 +56,7 @@ export interface AnimalForm {
   draft: AnimalDraft;
   record: AnimalRecord | null;
   isBusy: boolean;
+  isDirty: boolean;
   error: string | null;
   patch: (patch: DraftPatch) => void;
   handleSubmit: (event: FormEvent) => void;

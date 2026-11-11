@@ -1,4 +1,4 @@
-import { useCallback, useState, type FormEvent } from "react";
+import { useCallback, useMemo, useState, type FormEvent } from "react";
 import { describeError } from "@web-app-kit/frontend";
 import { toast } from "@web-app-kit/frontend/ui";
 import { animalsApi } from "@/api";
@@ -25,6 +25,8 @@ export function useAnimalForm(initial: AnimalRecord | null): AnimalForm {
   const [error, setError] = useState<string | null>(null);
 
   const patch = useCallback((next: DraftPatch) => setDraft((current) => ({ ...current, ...next })), []);
+  const baseline = useMemo(() => JSON.stringify(initialDraft(record)), [record]);
+  const isDirty = JSON.stringify(draft) !== baseline;
 
   const run = async (action: () => Promise<AnimalRecord>, message: string) => {
     setIsBusy(true);
@@ -51,5 +53,5 @@ export function useAnimalForm(initial: AnimalRecord | null): AnimalForm {
     if (record) void run(() => animalsApi.restore(record.id), "Tier wiederhergestellt.");
   };
 
-  return { draft, record, isBusy, error, patch, handleSubmit, restore };
+  return { draft, record, isBusy, isDirty, error, patch, handleSubmit, restore };
 }

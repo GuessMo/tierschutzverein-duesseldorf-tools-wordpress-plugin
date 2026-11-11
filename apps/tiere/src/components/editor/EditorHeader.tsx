@@ -1,3 +1,4 @@
+import type { MouseEvent } from "react";
 import { IconArrowLeft, IconExternalLink, IconPaw } from "@tabler/icons-react";
 import { Button } from "@web-app-kit/frontend/ui";
 import { CopyValue, StateBadge } from "@/components/common";
@@ -39,12 +40,18 @@ function RecordLinks({ record }: { record: AnimalRecord }) {
   );
 }
 
-export function EditorHeader({ draft, options, record, onChange }: EditorHeaderProps) {
+const LEAVE_QUESTION = "Du hast ungespeicherte Änderungen. Trotzdem zur Liste wechseln?";
+
+export function EditorHeader(props: EditorHeaderProps) {
+  const { draft, options, record, isDirty, onChange } = props;
   const title = record ? draft.name.trim() || "Ohne Namen" : "Neues Tier";
+  const confirmLeave = (event: MouseEvent<HTMLAnchorElement>) => {
+    if (isDirty && !window.confirm(LEAVE_QUESTION)) event.preventDefault();
+  };
   return (
     <header className="flex flex-col gap-4">
       <Button asChild variant="ghost" size="sm" className="self-start">
-        <a href={LIST_HASH}>
+        <a href={LIST_HASH} onClick={confirmLeave}>
           <IconArrowLeft data-icon="inline-start" />
           Alle Tiere
         </a>

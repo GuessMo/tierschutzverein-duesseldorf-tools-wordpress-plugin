@@ -6,6 +6,7 @@ export {
   isFilterActive,
   MISSING_PREFIX,
 } from "./filterAnimals";
+export { moveItem } from "./moveItem";
 export { speciesOptions, stateOf, stateOptions } from "./stateOptions";
 export {
   breedLabel,

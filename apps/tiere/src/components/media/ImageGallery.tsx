@@ -1,5 +1,5 @@
 import { FormError } from "@/components/common";
-import { ImageTile } from "./ImageTile";
+import { GalleryList } from "./GalleryList";
 import type { ImageGalleryProps } from "./media.types";
 import { NoUploadHint } from "./NoUploadHint";
 import { UploadButton } from "./UploadButton";
@@ -15,17 +15,13 @@ export function ImageGallery(props: ImageGalleryProps) {
   return (
     <fieldset className="flex flex-col gap-3" aria-busy={isUploading}>
       <legend className="mb-3 text-sm font-medium">{label}</legend>
+      {images.length > 1 && (
+        <p className="text-sm text-muted-foreground">
+          Reihenfolge wie auf der Website. Zum Umsortieren ein Bild ziehen oder die Pfeile nutzen.
+        </p>
+      )}
       {images.length > 0 ? (
-        <ul className="grid grid-cols-[repeat(auto-fill,minmax(8rem,1fr))] gap-3">
-          {images.map((image, index) => (
-            <ImageTile
-              key={image.id}
-              image={image}
-              removeLabel={`Bild ${index + 1} entfernen`}
-              onRemove={() => onChange(images.filter((item) => item.id !== image.id))}
-            />
-          ))}
-        </ul>
+        <GalleryList images={images} onChange={onChange} />
       ) : (
         <p className="text-sm text-muted-foreground">Noch keine Bilder.</p>
       )}

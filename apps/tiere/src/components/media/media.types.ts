@@ -1,3 +1,4 @@
+import type { ReactNode } from "react";
 import type { AnimalImage } from "@/types";
 
 interface MediaFieldProps {
@@ -25,10 +26,27 @@ export interface UploadButtonProps {
   onFiles: (files: File[]) => void;
 }
 
+export interface TileDropZoneProps {
+  onDropHere: () => void;
+  className?: string;
+  children: ReactNode;
+}
+
+export interface GalleryListProps {
+  images: AnimalImage[];
+  onChange: (images: AnimalImage[]) => void;
+}
+
 export interface ImageTileProps {
   image: AnimalImage;
-  removeLabel: string;
+  position: number;
+  count: number;
+  isDragging: boolean;
   onRemove: () => void;
+  onMove: (to: number) => void;
+  onDragStart: () => void;
+  onDragEnd: () => void;
+  onDropHere: () => void;
 }
 
 export interface ImageUpload {

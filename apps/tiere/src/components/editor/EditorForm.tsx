@@ -1,4 +1,6 @@
+import { useRef } from "react";
 import { PageContainer } from "@web-app-kit/frontend/ui";
+import { useSaveShortcut, useUnsavedWarning } from "@/hooks";
 import type { EditorFormProps } from "./editor.types";
 import { EditorHeader } from "./EditorHeader";
 import { EditorTabs } from "./EditorTabs";
@@ -7,24 +9,29 @@ import { useAnimalForm } from "./useAnimalForm";
 
 export function EditorForm({ options, record: initial }: EditorFormProps) {
   const form = useAnimalForm(initial);
-  const { draft, record, patch } = form;
+  const formRef = useRef<HTMLFormElement>(null);
+  const { draft, record, patch, isDirty } = form;
   const section = { draft, options, onChange: patch };
   const media = { ...section, animalId: record?.id ?? null };
+  useSaveShortcut(formRef);
+  useUnsavedWarning(isDirty);
 
   return (
     <form
+      ref={formRef}
       onSubmit={form.handleSubmit}
       aria-busy={form.isBusy}
       className="flex min-h-full flex-col"
     >
       <PageContainer size="md" className="flex w-full flex-1 flex-col gap-8">
-        <EditorHeader {...section} record={record} />
+        <EditorHeader {...section} record={record} isDirty={isDirty} />
         <EditorTabs section={section} media={media} record={record} />
       </PageContainer>
       <SaveBar
         {...section}
         record={record}
         isBusy={form.isBusy}
+        isDirty={isDirty}
         error={form.error}
         onRestore={form.restore}
       />

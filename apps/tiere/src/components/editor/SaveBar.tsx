@@ -23,8 +23,21 @@ function TrashNotice({ isBusy, onRestore }: { isBusy: boolean; onRestore: () => 
   );
 }
 
+function SaveActions({ isBusy, isDirty }: { isBusy: boolean; isDirty: boolean }) {
+  return (
+    <div className="flex items-center gap-3">
+      <span role="status" className="text-sm text-muted-foreground">
+        {isDirty ? "Ungespeicherte Änderungen" : ""}
+      </span>
+      <Button type="submit" disabled={isBusy} title="Speichern (Strg/Cmd + S)">
+        {isBusy ? "Speichert …" : "Speichern"}
+      </Button>
+    </div>
+  );
+}
+
 export function SaveBar(props: SaveBarProps) {
-  const { draft, options, record, isBusy, error, onChange, onRestore } = props;
+  const { draft, options, record, isBusy, isDirty, error, onChange, onRestore } = props;
   const isTrashed = record?.status === "trash";
   return (
     <div className="sticky bottom-0 z-10 border-t bg-background">
@@ -43,9 +56,7 @@ export function SaveBar(props: SaveBarProps) {
                 onValueChange={(status) => onChange({ status: status as PostStatus })}
               />
             </div>
-            <Button type="submit" disabled={isBusy}>
-              {isBusy ? "Speichert …" : "Speichern"}
-            </Button>
+            <SaveActions isBusy={isBusy} isDirty={isDirty} />
           </div>
         )}
       </div>
