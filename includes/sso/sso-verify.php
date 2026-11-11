@@ -53,7 +53,8 @@ function tsvd_sso_claims_valid( array $claims, $expected_nonce ) {
 	if ( empty( $claims['nonce'] ) || ! hash_equals( (string) $expected_nonce, (string) $claims['nonce'] ) ) {
 		return false;
 	}
-	if ( empty( $claims['hd'] ) || $claims['hd'] !== tsvd_sso_hosted_domain() ) {
+	$hosted_domain = strtolower( (string) ( $claims['hd'] ?? '' ) );
+	if ( '' === $hosted_domain || ! in_array( $hosted_domain, tsvd_sso_hosted_domains(), true ) ) {
 		return false;
 	}
 	return ! empty( $claims['email_verified'] ) && ! empty( $claims['sub'] );

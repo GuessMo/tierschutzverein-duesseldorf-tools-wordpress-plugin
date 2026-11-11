@@ -15,10 +15,18 @@ function tsvd_sso_is_configured() {
 		&& '' !== (string) TSVD_SSO_GOOGLE_CLIENT_SECRET;
 }
 
-function tsvd_sso_hosted_domain() {
-	return defined( 'TSVD_SSO_GOOGLE_HD' ) && TSVD_SSO_GOOGLE_HD
-		? (string) TSVD_SSO_GOOGLE_HD
-		: 'tierschutzverein-duesseldorf.de';
+const TSVD_SSO_DEFAULT_DOMAINS = array(
+	'tierschutzverein-duesseldorf.de',
+	'tierheim-duesseldorf.de',
+);
+
+function tsvd_sso_hosted_domains() {
+	$configured = defined( 'TSVD_SSO_GOOGLE_HD' )
+		? explode( ',', (string) TSVD_SSO_GOOGLE_HD )
+		: array();
+	$domains    = array_map( 'strtolower', array_map( 'trim', $configured ) );
+	$merged     = array_merge( TSVD_SSO_DEFAULT_DOMAINS, $domains );
+	return array_values( array_unique( array_filter( $merged ) ) );
 }
 
 add_action(
