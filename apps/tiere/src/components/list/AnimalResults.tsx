@@ -2,15 +2,17 @@ import { Button } from "@web-app-kit/frontend/ui";
 import { ErrorMessage, LoadingRows, StateMessage } from "@/components/common";
 import { NEW_ANIMAL_HASH } from "@/hooks";
 import { filterAnimals } from "@/lib";
-import { AnimalTable } from "./AnimalTable";
+import { AnimalCollection } from "./AnimalCollection";
 import type { AnimalResultsProps } from "./list.types";
+import { ViewToggle } from "./ViewToggle";
 
 function countLabel(shown: number, total: number): string {
   if (shown === total) return `${total} Tiere`;
   return `${shown} von ${total} Tieren`;
 }
 
-export function AnimalResults({ animals, options, filter, onResetFilter }: AnimalResultsProps) {
+export function AnimalResults(props: AnimalResultsProps) {
+  const { animals, options, filter, view, onViewChange, onResetFilter } = props;
   if (animals.error) {
     return <ErrorMessage message={animals.error} onRetry={() => void animals.reload()} />;
   }
@@ -31,9 +33,12 @@ export function AnimalResults({ animals, options, filter, onResetFilter }: Anima
   const shown = filterAnimals(animals.data, filter);
   return (
     <div className="flex flex-col gap-3">
-      <p role="status" className="text-sm text-muted-foreground">
-        {countLabel(shown.length, animals.data.length)}
-      </p>
+      <div className="flex items-center justify-between gap-3">
+        <p role="status" className="text-sm text-muted-foreground">
+          {countLabel(shown.length, animals.data.length)}
+        </p>
+        <ViewToggle view={view} onChange={onViewChange} />
+      </div>
       {shown.length === 0 ? (
         <StateMessage
           title="Kein Tier passt zu den Filtern"
@@ -45,7 +50,7 @@ export function AnimalResults({ animals, options, filter, onResetFilter }: Anima
           }
         />
       ) : (
-        <AnimalTable animals={shown} options={options} />
+        <AnimalCollection animals={shown} options={options} view={view} />
       )}
     </div>
   );

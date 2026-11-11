@@ -28,3 +28,4 @@ export type {
 } from "./options";
 export type { Resource } from "./resource";
 export type { Route } from "./route";
+export type { ListView } from "./view";

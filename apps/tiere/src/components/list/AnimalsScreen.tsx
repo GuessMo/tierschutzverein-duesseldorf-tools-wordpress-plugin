@@ -2,7 +2,7 @@ import { useState } from "react";
 import { IconPlus } from "@tabler/icons-react";
 import { Button, PageContainer } from "@web-app-kit/frontend/ui";
 import { animalsApi } from "@/api";
-import { NEW_ANIMAL_HASH, useResource } from "@/hooks";
+import { NEW_ANIMAL_HASH, useListView, useResource } from "@/hooks";
 import { EMPTY_FILTER } from "@/lib";
 import type { AnimalFilter } from "@/types";
 import { AnimalFilters } from "./AnimalFilters";
@@ -12,6 +12,7 @@ import type { AnimalsScreenProps } from "./list.types";
 export function AnimalsScreen({ options }: AnimalsScreenProps) {
   const animals = useResource(animalsApi.list);
   const [filter, setFilter] = useState<AnimalFilter>(EMPTY_FILTER);
+  const [view, setView] = useListView();
 
   return (
     <PageContainer size="lg" className="flex flex-col gap-6">
@@ -29,6 +30,8 @@ export function AnimalsScreen({ options }: AnimalsScreenProps) {
         animals={animals}
         options={options}
         filter={filter}
+        view={view}
+        onViewChange={setView}
         onResetFilter={() => setFilter(EMPTY_FILTER)}
       />
     </PageContainer>
