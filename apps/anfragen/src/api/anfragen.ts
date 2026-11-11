@@ -7,6 +7,8 @@ import type {
   ConversationAction,
   ListFilter,
   ListResponse,
+  RelayedFilter,
+  RelayedResponse,
   Settings,
 } from "@/types";
 import { send } from "./client";
@@ -23,6 +25,20 @@ function listQuery(filter: ListFilter): string {
   });
   return params.toString();
 }
+
+function relayedQuery(filter: RelayedFilter): string {
+  return new URLSearchParams({
+    kind: filter.kind,
+    search: filter.search,
+    month: filter.month,
+    page: String(filter.page),
+  }).toString();
+}
+
+export const relayedApi = {
+  list: (filter: RelayedFilter) =>
+    send<RelayedResponse>("GET", `${BASE}/relayed?${relayedQuery(filter)}`),
+};
 
 export const anfragenApi = {
   list: (filter: ListFilter) => send<ListResponse>("GET", `${BASE}?${listQuery(filter)}`),

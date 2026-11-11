@@ -7,7 +7,7 @@ import { ConversationSidebar } from "@/components/list";
 import { useConversationList, useSelection } from "@/hooks";
 import type { WorkspaceProps } from "./workspace.types";
 
-export function Workspace({ context }: WorkspaceProps) {
+export function Workspace({ context, nav }: WorkspaceProps) {
   const state = useConversationList(context.settings);
   const [selectedId, select] = useSelection();
   const sidebar = (
@@ -25,7 +25,13 @@ export function Workspace({ context }: WorkspaceProps) {
     ? { navigation: sidebar, navigationLabel: "Anfragen" }
     : { detail: sidebar, detailLabel: "Anfragen" };
   return (
-    <AppShell brand="Anfragen" skipLinkLabel="Zum Inhalt springen" controls={<AppControls />} {...slots}>
+    <AppShell
+      brand="Anfragen"
+      skipLinkLabel="Zum Inhalt springen"
+      actions={nav}
+      controls={<AppControls />}
+      {...slots}
+    >
       <PageContainer size="md" className="flex min-h-full flex-col">
         {selectedId === null ? (
           <StateMessage

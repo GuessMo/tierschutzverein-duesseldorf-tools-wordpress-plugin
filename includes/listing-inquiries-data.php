@@ -7,12 +7,17 @@ if ( ! defined( 'ABSPATH' ) ) {
 const TSVD_LISTING_PER_PAGE = 20;
 
 function tsvd_listing_filters_from_request() {
-	$kind = isset( $_GET['kind'] ) ? sanitize_key( $_GET['kind'] ) : '';
+	return tsvd_listing_filters( wp_unslash( $_GET ) );
+}
+
+function tsvd_listing_filters( array $source ) {
+	$kind  = sanitize_key( (string) ( $source['kind'] ?? '' ) );
+	$month = (string) ( $source['m'] ?? '' );
 	return array(
 		'kind'   => in_array( $kind, TSVD_LISTING_KINDS, true ) ? $kind : '',
-		'search' => isset( $_GET['s'] ) ? sanitize_text_field( wp_unslash( $_GET['s'] ) ) : '',
-		'month'  => isset( $_GET['m'] ) && preg_match( '/^\d{4}-\d{2}$/', $_GET['m'] ) ? $_GET['m'] : '',
-		'paged'  => max( 1, isset( $_GET['paged'] ) ? absint( $_GET['paged'] ) : 1 ),
+		'search' => sanitize_text_field( (string) ( $source['s'] ?? '' ) ),
+		'month'  => preg_match( '/^\d{4}-\d{2}$/', $month ) ? $month : '',
+		'paged'  => max( 1, absint( $source['paged'] ?? 1 ) ),
 	);
 }
 

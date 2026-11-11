@@ -26,3 +26,11 @@ export type {
   MessageDirection,
 } from "./conversation";
 export type { AskConfirmation, Confirmation, PendingConfirmation } from "./confirmation";
+export type {
+  RelayedFilter,
+  RelayedItem,
+  RelayedKind,
+  RelayedMonth,
+  RelayedResponse,
+  RelayedStateLevel,
+} from "./relayed";

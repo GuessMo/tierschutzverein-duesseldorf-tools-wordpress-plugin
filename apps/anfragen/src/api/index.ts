@@ -1,1 +1,1 @@
-export { anfragenApi, candidatesApi, messagesApi } from "./anfragen";
+export { anfragenApi, candidatesApi, messagesApi, relayedApi } from "./anfragen";

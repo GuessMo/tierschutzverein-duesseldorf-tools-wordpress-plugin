@@ -18,6 +18,7 @@ function tsvd_anfragen_rest_register_list_routes() {
 	$write = WP_REST_Server::EDITABLE;
 	tsvd_anfragen_rest_route( '', $read, 'tsvd_anfragen_rest_list' );
 	tsvd_anfragen_rest_route( '/context', $read, 'tsvd_anfragen_rest_context' );
+	tsvd_anfragen_rest_route( '/relayed', $read, 'tsvd_anfragen_rest_relayed' );
 	tsvd_anfragen_rest_route( '/settings', $write, 'tsvd_anfragen_rest_update_settings' );
 }
 

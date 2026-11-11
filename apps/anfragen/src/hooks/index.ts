@@ -6,3 +6,7 @@ export { useListFilter } from "./useListFilter";
 export { useResource } from "./useResource";
 export { useSelection } from "./useSelection";
 export { useSidebarPosition } from "./useSidebarPosition";
+export { useArea } from "./useArea";
+export type { Area } from "./useArea";
+export { useRelayed } from "./useRelayed";
+export type { RelayedState } from "./useRelayed";
