@@ -12,9 +12,12 @@ function deltaLabel(delta: number): string {
 export function SeoList({ rows, showDelta = false }: SeoListProps) {
   if (rows.length === 0) return <p className="text-sm text-muted-foreground">Noch keine Daten.</p>;
   return (
-    <ol className="flex flex-col divide-y">
+    <ol className="flex max-h-96 flex-col divide-y overflow-y-auto pr-2">
       {rows.map((row) => (
-        <li key={row.url} className="flex items-baseline justify-between gap-4 py-2 text-sm">
+        <li
+          key={row.url}
+          className="chart-fade flex items-baseline justify-between gap-4 py-2 text-sm"
+        >
           <a href={row.url} target="_blank" rel="noreferrer" className={LINK_CLASSES}>
             {row.title}
           </a>

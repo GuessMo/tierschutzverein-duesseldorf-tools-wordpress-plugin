@@ -1,5 +1,14 @@
 export { BarList } from "./BarList";
-export { ChartCard } from "./ChartCard";
-export { LineChart } from "./LineChart";
+export { ChartSettings } from "./ChartSettings";
+export { ChartView } from "./ChartView";
+export type { ChartViewProps } from "./ChartView";
+export { CompareIcon } from "./CompareIcon";
+export { ALL_TYPES, GEO_TYPES } from "./chartTypes";
+export type { ChartPrefs, ChartType } from "./chartTypes";
+export type { PlotSeries, SeriesSlot } from "./charts.types";
+export { EmptyNote } from "./EmptyNote";
+export { MultiLineChart } from "./MultiLineChart";
+export { NEUTRAL, slotColor } from "./palette";
 export { StatTile } from "./StatTile";
-export type { SeriesSlot } from "./charts.types";
+export { useChartPrefs } from "./useChartPrefs";
+export { useSwitchChart } from "./useSwitchChart";

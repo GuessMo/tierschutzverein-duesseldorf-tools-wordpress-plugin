@@ -1,40 +1,43 @@
-import type { ReactNode } from "react";
 import type { CountRow } from "@/types";
 import type { TickScale } from "@/utils";
 
 export type SeriesSlot = 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8;
 
-export interface LineChartProps {
-  rows: CountRow[];
+export interface PlotSeries {
+  key: string;
   label: string;
+  color: string;
+  values: number[];
+}
+
+export interface TooltipEntry {
+  label: string;
+  value: string;
+  color: string;
+}
+
+export interface MultiLineChartProps {
+  labels: string[];
+  series: PlotSeries[];
   format: (value: number) => string;
   axisFormat?: (value: number) => string;
   ticks?: TickScale;
-  series: SeriesSlot;
+  grid: boolean;
+  label: string;
+  area?: boolean;
 }
 
-export interface BarListProps {
+export interface CategoryChartProps {
   rows: CountRow[];
   label: string;
-  emptyText?: string;
-  series: SeriesSlot;
-}
-
-export interface ChartCardProps {
-  title: string;
-  description?: string;
-  action?: ReactNode;
-  children: ReactNode;
-  className?: string;
+  color: string;
+  colored: boolean;
+  grid: boolean;
+  format: (value: number) => string;
+  rowLabel?: (label: string) => string;
 }
 
 export interface StatTileProps {
   label: string;
   value: string;
-}
-
-export interface ChartPoint {
-  x: number;
-  y: number;
-  row: CountRow;
 }

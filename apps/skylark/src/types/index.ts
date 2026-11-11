@@ -3,6 +3,7 @@ export type {
   AnalyticsRange,
   Breakdowns,
   CountRow,
+  RedirectCounts,
   RedirectRoute,
   SeoLists,
   SeoRow,
@@ -11,3 +12,5 @@ export type {
 } from "./analytics";
 export type { ToolBootstrap } from "./bootstrap";
 export type { Resource } from "./resource";
+export type { ComparePair, CompareRow, Comparisons } from "./compare";
+export type { ConsentDay, Widgets } from "./widgets";

@@ -1,3 +1,6 @@
+import type { ComparePair, Comparisons } from "./compare";
+import type { Widgets } from "./widgets";
+
 export type AnalyticsRange = 7 | 30 | 90;
 
 export interface CountRow {
@@ -35,6 +38,16 @@ export interface RedirectRoute {
   total: number;
   series: CountRow[];
   top: CountRow[];
+  all: CountRow[];
+  counts: RedirectCounts;
+  compare: ComparePair[];
+}
+
+export interface RedirectCounts {
+  month: number;
+  months: CountRow[];
+  years: CountRow[];
+  all: number;
 }
 
 export interface SeoRow {
@@ -58,4 +71,8 @@ export interface AnalyticsData {
   breakdowns: Breakdowns;
   redirects: RedirectRoute[];
   seo: SeoLists;
+  compare: Comparisons;
+  widgets: Widgets;
+  mapUrl: string;
+  refresh: number;
 }
