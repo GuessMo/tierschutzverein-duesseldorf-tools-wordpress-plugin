@@ -1,25 +1,20 @@
+import { HeaderControls } from "@tsvd/tool-controls";
 import { AppShell, PageContainer } from "@web-app-kit/frontend/ui";
-import { AccountMenu } from "@/components/account";
-import { AppThemeToggle } from "@/components/controls";
-import { AppLauncher } from "@/components/launcher";
 import { readBootstrap } from "@/config/bootstrap";
 import { WidgetSlot } from "./WidgetSlot";
 
 const SLOT_COUNT = 6;
 
 export function DashboardScreen() {
-  const { tools, userName, userInitials, logoutUrl } = readBootstrap();
-  const firstName = userName.split(" ")[0];
-  const controls = (
-    <>
-      <AppThemeToggle />
-      <AppLauncher tools={tools} />
-      <AccountMenu userName={userName} initials={userInitials} logoutUrl={logoutUrl} />
-    </>
-  );
+  const bootstrap = readBootstrap();
+  const firstName = bootstrap.userName.split(" ")[0];
 
   return (
-    <AppShell brand="Tierschutzverein" skipLinkLabel="Zum Inhalt springen" controls={controls}>
+    <AppShell
+      brand="Tierschutzverein"
+      skipLinkLabel="Zum Inhalt springen"
+      controls={<HeaderControls {...bootstrap} />}
+    >
       <PageContainer size="lg" className="flex flex-col gap-6">
         <div className="flex flex-col gap-1">
           <h1 className="text-xl font-semibold">Dashboard</h1>

@@ -1,5 +1,5 @@
 import { AppShell } from "@web-app-kit/frontend/ui";
-import { AppThemeToggle } from "@/components/controls";
+import { AppControls } from "@/components/controls";
 import { EntriesView } from "@/components/entries";
 import { useWorkspace } from "@/hooks";
 import { CollectionHeader } from "./CollectionHeader";
@@ -19,7 +19,7 @@ export function CollectionScreen({ collectionId }: { collectionId: number }) {
       homeHref="#"
       skipLinkLabel="Zum Inhalt springen"
       actions={<CollectionHeader name={workspace.collection.data?.name ?? ""} />}
-      controls={<AppThemeToggle />}
+      controls={<AppControls />}
       navigation={<TaxonomyPanel workspace={workspace} />}
       navigationLabel="Taxonomien"
       {...entryDetail(workspace, editor, close)}

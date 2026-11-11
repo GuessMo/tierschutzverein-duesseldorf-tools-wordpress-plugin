@@ -1,9 +1,4 @@
-export interface LauncherTool {
-  slug: string;
-  title: string;
-  url: string;
-  symbol: string;
-}
+import type { LauncherTool } from "@tsvd/tool-controls";
 
 export interface ToolBootstrap {
   restUrl: string;

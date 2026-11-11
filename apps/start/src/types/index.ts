@@ -1,1 +1,1 @@
-export type { LauncherTool, ToolBootstrap } from "./bootstrap";
+export type { ToolBootstrap } from "./bootstrap";

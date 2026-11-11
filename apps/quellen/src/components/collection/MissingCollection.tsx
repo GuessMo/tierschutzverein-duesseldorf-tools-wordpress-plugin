@@ -1,6 +1,6 @@
 import { AppShell, Button, PageContainer } from "@web-app-kit/frontend/ui";
 import { StateMessage } from "@/components/common";
-import { AppThemeToggle } from "@/components/controls";
+import { AppControls } from "@/components/controls";
 
 export function MissingCollection({ message }: { message: string }) {
   return (
@@ -8,7 +8,7 @@ export function MissingCollection({ message }: { message: string }) {
       brand="Quellen"
       homeHref="#"
       skipLinkLabel="Zum Inhalt springen"
-      controls={<AppThemeToggle />}
+      controls={<AppControls />}
     >
       <PageContainer size="md">
         <StateMessage

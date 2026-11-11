@@ -1,4 +1,4 @@
-import type { Icon } from "@tabler/icons-react";
+import type { ReactNode } from "react";
 import {
   IconApps,
   IconBooks,
@@ -7,6 +7,7 @@ import {
   IconPaw,
   IconSchool,
   IconWorld,
+  type Icon,
 } from "@tabler/icons-react";
 
 const SYMBOLS: Record<string, Icon> = {
@@ -18,6 +19,7 @@ const SYMBOLS: Record<string, Icon> = {
   school: IconSchool,
 };
 
-export function symbolFor(name: string): Icon {
-  return SYMBOLS[name] ?? IconApps;
+export function symbolIcon(name: string): ReactNode {
+  const Symbol = SYMBOLS[name] ?? IconApps;
+  return <Symbol stroke={1.5} />;
 }

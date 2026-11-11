@@ -1,8 +1,9 @@
-export interface ToolBootstrap {
+import type { ToolControlsProps } from "@tsvd/tool-controls";
+
+export interface ToolBootstrap extends ToolControlsProps {
   restUrl: string;
   nonce: string;
   adminUrl: string;
-  userName: string;
   toolUrl: string;
 }
 

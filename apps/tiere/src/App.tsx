@@ -1,7 +1,7 @@
 import { AppShell, PageContainer } from "@web-app-kit/frontend/ui";
 import { animalsApi } from "@/api";
 import { ErrorMessage, LoadingRows } from "@/components/common";
-import { AppThemeToggle } from "@/components/controls";
+import { AppControls } from "@/components/controls";
 import { AnimalEditor } from "@/components/editor";
 import { AnimalsScreen } from "@/components/list";
 import { LIST_HASH, useHashRoute, useResource } from "@/hooks";
@@ -34,7 +34,7 @@ export function App() {
       brand="Tierverwaltung"
       homeHref={LIST_HASH}
       skipLinkLabel="Zum Inhalt springen"
-      controls={<AppThemeToggle />}
+      controls={<AppControls />}
     >
       <AppContent />
     </AppShell>

@@ -8,6 +8,7 @@
         "@fontsource-variable/noto-sans": "5.3.0",
         "@tabler/icons-react": "3.49.0",
         "@tailwindcss/vite": "^4.3.2",
+        "@tsvd/tool-controls": "file:../shared",
         "@web-app-kit/frontend": "file:../vendor/web-app-kit/packages/frontend",
         "class-variance-authority": "^0.7.1",
         "clsx": "^2.1.1",
@@ -418,6 +419,8 @@
     "@testing-library/user-event": ["@testing-library/user-event@14.6.7", "", { "peerDependencies": { "@testing-library/dom": ">=7.21.4" } }, "sha512-MPCpX8bxe8zS+JmmTwLp8jd0dy1rAm60Te/SL8JrQM3qvQJcBOs1d7IefJMyZzqM3EWBrDn/LWDt1BCGu4ASfg=="],
 
     "@ts-morph/common": ["@ts-morph/common@0.27.0", "", { "dependencies": { "fast-glob": "^3.3.3", "minimatch": "^10.0.1", "path-browserify": "^1.0.1" } }, "sha512-Wf29UqxWDpc+i61k3oIOzcUfQt79PIT9y/MWfAGlrkjg6lBC1hwDECLXPVJAhWjiGbfBCxZd65F/LIZF3+jeJQ=="],
+
+    "@tsvd/tool-controls": ["@tsvd/tool-controls@file:../shared", { "peerDependencies": { "@tabler/icons-react": "^3.49.0", "@web-app-kit/frontend": "*", "react": "^19.0.0" } }],
 
     "@tybys/wasm-util": ["@tybys/wasm-util@0.10.4", "", { "dependencies": { "tslib": "^2.4.0" } }, "sha512-W3c4gRigFS0T/Ma4qIYF3GDAc5AQdHb1yL5znJT1Zv1YaD9Kitx656wBjvr19qbiosmZT8lWDM5BEMynUqX65A=="],
 
