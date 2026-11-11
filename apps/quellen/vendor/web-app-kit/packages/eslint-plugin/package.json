@@ -1,0 +1,32 @@
+{
+  "name": "@web-app-kit/eslint-plugin",
+  "version": "0.7.1",
+  "private": true,
+  "type": "module",
+  "main": "./src/index.js",
+  "files": [
+    "src",
+    "!src/**/*.test.*",
+    "!src/**/*.helper.js"
+  ],
+  "engines": {
+    "node": "^22.18.0 || >=24.11.0"
+  },
+  "exports": {
+    ".": "./src/index.js"
+  },
+  "scripts": {
+    "test": "node --test \"src/**/*.test.js\""
+  },
+  "dependencies": {
+    "@babel/core": "8.0.7",
+    "@babel/eslint-parser": "8.0.7",
+    "eslint-plugin-jsx-a11y": "6.10.2"
+  },
+  "peerDependencies": {
+    "eslint": "^9.24.0"
+  },
+  "devDependencies": {
+    "eslint": "9.39.5"
+  }
+}

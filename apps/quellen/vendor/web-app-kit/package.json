@@ -1,0 +1,15 @@
+{
+  "name": "web-app-kit-monorepo",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "workspaces": ["packages/*"],
+  "scripts": {
+    "typecheck": "npm run typecheck --workspaces --if-present",
+    "test": "npm test --workspaces --if-present",
+    "test:scripts": "bash scripts/tests/run.sh"
+  },
+  "devDependencies": {
+    "fastify": "5.10.0"
+  }
+}

@@ -129,6 +129,15 @@ jobs:
           git pull origin main
           git fetch --tags origin
 
+      - name: Set up Bun
+        uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: latest
+
+      - name: Build Quellen app
+        working-directory: apps/quellen
+        run: bun install --frozen-lockfile && bun run build
+
       - name: Stage deploy artifact
         run: |
           mkdir -p "$DEPLOY_ARTIFACT_DIR"
@@ -136,6 +145,8 @@ jobs:
             --exclude='.github/' \
             --exclude='.git/' \
             --exclude='*.md' \
+            --include='/apps/quellen/dist/***' \
+            --exclude='/apps/quellen/*' \
             ./ \
             "$DEPLOY_ARTIFACT_DIR/"
 

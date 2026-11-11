@@ -11,6 +11,7 @@ parameters:
         - vendor
         - node_modules (?)
         - build (?)
+        - apps (?)
     phpVersion: 80100
     reportUnmatchedIgnoredErrors: false
     parallel:

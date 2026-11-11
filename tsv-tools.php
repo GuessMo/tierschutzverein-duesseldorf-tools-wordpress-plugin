@@ -102,3 +102,5 @@ require_once TSVD_TOOLS_DIR . 'includes/academy-search.php';
 require_once TSVD_TOOLS_DIR . 'includes/academy-dashboard.php';
 require_once TSVD_TOOLS_DIR . 'includes/academy-viewer.php';
 require_once TSVD_TOOLS_DIR . 'includes/architecture-map/index.php';
+require_once TSVD_TOOLS_DIR . 'includes/tool-portal/index.php';
+require_once TSVD_TOOLS_DIR . 'includes/sources/index.php';

@@ -17,9 +17,16 @@ function tsvd_sso_redirect_uri() {
 	return $base . ( false === strpos( $base, '?' ) ? '?' : '&' ) . 'tsvd_sso=callback';
 }
 
+function tsvd_sso_requested_redirect() {
+	$requested = isset( $_REQUEST['redirect_to'] ) ? esc_url_raw( wp_unslash( $_REQUEST['redirect_to'] ) ) : '';
+	return $requested ? wp_validate_redirect( $requested, '' ) : '';
+}
+
 function tsvd_sso_start_url() {
 	$base = wp_login_url();
-	return $base . ( false === strpos( $base, '?' ) ? '?' : '&' ) . 'tsvd_sso=start';
+	$url  = $base . ( false === strpos( $base, '?' ) ? '?' : '&' ) . 'tsvd_sso=start';
+	$back = tsvd_sso_requested_redirect();
+	return $back ? add_query_arg( 'redirect_to', rawurlencode( $back ), $url ) : $url;
 }
 
 function tsvd_sso_start() {
@@ -35,6 +42,7 @@ function tsvd_sso_start() {
 			'state'    => $state,
 			'nonce'    => $nonce,
 			'verifier' => $verifier,
+			'redirect' => tsvd_sso_requested_redirect(),
 		),
 		10 * MINUTE_IN_SECONDS
 	);
@@ -95,7 +103,7 @@ function tsvd_sso_callback() {
 	}
 
 	wp_set_auth_cookie( $user_id, true );
-	wp_safe_redirect( admin_url() );
+	wp_safe_redirect( empty( $data['redirect'] ) ? admin_url() : $data['redirect'] );
 	exit;
 }
 
