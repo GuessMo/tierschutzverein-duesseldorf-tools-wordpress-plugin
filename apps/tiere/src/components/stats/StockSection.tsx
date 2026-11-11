@@ -1,4 +1,4 @@
-import { formatNumber, monthLabel, StatTile, WIDE } from "@tsvd/tool-controls";
+import { formatNumber, monthLabel, StatTile, WIDE_XL } from "@tsvd/tool-controls";
 import type { StockStats } from "@/types";
 import { statsChart } from "./statsCharts";
 import { StatsCard } from "./StatsCard";
@@ -17,7 +17,7 @@ export function StockSection({ stock }: { stock: StockStats }) {
       <StatsCard
         title="Vermittelt pro Monat"
         spec={{ ...adopted, rowLabel: monthLabel }}
-        className={WIDE}
+        className={WIDE_XL}
       />
       <StatsCard
         title="Aufmerksam geworden durch"

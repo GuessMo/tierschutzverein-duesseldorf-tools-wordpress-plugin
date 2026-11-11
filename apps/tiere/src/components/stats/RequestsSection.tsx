@@ -7,6 +7,7 @@ import {
   slotColor,
   StatTile,
   WIDE,
+  WIDE_XL,
 } from "@tsvd/tool-controls";
 import type { RequestStats } from "@/types";
 import { statsChart } from "./statsCharts";
@@ -42,7 +43,7 @@ function Kpis({ requests }: { requests: RequestStats }) {
 
 function ListedVsCard({ requests }: { requests: RequestStats }) {
   return (
-    <CardShell title="Gelistet und Anfragen je Tierart" className={WIDE}>
+    <CardShell title="Gelistet und Anfragen je Tierart" className={WIDE_XL}>
       <CardBody>
         <GroupedBarList
           rows={requests.listedVs.map((row) => ({
@@ -89,7 +90,7 @@ export function RequestsSection({ requests }: { requests: RequestStats }) {
       <StatsCard
         title="Top-Tiere"
         spec={statsChart("top", "Anfragen", requests.topAnimals, 1, "hbars")}
-        className={WIDE}
+        className={WIDE_XL}
       />
       <StatsCard
         title="Anfragen nach Tierart"
