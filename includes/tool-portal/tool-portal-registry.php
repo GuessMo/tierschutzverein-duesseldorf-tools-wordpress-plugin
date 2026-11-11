@@ -31,7 +31,7 @@ function tsvd_tool_portal_tools() {
 
 function tsvd_tool_portal_start_app() {
 	return array(
-		'title' => __( 'Übersicht', 'tsvd' ),
+		'title' => __( 'Dashboard', 'tsvd' ),
 		'cap'   => 'read',
 	);
 }
