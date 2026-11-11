@@ -35,6 +35,7 @@ function tsvd_at_list_item( WP_Post $post ) {
 			'title'    => $post->post_title,
 			'name'     => (string) tsvd_at_meta( $id, 'animal_name', $post->post_title ),
 			'thumb'    => (string) get_the_post_thumbnail_url( $id, 'thumbnail' ),
+			'tile'     => (string) get_the_post_thumbnail_url( $id, 'tsvd-card' ),
 			'focus'    => tsvd_at_has_focus( $id ),
 			'modified' => mysql_to_rfc3339( $post->post_modified ),
 		),

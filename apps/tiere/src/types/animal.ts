@@ -29,6 +29,7 @@ export interface AnimalListItem {
   title: string;
   name: string;
   thumb: string;
+  tile: string;
   focus: FocusState;
   modified: string;
   species: string;
