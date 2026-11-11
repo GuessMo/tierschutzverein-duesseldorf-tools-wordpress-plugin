@@ -270,7 +270,7 @@ function tsvd_anfragen_calc_status( $anfrage ) {
 	return 'out' === $last ? 'answered' : 'open';
 }
 
-function tsvd_anfragen_list_where( $status, $search, $breed = 0 ) {
+function tsvd_anfragen_list_where( $status, $search, $breed = 0, $animal = 0 ) {
 	global $wpdb;
 	$clauses = array( tsvd_anfragen_messenger_sql( 'a' ) );
 	if ( 'trash' === $status ) {
@@ -309,6 +309,9 @@ function tsvd_anfragen_list_where( $status, $search, $breed = 0 ) {
 			'animal_id IN ( SELECT object_id FROM ' . $wpdb->term_relationships . ' WHERE term_taxonomy_id = %d )',
 			$breed
 		);
+	}
+	if ( $animal ) {
+		$clauses[] = $wpdb->prepare( 'animal_id = %d', $animal );
 	}
 	return 'WHERE ' . implode( ' AND ', $clauses );
 }
@@ -363,10 +366,10 @@ function tsvd_anfragen_render_pagination( $total, $paged, $status, $search, $bre
 	echo '</div></div>';
 }
 
-function tsvd_anfragen_list_rows( $status, $search, $breed, $paged ) {
+function tsvd_anfragen_list_rows( $status, $search, $breed, $paged, $animal = 0 ) {
 	global $wpdb;
 	$table    = tsvd_anfragen_table_name();
-	$where    = tsvd_anfragen_list_where( $status, $search, $breed );
+	$where    = tsvd_anfragen_list_where( $status, $search, $breed, $animal );
 	$calc     = tsvd_anfragen_calc_status_sql( 'a' );
 	$waiting  = tsvd_anfragen_waiting_since_sql( 'a' );
 	$activity = tsvd_anfragen_last_activity_sql( 'a' );

@@ -12,6 +12,7 @@ function tsvd_anfragen_rest_filter( WP_REST_Request $request ) {
 		'status' => in_array( $status, TSVD_ANFRAGEN_REST_STATUSES, true ) ? $status : '',
 		'search' => sanitize_text_field( (string) $request->get_param( 'search' ) ),
 		'breed'  => absint( $request->get_param( 'breed' ) ),
+		'animal' => absint( $request->get_param( 'animal' ) ),
 	);
 }
 
@@ -21,7 +22,8 @@ function tsvd_anfragen_rest_list( WP_REST_Request $request ) {
 		$filter['status'],
 		$filter['search'],
 		$filter['breed'],
-		max( 1, absint( $request->get_param( 'page' ) ) )
+		max( 1, absint( $request->get_param( 'page' ) ) ),
+		$filter['animal']
 	);
 	return rest_ensure_response(
 		array(
@@ -29,7 +31,8 @@ function tsvd_anfragen_rest_list( WP_REST_Request $request ) {
 			'total'  => $list['total'],
 			'pages'  => $list['pages'],
 			'page'   => $list['paged'],
-			'counts' => tsvd_anfragen_rest_counts( $filter['search'], $filter['breed'] ),
+			'counts' => tsvd_anfragen_rest_counts( $filter['search'], $filter['breed'], $filter['animal'] ),
+			'animal' => $filter['animal'] ? tsvd_anfragen_animal_name( $filter['animal'] ) : '',
 			'houses' => tsvd_anfragen_rest_houses(),
 		)
 	);
@@ -53,10 +56,10 @@ function tsvd_anfragen_rest_list_item( $row ) {
 	);
 }
 
-function tsvd_anfragen_rest_counts( $search, $breed ) {
+function tsvd_anfragen_rest_counts( $search, $breed, $animal = 0 ) {
 	$counts = array();
 	foreach ( TSVD_ANFRAGEN_REST_STATUSES as $status ) {
-		$counts[ '' === $status ? 'all' : $status ] = tsvd_anfragen_count( $status, $search, $breed );
+		$counts[ '' === $status ? 'all' : $status ] = tsvd_anfragen_count( $status, $search, $breed, $animal );
 	}
 	return $counts;
 }

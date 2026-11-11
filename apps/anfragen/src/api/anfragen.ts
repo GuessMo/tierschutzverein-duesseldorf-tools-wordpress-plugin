@@ -18,6 +18,7 @@ function listQuery(filter: ListFilter): string {
     status: filter.status,
     search: filter.search,
     breed: String(filter.breed),
+    animal: String(filter.animal),
     page: String(filter.page),
   });
   return params.toString();

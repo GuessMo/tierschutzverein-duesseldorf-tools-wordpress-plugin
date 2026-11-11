@@ -37,7 +37,8 @@ function tsvd_at_list_item( WP_Post $post ) {
 			'thumb'    => (string) get_the_post_thumbnail_url( $id, 'thumbnail' ),
 			'tile'     => (string) get_the_post_thumbnail_url( $id, 'tsvd-card' ),
 			'focus'    => tsvd_at_has_focus( $id ),
-			'modified' => mysql_to_rfc3339( $post->post_modified ),
+			'modified'  => mysql_to_rfc3339( $post->post_modified ),
+			'permalink' => 'publish' === $post->post_status ? get_permalink( $post ) : '',
 		),
 		tsvd_at_list_profile( $id ),
 		tsvd_at_list_state( $id )

@@ -1,5 +1,5 @@
 import type { MouseEvent } from "react";
-import { IconArrowLeft, IconExternalLink, IconPaw } from "@tabler/icons-react";
+import { IconArrowLeft, IconExternalLink, IconMessages, IconPaw } from "@tabler/icons-react";
 import { Button } from "@web-app-kit/frontend/ui";
 import { CopyValue, StateBadge } from "@/components/common";
 import { LIST_HASH } from "@/hooks";
@@ -10,13 +10,20 @@ import { RecordTypeSwitch } from "./RecordTypeSwitch";
 
 function HeaderImage({ image }: { image: AnimalImage | null }) {
   if (image) {
-    return <img src={image.large || image.thumb} alt="" className="size-28 rounded-xl object-cover" />;
+    return (
+      <img src={image.large || image.thumb} alt="" className="size-28 rounded-xl object-cover" />
+    );
   }
   return (
     <span className="flex size-28 items-center justify-center rounded-xl bg-muted text-muted-foreground">
       <IconPaw aria-hidden className="size-10" stroke={1.5} />
     </span>
   );
+}
+
+function inquiryLabel(count: number): string {
+  if (count === 0) return "Keine Anfragen";
+  return count === 1 ? "1 Anfrage" : `${count} Anfragen`;
 }
 
 function RecordLinks({ record }: { record: AnimalRecord }) {
@@ -28,6 +35,14 @@ function RecordLinks({ record }: { record: AnimalRecord }) {
           <a href={pageUrl} target="_blank" rel="noreferrer">
             <IconExternalLink data-icon="inline-start" />
             {record.permalink ? "Auf der Website ansehen" : "Vorschau"}
+          </a>
+        </Button>
+      )}
+      {record.inquiries && (
+        <Button asChild variant="outline" size="sm">
+          <a href={record.inquiries.url} target="_blank" rel="noopener">
+            <IconMessages data-icon="inline-start" />
+            {inquiryLabel(record.inquiries.count)}
           </a>
         </Button>
       )}

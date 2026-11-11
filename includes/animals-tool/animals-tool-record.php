@@ -16,9 +16,20 @@ function tsvd_at_record( WP_Post $post ) {
 		tsvd_at_record_status( $id ),
 		tsvd_at_record_story( $id ),
 		array(
-			'tdw'      => tsvd_at_record_tdw( $id ),
-			'interest' => tsvd_at_record_interest( $id ),
+			'tdw'       => tsvd_at_record_tdw( $id ),
+			'interest'  => tsvd_at_record_interest( $id ),
+			'inquiries' => tsvd_at_record_inquiries( $id ),
 		)
+	);
+}
+
+function tsvd_at_record_inquiries( $id ) {
+	if ( ! function_exists( 'tsvd_anfragen_count' ) || ! current_user_can( 'manage_tsvd_anfragen' ) ) {
+		return null;
+	}
+	return array(
+		'count' => tsvd_anfragen_count( '', '', 0, $id ),
+		'url'   => add_query_arg( 'tier', $id, tsvd_tool_portal_url( 'anfragen' ) ),
 	);
 }
 

@@ -51,7 +51,15 @@ function tsvd_anfragen_rest_animal( $animal_id ) {
 		'facts'    => tsvd_anfragen_rest_animal_facts( $animal_id ),
 		'editUrl'  => (string) get_edit_post_link( $animal_id, 'raw' ),
 		'viewUrl'  => (string) get_permalink( $animal_id ),
+		'toolUrl'  => tsvd_anfragen_rest_animal_tool_url( $animal_id ),
 	);
+}
+
+function tsvd_anfragen_rest_animal_tool_url( $animal_id ) {
+	if ( ! current_user_can( 'edit_post', $animal_id ) ) {
+		return '';
+	}
+	return tsvd_tool_portal_url( 'tiere' ) . '#tier/' . $animal_id;
 }
 
 function tsvd_anfragen_rest_animal_facts( $animal_id ) {

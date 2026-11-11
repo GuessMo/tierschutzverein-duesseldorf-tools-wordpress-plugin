@@ -10,6 +10,7 @@ export interface ListFilter {
   status: ListStatus;
   search: string;
   breed: number;
+  animal: number;
   page: number;
 }
 
@@ -39,6 +40,7 @@ export interface ListResponse {
   page: number;
   counts: Record<CountKey, number>;
   houses: House[];
+  animal: string;
 }
 
 export interface Settings {

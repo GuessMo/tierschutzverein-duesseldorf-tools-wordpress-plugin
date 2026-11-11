@@ -1,4 +1,5 @@
 import { ErrorMessage, LoadingRows, StateMessage } from "@/components/common";
+import { AnimalFilterChip } from "./AnimalFilterChip";
 import { ConversationItem } from "./ConversationItem";
 import { HouseFilter } from "./HouseFilter";
 import type { ConversationSidebarProps } from "./list.types";
@@ -29,9 +30,12 @@ function Items({ state, selectedId, onSelect }: ConversationSidebarProps) {
 }
 
 export function ConversationSidebar(props: ConversationSidebarProps) {
-  const { filter, update, setPage, list } = props.state;
+  const { filter, update, setPage, clearAnimal, list } = props.state;
   return (
     <div className="flex flex-col gap-3 p-3">
+      {filter.animal > 0 && (
+        <AnimalFilterChip name={list.data?.animal ?? ""} onClear={clearAnimal} />
+      )}
       <StatusFilter
         value={filter.status}
         counts={list.data?.counts ?? null}

@@ -31,7 +31,10 @@ function MoreFolders({ value, counts, onChange }: StatusFilterProps) {
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end">
-        <DropdownMenuRadioGroup value={value} onValueChange={(next) => onChange(next as ListStatus)}>
+        <DropdownMenuRadioGroup
+          value={value}
+          onValueChange={(next) => onChange(next as ListStatus)}
+        >
           {MORE_STATUSES.map((item) => (
             <DropdownMenuRadioItem key={item.value} value={item.value}>
               {withCount(item.label, item.value, counts)}

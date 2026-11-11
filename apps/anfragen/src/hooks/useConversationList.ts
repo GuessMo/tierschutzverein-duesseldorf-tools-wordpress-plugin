@@ -5,10 +5,10 @@ import { useListFilter } from "./useListFilter";
 import { useResource } from "./useResource";
 
 export function useConversationList(settings: Settings) {
-  const { filter, update, setPage } = useListFilter(settings);
+  const { filter, update, setPage, clearAnimal } = useListFilter(settings);
   const load = useCallback(() => anfragenApi.list(filter), [filter]);
   const list = useResource(load);
-  return { filter, update, setPage, list };
+  return { filter, update, setPage, clearAnimal, list };
 }
 
 export type ConversationListState = ReturnType<typeof useConversationList>;

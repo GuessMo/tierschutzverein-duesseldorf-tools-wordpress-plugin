@@ -9,6 +9,7 @@ export interface Animal {
   facts: string[];
   editUrl: string;
   viewUrl: string;
+  toolUrl: string;
 }
 
 export interface Fact {

@@ -18,7 +18,9 @@ export function ConversationItem({ item, isSelected, onSelect }: ConversationIte
       className={cn(INTERACTIVE_SURFACE_CLASSES, ITEM_CLASSES)}
     >
       <span className="flex items-center gap-2">
-        {item.isOpen && <span aria-label="offen" className="size-2 shrink-0 rounded-full bg-primary" />}
+        {item.isOpen && (
+          <span aria-label="offen" className="size-2 shrink-0 rounded-full bg-primary" />
+        )}
         <span className={cn("min-w-0 flex-1 truncate", item.isOpen && "font-semibold")}>
           {item.name || "Ohne Namen"}
         </span>

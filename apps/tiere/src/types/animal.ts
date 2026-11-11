@@ -47,6 +47,7 @@ export interface AnimalListItem {
   successfully_adopted: boolean;
   owner_feedback_date: string;
   owner_pending: boolean;
+  permalink: string;
 }
 
 export interface AnimalTdw {
@@ -63,6 +64,11 @@ export interface AnimalInterest {
   total: number;
 }
 
+export interface AnimalInquiries {
+  count: number;
+  url: string;
+}
+
 export interface AnimalRecord {
   id: number;
   status: PostStatus;
@@ -75,6 +81,7 @@ export interface AnimalRecord {
   featured_image: AnimalImage | null;
   images: AnimalImage[];
   can_delete: boolean;
+  inquiries: AnimalInquiries | null;
   name: string;
   teo_id: string;
   description: string;

@@ -35,10 +35,10 @@ function tsvd_anfragen_first_name( $full_name ) {
 	return $parts && '' !== $parts[0] ? $parts[0] : __( 'die interessierte Person', 'tsvd' );
 }
 
-function tsvd_anfragen_count( $status, $search, $breed ) {
+function tsvd_anfragen_count( $status, $search, $breed, $animal = 0 ) {
 	global $wpdb;
 	$table = tsvd_anfragen_table_name();
-	$where = tsvd_anfragen_list_where( $status, $search, $breed );
+	$where = tsvd_anfragen_list_where( $status, $search, $breed, $animal );
 	return (int) $wpdb->get_var( "SELECT COUNT(*) FROM {$table} a {$where}" );
 }
 
