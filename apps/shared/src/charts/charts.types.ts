@@ -40,4 +40,18 @@ export interface CategoryChartProps {
 export interface StatTileProps {
   label: string;
   value: string;
+  sub?: string;
+}
+
+export interface GroupedRow {
+  label: string;
+  values: number[];
+}
+
+export interface GroupedBarListProps {
+  rows: GroupedRow[];
+  series: { label: string; color: string }[];
+  label: string;
+  format: (value: number) => string;
+  rowLabel?: (label: string) => string;
 }

@@ -41,10 +41,11 @@ export type AnimalDraft = Pick<AnimalRecord, DraftFields> & {
 
 export type DraftPatch = Partial<AnimalDraft>;
 
-export interface AnimalPayload extends Omit<
-  AnimalDraft,
-  "featured_image" | "images" | "owner_photos" | "tdw" | "interest_seed" | "status"
-> {
+export interface AnimalPayload
+  extends Omit<
+    AnimalDraft,
+    "featured_image" | "images" | "owner_photos" | "tdw" | "interest_seed" | "status"
+  > {
   status?: PostStatus;
   featured_image_id: number;
   image_ids: number[];

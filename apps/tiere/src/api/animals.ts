@@ -4,6 +4,7 @@ import type {
   AnimalOptions,
   AnimalPayload,
   AnimalRecord,
+  AnimalStats,
 } from "@/types";
 import { send, upload } from "./client";
 
@@ -19,6 +20,7 @@ function uploadImage(file: File, animalId: number | null): Promise<AnimalImage> 
 export const animalsApi = {
   list: () => send<AnimalListItem[]>("GET", BASE),
   options: () => send<AnimalOptions>("GET", `${BASE}/options`),
+  stats: () => send<AnimalStats>("GET", `${BASE}/statistik`),
   get: (id: number) => send<AnimalRecord>("GET", `${BASE}/${id}`),
   create: (payload: AnimalPayload) => send<AnimalRecord>("POST", BASE, payload),
   update: (id: number, payload: AnimalPayload) =>

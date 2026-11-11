@@ -29,3 +29,13 @@ export type {
 export type { Resource } from "./resource";
 export type { Route } from "./route";
 export type { ListView } from "./view";
+export type {
+  AnimalStats,
+  ListedVsRow,
+  RequestStats,
+  ResponseTimes,
+  StockStats,
+  StatsTrend,
+  TimeCompareRow,
+  TimeKpi,
+} from "./stats";

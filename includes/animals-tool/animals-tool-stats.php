@@ -6,7 +6,11 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 function tsvd_at_rest_stats() {
 	if ( ! function_exists( 'tsvd_stats_count_by' ) ) {
-		return new WP_Error( 'tsvd_at_stats_missing', __( 'Die Statistik ist ohne das TSVD-Theme nicht verfügbar.', 'tsvd' ), array( 'status' => 501 ) );
+		return new WP_Error(
+			'tsvd_at_stats_missing',
+			__( 'Die Statistik ist ohne das TSVD-Theme nicht verfügbar.', 'tsvd' ),
+			array( 'status' => 501 )
+		);
 	}
 	return rest_ensure_response(
 		array(
@@ -17,11 +21,15 @@ function tsvd_at_rest_stats() {
 	);
 }
 
+function tsvd_at_stats_text( $value ) {
+	return html_entity_decode( (string) $value, ENT_QUOTES );
+}
+
 function tsvd_at_stats_rows( array $rows, $label_cb = null ) {
 	$out = array();
 	foreach ( $rows as $row ) {
 		$out[] = array(
-			'label' => (string) ( $label_cb ? $label_cb( $row ) : $row['label'] ),
+			'label' => tsvd_at_stats_text( $label_cb ? $label_cb( $row ) : $row['label'] ),
 			'total' => (int) $row['total'],
 		);
 	}
@@ -95,7 +103,7 @@ function tsvd_at_stats_listed_vs_requests() {
 			continue;
 		}
 		$out[] = array(
-			'label'    => (string) $row['name'],
+			'label'    => tsvd_at_stats_text( $row['name'] ),
 			'listed'   => (int) $row['listed'],
 			'requests' => $count,
 		);
@@ -137,7 +145,8 @@ function tsvd_at_stats_stock() {
 	$sources = tsvd_at_stats_rows(
 		tsvd_stats_count_by_adoption_source(),
 		function ( $row ) {
-			return '' === $row['label'] ? __( 'Keine Angabe', 'tsvd' ) : tsvd_stats_enum_label( $row['label'] );
+			$empty = '' === $row['label'];
+			return $empty ? __( 'Keine Angabe', 'tsvd' ) : tsvd_stats_enum_label( $row['label'] );
 		}
 	);
 	return array(
