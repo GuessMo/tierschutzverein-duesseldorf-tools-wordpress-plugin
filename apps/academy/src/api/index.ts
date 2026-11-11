@@ -1,0 +1,1 @@
+export { academyApi } from "./academy";

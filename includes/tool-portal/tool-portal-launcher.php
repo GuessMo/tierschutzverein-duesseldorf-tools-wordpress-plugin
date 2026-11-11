@@ -18,12 +18,6 @@ function tsvd_tool_portal_admin_links() {
 			'symbol' => 'chart',
 			'cap'    => 'manage_options',
 		),
-		'academy' => array(
-			'title'  => __( 'Academy', 'tsvd' ),
-			'page'   => 'tsvd-academy',
-			'symbol' => 'school',
-			'cap'    => 'read',
-		),
 	);
 }
 

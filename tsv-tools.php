@@ -106,3 +106,4 @@ require_once TSVD_TOOLS_DIR . 'includes/tool-portal/index.php';
 require_once TSVD_TOOLS_DIR . 'includes/sources/index.php';
 require_once TSVD_TOOLS_DIR . 'includes/anfragen-rest/index.php';
 require_once TSVD_TOOLS_DIR . 'includes/animals-tool/index.php';
+require_once TSVD_TOOLS_DIR . 'includes/academy-tool/index.php';

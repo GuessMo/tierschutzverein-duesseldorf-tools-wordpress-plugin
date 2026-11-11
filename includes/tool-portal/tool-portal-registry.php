@@ -28,6 +28,13 @@ function tsvd_tool_portal_tools() {
 			'icon'   => 'dashicons-book-alt',
 			'symbol' => 'books',
 		),
+		'academy'  => array(
+			'title'  => __( 'Academy', 'tsvd' ),
+			'path'   => 'academy',
+			'icon'   => 'dashicons-welcome-learn-more',
+			'symbol' => 'school',
+			'cap'    => 'read',
+		),
 	);
 }
 
