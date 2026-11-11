@@ -1,4 +1,5 @@
 import { AppShell, PageContainer } from "@web-app-kit/frontend/ui";
+import { CandidatesDialog } from "@/components/candidates";
 import { StateMessage } from "@/components/common";
 import { AppControls } from "@/components/controls";
 import { ConversationView } from "@/components/conversation";
@@ -9,7 +10,16 @@ import type { WorkspaceProps } from "./workspace.types";
 export function Workspace({ context }: WorkspaceProps) {
   const state = useConversationList(context.settings);
   const [selectedId, select] = useSelection();
-  const sidebar = <ConversationSidebar state={state} selectedId={selectedId} onSelect={select} />;
+  const sidebar = (
+    <div className="flex flex-col">
+      <ConversationSidebar state={state} selectedId={selectedId} onSelect={select} />
+      {context.canManageCandidates && (
+        <div className="px-3 pb-3">
+          <CandidatesDialog onChanged={state.list.reload} />
+        </div>
+      )}
+    </div>
+  );
   const isLeft = context.settings.sidebarPos !== "right";
   const slots = isLeft
     ? { navigation: sidebar, navigationLabel: "Anfragen" }
