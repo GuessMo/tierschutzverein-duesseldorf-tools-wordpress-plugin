@@ -1,4 +1,4 @@
-import type { CountRow } from "@/types";
+import type { CountRow } from "../types";
 
 const DAY_MS = 86_400_000;
 

@@ -1,9 +1,6 @@
-import { ChartView } from "@/components/charts";
+import { ChartView, ViewToggle, monthLabel, useView } from "@tsvd/tool-controls";
 import type { RedirectCounts as Counts } from "@/types";
-import { formatNumber } from "@/utils";
-import { monthLabel } from "./monthLabel";
-import { useView } from "./useView";
-import { ViewToggle } from "./ViewToggle";
+import { formatNumber } from "@tsvd/tool-controls";
 
 const VIEWS = [
   { value: "month", label: "Monat" },

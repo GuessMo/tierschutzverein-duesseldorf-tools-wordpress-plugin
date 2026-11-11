@@ -1,7 +1,8 @@
-import { WIDE } from "@/components/layout";
-import { ConsentCard, MultiViewCard, RedirectCard } from "@/components/cards";
-import { ALL_TYPES, slotColor } from "@/components/charts";
-import { formatNumber } from "@/utils";
+import { WIDE } from "@tsvd/tool-controls";
+import { MultiViewCard } from "@tsvd/tool-controls";
+import { ConsentCard, RedirectCard } from "@/components/cards";
+import { ALL_TYPES, slotColor } from "@tsvd/tool-controls";
+import { formatNumber } from "@tsvd/tool-controls";
 import type { SectionProps } from "./sections.types";
 
 const NEVER = "Alle wurden mindestens einmal aufgerufen.";

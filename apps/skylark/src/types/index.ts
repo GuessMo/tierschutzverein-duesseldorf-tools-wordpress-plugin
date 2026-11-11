@@ -2,7 +2,6 @@ export type {
   AnalyticsData,
   AnalyticsRange,
   Breakdowns,
-  CountRow,
   RedirectCounts,
   RedirectRoute,
   SeoLists,
@@ -12,5 +11,5 @@ export type {
 } from "./analytics";
 export type { ToolBootstrap } from "./bootstrap";
 export type { Resource } from "./resource";
-export type { ComparePair, CompareRow, Comparisons } from "./compare";
+export type { ComparePair, CompareRow, Comparisons, CountRow } from "@tsvd/tool-controls";
 export type { ConsentDay, Widgets } from "./widgets";

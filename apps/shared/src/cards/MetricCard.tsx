@@ -1,4 +1,4 @@
-import { ALL_TYPES } from "@/components/charts";
+import { ALL_TYPES } from "../charts";
 import { ChartPanel } from "./ChartPanel";
 import type { MetricCardProps } from "./cards.types";
 import { CardBody, CardShell } from "./CardShell";

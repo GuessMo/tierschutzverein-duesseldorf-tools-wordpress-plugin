@@ -1,5 +1,5 @@
-import type { CountRow } from "@/types";
-import type { TickScale } from "@/utils";
+import type { CountRow } from "../types";
+import type { TickScale } from "../utils";
 import { BarList } from "./BarList";
 import type { ChartPrefs } from "./chartTypes";
 import { isColored } from "./chartTypes";

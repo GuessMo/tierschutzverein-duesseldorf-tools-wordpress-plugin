@@ -1,8 +1,8 @@
-import { WIDE } from "@/components/layout";
-import { MultiViewCard, type ChartPanelSpec } from "@/components/cards";
-import { ALL_TYPES, GEO_TYPES, slotColor, type ChartType } from "@/components/charts";
+import { WIDE } from "@tsvd/tool-controls";
+import { MultiViewCard, type ChartPanelSpec } from "@tsvd/tool-controls";
+import { ALL_TYPES, GEO_TYPES, slotColor, type ChartType } from "@tsvd/tool-controls";
 import type { CountRow } from "@/types";
-import { formatNumber } from "@/utils";
+import { formatNumber } from "@tsvd/tool-controls";
 import type { SectionProps } from "./sections.types";
 
 function chart(

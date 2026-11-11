@@ -1,4 +1,4 @@
-import { useStoredState } from "@/hooks";
+import { useStoredState } from "../hooks";
 import type { ChartPrefs, ChartType } from "./chartTypes";
 
 export function useChartPrefs(id: string, types: ChartType[], fallback: ChartType) {

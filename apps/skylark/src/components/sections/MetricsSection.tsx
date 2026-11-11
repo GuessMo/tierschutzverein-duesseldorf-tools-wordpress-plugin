@@ -1,6 +1,6 @@
-import { HALF } from "@/components/layout";
-import { MetricCard } from "@/components/cards";
-import { slotColor } from "@/components/charts";
+import { HALF } from "@tsvd/tool-controls";
+import { MetricCard } from "@tsvd/tool-controls";
+import { slotColor } from "@tsvd/tool-controls";
 import {
   fillDays,
   formatCompact,
@@ -9,7 +9,7 @@ import {
   formatNumber,
   minuteTicks,
   scoreTicks,
-} from "@/utils";
+} from "@tsvd/tool-controls";
 import type { SectionProps } from "./sections.types";
 
 const formatScore = (value: number) => `${formatNumber(value)} / 100`;

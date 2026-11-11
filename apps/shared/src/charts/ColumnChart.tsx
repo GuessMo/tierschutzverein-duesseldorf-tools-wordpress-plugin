@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { useElementWidth } from "@/hooks";
+import { useElementWidth } from "../hooks";
 import type { CategoryChartProps } from "./charts.types";
 import { EmptyNote } from "./EmptyNote";
 import { NumberedLegend } from "./NumberedLegend";

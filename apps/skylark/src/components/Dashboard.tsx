@@ -1,6 +1,6 @@
 import { KpiRow, MetricsSection, SeoCard, TrafficCards, WidgetCards } from "@/components/sections";
 import type { AnalyticsData } from "@/types";
-import { FULL } from "./layout";
+import { FULL } from "@tsvd/tool-controls";
 
 const STALE_CLASSES = [
   "flex flex-col gap-6 transition-opacity duration-300",

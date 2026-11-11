@@ -1,5 +1,5 @@
-import { StatTile } from "@/components/charts";
-import { formatDuration, formatNumber } from "@/utils";
+import { StatTile } from "@tsvd/tool-controls";
+import { formatDuration, formatNumber } from "@tsvd/tool-controls";
 import type { SectionProps } from "./sections.types";
 
 export function KpiRow({ data }: SectionProps) {

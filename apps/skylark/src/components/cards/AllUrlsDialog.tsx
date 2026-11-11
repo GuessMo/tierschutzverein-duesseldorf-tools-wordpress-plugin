@@ -7,7 +7,7 @@ import {
   DialogTrigger,
 } from "@web-app-kit/frontend/ui";
 import type { CountRow } from "@/types";
-import { formatNumber } from "@/utils";
+import { formatNumber } from "@tsvd/tool-controls";
 
 export function AllUrlsDialog({ title, rows }: { title: string; rows: CountRow[] }) {
   if (rows.length === 0) return null;

@@ -1,4 +1,4 @@
-import { ChartView, useSwitchChart } from "@/components/charts";
+import { ChartView, useSwitchChart } from "../charts";
 import type { ChartPanelSpec } from "./cards.types";
 import { CardBody } from "./CardShell";
 

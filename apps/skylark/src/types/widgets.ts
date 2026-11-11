@@ -1,4 +1,4 @@
-import type { CountRow } from "./analytics";
+import type { CountRow } from "@tsvd/tool-controls";
 
 export interface ConsentDay {
   label: string;

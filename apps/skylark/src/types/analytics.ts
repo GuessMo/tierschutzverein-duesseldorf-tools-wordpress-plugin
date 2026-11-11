@@ -1,12 +1,7 @@
-import type { ComparePair, Comparisons } from "./compare";
+import type { ComparePair, Comparisons, CountRow } from "@tsvd/tool-controls";
 import type { Widgets } from "./widgets";
 
 export type AnalyticsRange = 7 | 30 | 90;
-
-export interface CountRow {
-  label: string;
-  total: number;
-}
 
 export interface Totals {
   pageviews: number;

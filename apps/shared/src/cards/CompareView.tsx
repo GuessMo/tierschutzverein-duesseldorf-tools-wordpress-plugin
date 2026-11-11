@@ -6,10 +6,10 @@ import {
   MultiLineChart,
   NEUTRAL,
   useChartPrefs,
-} from "@/components/charts";
-import { useStoredState } from "@/hooks";
-import type { ComparePair } from "@/types";
-import type { TickScale } from "@/utils";
+} from "../charts";
+import { useStoredState } from "../hooks";
+import type { ComparePair } from "../types";
+import type { TickScale } from "../utils";
 import { monthLabel } from "./monthLabel";
 
 interface CompareViewProps {

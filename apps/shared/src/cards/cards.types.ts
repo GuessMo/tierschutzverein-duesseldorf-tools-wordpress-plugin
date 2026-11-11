@@ -1,6 +1,6 @@
-import type { ChartType } from "@/components/charts";
-import type { ComparePair, CountRow } from "@/types";
-import type { TickScale } from "@/utils";
+import type { ChartType } from "../charts";
+import type { ComparePair, CountRow } from "../types";
+import type { TickScale } from "../utils";
 
 export interface ChartPanelSpec {
   id: string;

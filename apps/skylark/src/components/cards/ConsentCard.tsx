@@ -1,11 +1,17 @@
-import { ALL_TYPES, MultiLineChart, slotColor, useChartPrefs } from "@/components/charts";
+import {
+  ALL_TYPES,
+  CardBody,
+  CardShell,
+  ChartPanel,
+  MultiLineChart,
+  ViewToggle,
+  slotColor,
+  useChartPrefs,
+  useView,
+} from "@tsvd/tool-controls";
 import type { Widgets } from "@/types";
-import { fillDays, formatCompact, formatDay } from "@/utils";
-import { CardBody, CardShell } from "./CardShell";
-import { ChartPanel } from "./ChartPanel";
-import { useView } from "./useView";
-import { ViewToggle } from "./ViewToggle";
-import { ChartSettings } from "@/components/charts";
+import { fillDays, formatCompact, formatDay } from "@tsvd/tool-controls";
+import { ChartSettings } from "@tsvd/tool-controls";
 
 const SERIES = [
   { key: "accepted", label: "Akzeptiert", color: slotColor(1) },

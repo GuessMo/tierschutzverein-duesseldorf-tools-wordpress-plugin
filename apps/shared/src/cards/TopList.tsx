@@ -1,6 +1,6 @@
-import { EmptyNote } from "@/components/charts";
-import type { CountRow } from "@/types";
-import { formatNumber } from "@/utils";
+import { EmptyNote } from "../charts";
+import type { CountRow } from "../types";
+import { formatNumber } from "../utils";
 
 interface TopListProps {
   rows: CountRow[];

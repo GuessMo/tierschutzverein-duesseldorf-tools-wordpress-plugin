@@ -1,5 +1,5 @@
 import { useState } from "react";
-import type { CountRow } from "@/types";
+import type { CountRow } from "../types";
 import { BarList } from "./BarList";
 import { countryName } from "./countryName";
 import { EmptyNote } from "./EmptyNote";

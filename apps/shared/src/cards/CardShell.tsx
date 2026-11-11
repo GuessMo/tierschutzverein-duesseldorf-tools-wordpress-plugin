@@ -1,5 +1,5 @@
 import type { ReactNode } from "react";
-import { SINGLE } from "@/components/layout";
+import { SINGLE } from "./layout";
 import {
   Card,
   CardContent,

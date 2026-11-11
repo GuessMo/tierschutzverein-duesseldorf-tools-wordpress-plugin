@@ -1,4 +1,4 @@
-import { niceTicks, type TickScale } from "@/utils";
+import { niceTicks, type TickScale } from "../utils";
 
 export const CHART_HEIGHT = 220;
 export const PADDING = { top: 12, right: 12, bottom: 28, left: 48 };

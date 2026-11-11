@@ -1,4 +1,4 @@
-import { useStoredState } from "@/hooks";
+import { useStoredState } from "../hooks";
 import type { ViewOption } from "./ViewToggle";
 
 export function useView(id: string, options: ViewOption[]) {

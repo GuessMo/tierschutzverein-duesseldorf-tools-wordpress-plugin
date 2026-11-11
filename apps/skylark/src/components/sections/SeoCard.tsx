@@ -1,4 +1,4 @@
-import { CardBody, CardShell, useView, ViewToggle } from "@/components/cards";
+import { CardBody, CardShell, useView, ViewToggle } from "@tsvd/tool-controls";
 import type { SeoLists } from "@/types";
 import { SeoList } from "./SeoList";
 

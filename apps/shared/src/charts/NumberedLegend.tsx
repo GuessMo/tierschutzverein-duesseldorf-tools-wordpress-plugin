@@ -1,4 +1,4 @@
-import type { CountRow } from "@/types";
+import type { CountRow } from "../types";
 
 interface NumberedLegendProps {
   rows: CountRow[];

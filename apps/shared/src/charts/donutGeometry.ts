@@ -1,4 +1,4 @@
-import type { CountRow } from "@/types";
+import type { CountRow } from "../types";
 
 const MAX_SLICES = 8;
 

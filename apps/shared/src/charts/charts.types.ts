@@ -1,5 +1,5 @@
-import type { CountRow } from "@/types";
-import type { TickScale } from "@/utils";
+import type { CountRow } from "../types";
+import type { TickScale } from "../utils";
 
 export type SeriesSlot = 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8;
 
