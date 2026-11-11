@@ -4,11 +4,11 @@ export interface Topic {
 }
 
 export interface LessonSummary {
-  id: number;
+  slug: string;
   title: string;
   excerpt: string;
   topics: Topic[];
-  modified: string;
+  updated: string;
 }
 
 export interface TocItem {
@@ -17,16 +17,18 @@ export interface TocItem {
 }
 
 export interface Lesson extends LessonSummary {
+  markdown: string;
+  blocks: Record<string, string>;
+}
+
+export interface RenderedLesson {
   html: string;
   toc: TocItem[];
-  editUrl: string;
 }
 
 export interface AcademyIndex {
   topics: Topic[];
   lessons: LessonSummary[];
-  canManage: boolean;
-  newUrl: string;
 }
 
-export type AcademyRoute = { view: "list"; topic: string } | { view: "lesson"; id: number };
+export type AcademyRoute = { view: "list"; topic: string } | { view: "lesson"; slug: string };

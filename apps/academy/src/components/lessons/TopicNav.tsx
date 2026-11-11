@@ -11,7 +11,17 @@ import type { TopicNavProps } from "./lessons.types";
 
 const LINK_CLASSES = "flex w-full items-center justify-between gap-2 rounded-md px-3 py-2 text-sm";
 
-function TopicLink({ slug, name, count, isActive }: { slug: string; name: string; count: number; isActive: boolean }) {
+function TopicLink({
+  slug,
+  name,
+  count,
+  isActive,
+}: {
+  slug: string;
+  name: string;
+  count: number;
+  isActive: boolean;
+}) {
   return (
     <a
       href={topicHash(slug)}
@@ -43,7 +53,12 @@ export function TopicNav({ topics, lessons, activeTopic, search, onSearch }: Top
       </InputGroup>
       <ul className="flex flex-col gap-0.5">
         <li>
-          <TopicLink slug="" name="Alle Themen" count={lessons.length} isActive={activeTopic === ""} />
+          <TopicLink
+            slug=""
+            name="Alle Themen"
+            count={lessons.length}
+            isActive={activeTopic === ""}
+          />
         </li>
         {topics.map((topic) => (
           <li key={topic.slug}>

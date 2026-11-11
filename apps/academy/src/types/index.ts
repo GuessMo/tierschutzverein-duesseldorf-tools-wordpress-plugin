@@ -3,6 +3,7 @@ export type {
   AcademyRoute,
   Lesson,
   LessonSummary,
+  RenderedLesson,
   TocItem,
   Topic,
 } from "./academy";

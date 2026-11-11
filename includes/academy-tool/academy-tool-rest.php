@@ -21,7 +21,7 @@ function tsvd_act_register_routes() {
 	);
 	register_rest_route(
 		'tsvd-tools/v1',
-		'/academy/(?P<id>\d+)',
+		'/academy/(?P<slug>[a-z0-9-]+)',
 		array(
 			'methods'             => 'GET',
 			'callback'            => 'tsvd_act_rest_lesson',
@@ -30,59 +30,87 @@ function tsvd_act_register_routes() {
 	);
 }
 
+function tsvd_act_visible_lessons() {
+	return array_values( array_filter( tsvd_act_md_lessons(), 'tsvd_act_md_can_view' ) );
+}
+
+function tsvd_act_visible_topics() {
+	$is_manager = current_user_can( TSVD_ACADEMY_EDIT_CAP );
+	return array_values(
+		array_filter(
+			tsvd_act_md_topics(),
+			function ( $topic ) use ( $is_manager ) {
+				return $is_manager || TSVD_ACADEMY_ADMIN_TERM !== $topic['slug'];
+			}
+		)
+	);
+}
+
 function tsvd_act_rest_index() {
 	return rest_ensure_response(
 		array(
-			'topics'    => array_map( 'tsvd_act_topic', tsvd_academy_visible_topics() ),
-			'lessons'   => array_map( 'tsvd_act_lesson_summary', tsvd_academy_visible_lessons() ),
-			'canManage' => tsvd_academy_can_manage(),
-			'newUrl'    => tsvd_act_new_url(),
+			'topics'  => tsvd_act_visible_topics(),
+			'lessons' => array_map( 'tsvd_act_lesson_summary', tsvd_act_visible_lessons() ),
 		)
 	);
 }
 
 function tsvd_act_rest_lesson( WP_REST_Request $request ) {
-	$post = get_post( (int) $request['id'] );
-	if ( ! $post || ! tsvd_academy_can_view( $post ) ) {
+	$lessons = tsvd_act_md_lessons();
+	$lesson  = $lessons[ (string) $request['slug'] ] ?? null;
+	if ( ! $lesson || ! tsvd_act_md_can_view( $lesson ) ) {
 		return new WP_Error(
 			'tsvd_act_not_found',
 			__( 'Diese Anleitung gibt es nicht oder du darfst sie nicht sehen.', 'tsvd' ),
 			array( 'status' => 404 )
 		);
 	}
-	$toc = tsvd_academy_build_toc( apply_filters( 'the_content', $post->post_content ) );
 	return rest_ensure_response(
 		array_merge(
-			tsvd_act_lesson_summary( $post ),
+			tsvd_act_lesson_summary( $lesson ),
 			array(
-				'html'    => $toc['html'],
-				'toc'     => $toc['items'],
-				'editUrl' => tsvd_academy_can_manage() ? (string) get_edit_post_link( $post->ID, 'raw' ) : '',
+				'markdown' => $lesson['body'],
+				'blocks'   => tsvd_act_lesson_blocks( $lesson['body'] ),
 			)
 		)
 	);
 }
 
-function tsvd_act_new_url() {
-	if ( ! tsvd_academy_can_manage() ) {
-		return '';
+function tsvd_act_lesson_blocks( $body ) {
+	$blocks = array();
+	if ( str_contains( $body, ':::architecture-map' ) ) {
+		$blocks['architecture-map'] = render_block(
+			array(
+				'blockName' => 'tsvd/architecture-map',
+				'attrs'     => array(),
+			)
+		);
 	}
-	return admin_url( 'post-new.php?post_type=' . TSVD_ACADEMY_CPT );
+	return $blocks;
 }
 
-function tsvd_act_topic( WP_Term $term ) {
-	return array(
-		'slug' => $term->slug,
-		'name' => $term->name,
-	);
+function tsvd_act_topic_lookup() {
+	$map = array();
+	foreach ( tsvd_act_md_topics() as $topic ) {
+		$map[ $topic['slug'] ] = $topic;
+	}
+	return $map;
 }
 
-function tsvd_act_lesson_summary( WP_Post $post ) {
+function tsvd_act_lesson_summary( array $lesson ) {
+	$lookup = tsvd_act_topic_lookup();
+	$topics = array();
+	foreach ( $lesson['topics'] as $slug ) {
+		$topics[] = $lookup[ $slug ] ?? array(
+			'slug' => $slug,
+			'name' => $slug,
+		);
+	}
 	return array(
-		'id'       => $post->ID,
-		'title'    => get_the_title( $post ),
-		'excerpt'  => wp_trim_words( wp_strip_all_tags( get_the_excerpt( $post ) ), 30 ),
-		'topics'   => array_map( 'tsvd_act_topic', tsvd_academy_lesson_topics( $post ) ),
-		'modified' => mysql_to_rfc3339( $post->post_modified ),
+		'slug'    => $lesson['slug'],
+		'title'   => $lesson['title'],
+		'excerpt' => tsvd_act_md_excerpt( $lesson['body'] ),
+		'topics'  => $topics,
+		'updated' => $lesson['updated'],
 	);
 }

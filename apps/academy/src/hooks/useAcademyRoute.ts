@@ -1,18 +1,18 @@
 import { useEffect, useState } from "react";
 import type { AcademyRoute } from "@/types";
 
-const LESSON = /^#lesson\/(\d+)$/;
+const LESSON = /^#lesson\/([a-z0-9-]+)$/;
 const TOPIC = /^#topic\/([\w-]+)$/;
 
 function readRoute(): AcademyRoute {
   const lesson = LESSON.exec(window.location.hash);
-  if (lesson) return { view: "lesson", id: Number(lesson[1]) };
+  if (lesson?.[1]) return { view: "lesson", slug: lesson[1] };
   const topic = TOPIC.exec(window.location.hash);
   return { view: "list", topic: topic?.[1] ?? "" };
 }
 
-export function lessonHash(id: number): string {
-  return `#lesson/${id}`;
+export function lessonHash(slug: string): string {
+  return `#lesson/${slug}`;
 }
 
 export function topicHash(slug: string): string {

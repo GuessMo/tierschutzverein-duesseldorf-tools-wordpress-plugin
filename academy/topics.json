@@ -1,0 +1,18 @@
+[
+  {
+    "slug": "anwender",
+    "name": "Anwender"
+  },
+  {
+    "slug": "google-workspace",
+    "name": "Google Workspace"
+  },
+  {
+    "slug": "mails",
+    "name": "Mails"
+  },
+  {
+    "slug": "admin",
+    "name": "Admin"
+  }
+]

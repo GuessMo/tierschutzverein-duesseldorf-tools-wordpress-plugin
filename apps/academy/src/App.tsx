@@ -7,8 +7,16 @@ import { LessonList, LessonView, TopicNav } from "@/components/lessons";
 import { topicHash, useAcademyRoute, useResource } from "@/hooks";
 import type { AcademyIndex, AcademyRoute } from "@/types";
 
-function Content({ index, route, search }: { index: AcademyIndex; route: AcademyRoute; search: string }) {
-  if (route.view === "lesson") return <LessonView key={route.id} id={route.id} />;
+function Content({
+  index,
+  route,
+  search,
+}: {
+  index: AcademyIndex;
+  route: AcademyRoute;
+  search: string;
+}) {
+  if (route.view === "lesson") return <LessonView key={route.slug} slug={route.slug} />;
   return <LessonList index={index} topic={route.topic} search={search} />;
 }
 

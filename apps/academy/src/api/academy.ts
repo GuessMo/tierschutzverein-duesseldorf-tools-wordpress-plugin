@@ -3,5 +3,5 @@ import { send } from "./client";
 
 export const academyApi = {
   index: () => send<AcademyIndex>("GET", "academy"),
-  lesson: (id: number) => send<Lesson>("GET", `academy/${id}`),
+  lesson: (slug: string) => send<Lesson>("GET", `academy/${slug}`),
 };

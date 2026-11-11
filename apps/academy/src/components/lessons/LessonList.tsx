@@ -1,5 +1,4 @@
-import { IconPlus } from "@tabler/icons-react";
-import { Badge, Button, Card } from "@web-app-kit/frontend/ui";
+import { Badge, Card } from "@web-app-kit/frontend/ui";
 import { StateMessage } from "@/components/common";
 import { lessonHash } from "@/hooks";
 import type { LessonSummary } from "@/types";
@@ -15,7 +14,7 @@ function matches(lesson: LessonSummary, topic: string, search: string): boolean 
 function LessonCard({ lesson }: { lesson: LessonSummary }) {
   return (
     <Card interactive asChild className="h-full gap-2 px-4">
-      <a href={lessonHash(lesson.id)}>
+      <a href={lessonHash(lesson.slug)}>
         <span className="font-semibold">{lesson.title}</span>
         <span className="line-clamp-3 text-sm text-muted-foreground">{lesson.excerpt}</span>
         <span className="flex flex-wrap gap-1">
@@ -37,21 +36,16 @@ export function LessonList({ index, topic, search }: LessonListProps) {
     <div className="flex flex-col gap-6">
       <div className="flex flex-wrap items-center justify-between gap-3">
         <h1 className="text-xl font-semibold">{title}</h1>
-        {index.newUrl && (
-          <Button asChild variant="outline">
-            <a href={index.newUrl} target="_blank" rel="noreferrer">
-              <IconPlus data-icon="inline-start" />
-              Neue Anleitung
-            </a>
-          </Button>
-        )}
       </div>
       {lessons.length === 0 ? (
-        <StateMessage title="Keine Anleitung gefunden" description="Ändere die Suche oder wähle ein anderes Thema." />
+        <StateMessage
+          title="Keine Anleitung gefunden"
+          description="Ändere die Suche oder wähle ein anderes Thema."
+        />
       ) : (
         <ul className="grid gap-4 sm:grid-cols-2">
           {lessons.map((lesson) => (
-            <li key={lesson.id}>
+            <li key={lesson.slug}>
               <LessonCard lesson={lesson} />
             </li>
           ))}

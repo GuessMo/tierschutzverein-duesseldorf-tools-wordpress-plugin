@@ -15,5 +15,5 @@ export interface LessonListProps {
 }
 
 export interface LessonViewProps {
-  id: number;
+  slug: string;
 }
