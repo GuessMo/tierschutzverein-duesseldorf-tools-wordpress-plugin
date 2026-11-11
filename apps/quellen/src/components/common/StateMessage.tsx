@@ -10,9 +10,7 @@ export function StateMessage({ title, description, action }: StateMessageProps) 
     <div className={FRAME_CLASSES}>
       <div className="flex max-w-sm flex-col items-center gap-2">
         <p className="text-sm font-medium tracking-tight">{title}</p>
-        {description && (
-          <p className="text-sm/relaxed text-muted-foreground">{description}</p>
-        )}
+        {description && <p className="text-sm/relaxed text-muted-foreground">{description}</p>}
       </div>
       {action && (
         <div className="flex w-full max-w-sm min-w-0 flex-col items-center gap-2.5 text-sm">

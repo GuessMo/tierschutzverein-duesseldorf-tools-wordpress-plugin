@@ -15,9 +15,9 @@ export function CollectionsScreen() {
 
   return (
     <AppShell brand="Quellen" skipLinkLabel="Zum Inhalt springen" controls={<AppControls />}>
-      <PageContainer size="md" className="flex flex-col gap-6">
+      <PageContainer size="lg" className="flex flex-col gap-6">
         <div className="flex flex-wrap items-center justify-between gap-3">
-          <h1 className="text-xl font-semibold">Sammlungen</h1>
+          <h1 className="text-2xl font-semibold">Sammlungen</h1>
           <Button onClick={create}>
             <IconPlus data-icon="inline-start" />
             Neue Sammlung

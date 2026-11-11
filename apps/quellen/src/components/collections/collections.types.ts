@@ -6,7 +6,7 @@ export type CollectionDialogState =
   | { type: "edit"; collection: Collection }
   | { type: "delete"; collection: Collection };
 
-export interface CollectionTableProps {
+export interface CollectionListProps {
   collections: Collection[];
   onEdit: (collection: Collection) => void;
   onDelete: (collection: Collection) => void;

@@ -1,7 +1,7 @@
 import { ErrorMessage, LoadingRows, StateMessage } from "@/components/common";
 import { TEXTS } from "@/config/texts";
 import type { CollectionContentProps } from "./collections.types";
-import { CollectionTable } from "./CollectionTable";
+import { CollectionList } from "./CollectionList";
 
 export function CollectionContent({ collections, onEdit, onDelete }: CollectionContentProps) {
   if (collections.error) {
@@ -11,5 +11,5 @@ export function CollectionContent({ collections, onEdit, onDelete }: CollectionC
   if (collections.data.length === 0) {
     return <StateMessage title="Noch keine Sammlung" description={TEXTS.collectionsEmpty} />;
   }
-  return <CollectionTable collections={collections.data} onEdit={onEdit} onDelete={onDelete} />;
+  return <CollectionList collections={collections.data} onEdit={onEdit} onDelete={onDelete} />;
 }
