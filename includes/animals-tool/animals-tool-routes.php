@@ -42,6 +42,12 @@ function tsvd_at_register_collection_routes() {
 			tsvd_at_endpoint( WP_REST_Server::READABLE, 'tsvd_at_rest_options', 'tsvd_at_can_use' ),
 		)
 	);
+	tsvd_at_route(
+		'/statistik',
+		array(
+			tsvd_at_endpoint( WP_REST_Server::READABLE, 'tsvd_at_rest_stats', 'tsvd_at_can_use' ),
+		)
+	);
 }
 
 function tsvd_at_register_item_routes() {

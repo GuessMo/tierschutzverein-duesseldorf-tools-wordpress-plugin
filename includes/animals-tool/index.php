@@ -18,5 +18,7 @@ require_once __DIR__ . '/animals-tool-save.php';
 require_once __DIR__ . '/animals-tool-status.php';
 require_once __DIR__ . '/animals-tool-media.php';
 require_once __DIR__ . '/animals-tool-owner.php';
+require_once __DIR__ . '/animals-tool-stats.php';
+require_once __DIR__ . '/animals-tool-stats-times.php';
 require_once __DIR__ . '/animals-tool-routes.php';
 require_once __DIR__ . '/legacy-menu-hide.php';
