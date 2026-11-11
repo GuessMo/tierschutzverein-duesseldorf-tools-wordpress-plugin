@@ -28,6 +28,8 @@ function blockFor(token: Token, images: Map<string, string>): Content | null {
       return token.ordered
         ? { ol: listItems(token as Tokens.List), style: "body" }
         : { ul: listItems(token as Tokens.List), style: "body" };
+    case "table":
+      return tableBlock(token as Tokens.Table);
     case "code":
       return { text: token.text, style: "code" };
     case "blockquote":
@@ -35,6 +37,28 @@ function blockFor(token: Token, images: Map<string, string>): Content | null {
     default:
       return null;
   }
+}
+
+const BREAK_AFTER = /([/:,>-])/g;
+const WIDE_TABLE = 5;
+
+function breakable(text: string): string {
+  return plain(text).replace(BREAK_AFTER, "$1\u200b");
+}
+
+function tableBlock(table: Tokens.Table): Content {
+  const header = table.header.map((cell) => ({ text: breakable(cell.text), bold: true }));
+  const rows = table.rows.map((row) => row.map((cell) => breakable(cell.text)));
+  const isWide = header.length > WIDE_TABLE;
+  return {
+    table: {
+      headerRows: 1,
+      widths: header.map(() => (isWide ? "auto" : "*")),
+      body: [header, ...rows],
+    },
+    style: isWide ? "wideTable" : "table",
+    layout: "lightHorizontalLines",
+  };
 }
 
 function imageBlock(image: Tokens.Image, images: Map<string, string>): Content {

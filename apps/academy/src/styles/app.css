@@ -69,3 +69,24 @@ body,
     color: var(--muted-foreground);
   }
 }
+
+.academy-prose table {
+  display: block;
+  width: 100%;
+  overflow-x: auto;
+  border-collapse: collapse;
+  font-size: 0.875rem;
+
+  & th,
+  & td {
+    padding: 0.4rem 0.6rem;
+    border: 1px solid var(--border);
+    text-align: left;
+    vertical-align: top;
+  }
+
+  & th {
+    background: var(--muted);
+    font-weight: 600;
+  }
+}

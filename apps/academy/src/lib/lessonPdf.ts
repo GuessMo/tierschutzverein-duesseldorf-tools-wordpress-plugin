@@ -9,6 +9,8 @@ const STYLES: TDocumentDefinitions["styles"] = {
   h3: { fontSize: 12, bold: true, margin: [0, 10, 0, 4] },
   body: { fontSize: 10.5, lineHeight: 1.35, margin: [0, 0, 0, 8] },
   code: { fontSize: 9, background: "#f2f2f2", margin: [0, 2, 0, 10] },
+  table: { fontSize: 8.5, margin: [0, 2, 0, 12] },
+  wideTable: { fontSize: 6.5, margin: [0, 2, 0, 12] },
   note: { fontSize: 10, italics: true, color: "#555555", margin: [0, 2, 0, 10] },
 };
 
