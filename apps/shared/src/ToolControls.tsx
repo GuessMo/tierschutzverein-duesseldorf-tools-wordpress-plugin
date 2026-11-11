@@ -7,7 +7,7 @@ function launcherItems(tools: LauncherTool[]): AppLauncherItem[] {
     id: tool.slug,
     label: tool.title,
     href: tool.url,
-    icon: symbolIcon(tool.symbol),
+    icon: symbolIcon(tool.symbol, tool.color),
   }));
 }
 

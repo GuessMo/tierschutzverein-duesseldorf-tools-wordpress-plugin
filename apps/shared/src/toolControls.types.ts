@@ -3,6 +3,7 @@ export interface LauncherTool {
   title: string;
   url: string;
   symbol: string;
+  color: string;
 }
 
 export interface ToolControlsProps {

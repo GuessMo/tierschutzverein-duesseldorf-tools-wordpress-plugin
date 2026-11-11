@@ -37,6 +37,7 @@ function tsvd_tool_portal_admin_link_item( $slug, $link ) {
 		'title'  => $link['title'],
 		'url'    => $url,
 		'symbol' => $link['symbol'],
+		'color'  => tsvd_tool_portal_icon_color( $slug ),
 	);
 }
 
@@ -46,6 +47,7 @@ function tsvd_tool_portal_launcher_item( $slug, $tool ) {
 		'title'  => $tool['title'],
 		'url'    => tsvd_tool_portal_url( $slug ),
 		'symbol' => $tool['symbol'] ?? 'apps',
+		'color'  => tsvd_tool_portal_icon_color( $slug ),
 	);
 }
 

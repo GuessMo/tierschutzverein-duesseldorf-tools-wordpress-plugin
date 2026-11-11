@@ -25,6 +25,7 @@ function tsvd_tool_portal_print_head( $slug, $assets ) {
 	foreach ( $assets['styles'] as $style ) {
 		echo '<link rel="stylesheet" href="' . esc_url( $style ) . '">';
 	}
+	echo '<style>' . tsvd_tool_portal_color_css( $slug ) . '</style>';
 	$bootstrap = tsvd_tool_portal_bootstrap_json( $slug );
 	echo '<script>window.tsvdToolBootstrap = ' . $bootstrap . ';</script>';
 }

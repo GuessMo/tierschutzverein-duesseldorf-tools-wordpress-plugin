@@ -19,7 +19,7 @@ const SYMBOLS: Record<string, Icon> = {
   school: IconSchool,
 };
 
-export function symbolIcon(name: string): ReactNode {
+export function symbolIcon(name: string, color: string): ReactNode {
   const Symbol = SYMBOLS[name] ?? IconApps;
-  return <Symbol stroke={1.5} />;
+  return <Symbol stroke={1.5} style={{ color }} />;
 }

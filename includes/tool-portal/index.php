@@ -5,6 +5,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 require_once __DIR__ . '/tool-portal-registry.php';
+require_once __DIR__ . '/tool-portal-colors.php';
 require_once __DIR__ . '/tool-portal-caps.php';
 require_once __DIR__ . '/tool-portal-menu.php';
 require_once __DIR__ . '/tool-portal-manifest.php';
