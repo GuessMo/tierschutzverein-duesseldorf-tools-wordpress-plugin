@@ -1,6 +1,5 @@
 import { anfragenApi } from "@/api";
-import { StartupScreen } from "@/components/workspace";
-import { Workspace } from "@/components/workspace";
+import { StartupScreen, Workspace } from "@/components/workspace";
 import { useResource } from "@/hooks";
 
 export function App() {

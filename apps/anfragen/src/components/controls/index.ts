@@ -1,1 +1,1 @@
-export { AppThemeToggle } from "./AppThemeToggle";
+export { AppControls } from "./AppControls";
