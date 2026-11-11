@@ -18,7 +18,8 @@ function tsvd_tool_portal_grant_caps() {
 }
 
 function tsvd_tool_portal_grant_role_caps( WP_Role $role ) {
-	foreach ( array_keys( tsvd_tool_portal_tools() ) as $slug ) {
+	$slugs = array_filter( array_keys( tsvd_tool_portal_tools() ), 'tsvd_tool_portal_has_own_cap' );
+	foreach ( $slugs as $slug ) {
 		$cap = tsvd_tool_portal_cap( $slug );
 		if ( ! $role->has_cap( $cap ) ) {
 			$role->add_cap( $cap );

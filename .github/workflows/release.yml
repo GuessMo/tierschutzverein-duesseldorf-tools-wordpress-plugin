@@ -134,9 +134,12 @@ jobs:
         with:
           bun-version: latest
 
-      - name: Build Quellen app
-        working-directory: apps/quellen
-        run: bun install --frozen-lockfile && bun run build
+      - name: Build tool apps
+        run: |
+          for config in apps/*/vite.config.ts; do
+            app_dir="$(dirname "$config")"
+            (cd "$app_dir" && bun install --frozen-lockfile && bun run build)
+          done
 
       - name: Stage deploy artifact
         run: |
@@ -145,8 +148,9 @@ jobs:
             --exclude='.github/' \
             --exclude='.git/' \
             --exclude='*.md' \
-            --include='/apps/quellen/dist/***' \
-            --exclude='/apps/quellen/*' \
+            --exclude='/apps/vendor/' \
+            --include='/apps/*/dist/***' \
+            --exclude='/apps/*/*' \
             ./ \
             "$DEPLOY_ARTIFACT_DIR/"
 

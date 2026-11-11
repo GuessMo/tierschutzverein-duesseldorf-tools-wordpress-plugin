@@ -127,21 +127,12 @@ function tsvd_anfragen_candidate_redirect( $result, $anfrage_id = 0 ) {
 
 function tsvd_anfragen_handle_candidate_approve() {
 	$candidate = tsvd_anfragen_checked_candidate( 'tsvd_anfrage_candidate_approve_' );
-	$anfrage   = tsvd_halter_get_anfrage( (int) $candidate['anfrage_id'] );
-	$released  = $anfrage ? tsvd_anfragen_imap_release_candidate( $candidate ) : null;
-	if ( ! $anfrage || ! tsvd_anfragen_imap_candidate_done( $released ) ) {
-		tsvd_anfragen_candidate_redirect( 'failed' );
-	}
-	tsvd_anfragen_receive( $anfrage, '', $candidate['body'] );
-	tsvd_anfragen_candidate_mark_decided( (int) $candidate['id'] );
-	tsvd_anfragen_candidate_redirect( 'approved', (int) $anfrage['id'] );
+	$result    = tsvd_anfragen_candidate_approve( $candidate );
+	$view      = 'approved' === $result ? (int) $candidate['anfrage_id'] : 0;
+	tsvd_anfragen_candidate_redirect( $result, $view );
 }
 
 function tsvd_anfragen_handle_candidate_reject() {
 	$candidate = tsvd_anfragen_checked_candidate( 'tsvd_anfrage_candidate_reject_' );
-	if ( ! tsvd_anfragen_imap_candidate_done( tsvd_anfragen_imap_dismiss_candidate( $candidate ) ) ) {
-		tsvd_anfragen_candidate_redirect( 'failed' );
-	}
-	tsvd_anfragen_candidate_mark_decided( (int) $candidate['id'] );
-	tsvd_anfragen_candidate_redirect( 'rejected' );
+	tsvd_anfragen_candidate_redirect( tsvd_anfragen_candidate_reject( $candidate ) );
 }

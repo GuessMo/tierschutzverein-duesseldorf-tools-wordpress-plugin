@@ -363,24 +363,30 @@ function tsvd_anfragen_render_pagination( $total, $paged, $status, $search, $bre
 	echo '</div></div>';
 }
 
-function tsvd_anfragen_render_sidebar( $status, $search, $selected, $pos = 'right', $breed = 0 ) {
+function tsvd_anfragen_list_rows( $status, $search, $breed, $paged ) {
 	global $wpdb;
-	$table = tsvd_anfragen_table_name();
-	$where = tsvd_anfragen_list_where( $status, $search, $breed );
-	$calc  = tsvd_anfragen_calc_status_sql( 'a' );
-	$waiting = tsvd_anfragen_waiting_since_sql( 'a' );
+	$table    = tsvd_anfragen_table_name();
+	$where    = tsvd_anfragen_list_where( $status, $search, $breed );
+	$calc     = tsvd_anfragen_calc_status_sql( 'a' );
+	$waiting  = tsvd_anfragen_waiting_since_sql( 'a' );
 	$activity = tsvd_anfragen_last_activity_sql( 'a' );
-	$total = (int) $wpdb->get_var( "SELECT COUNT(*) FROM {$table} a {$where}" );
-	$pages  = max( 1, (int) ceil( $total / TSVD_ANFRAGEN_PER_PAGE ) );
-	$paged  = max( 1, isset( $_GET['paged'] ) ? absint( $_GET['paged'] ) : 1 );
-	if ( $paged > $pages ) {
-		$paged = $pages;
-	}
-	$offset = ( $paged - 1 ) * TSVD_ANFRAGEN_PER_PAGE;
-	$rows   = $wpdb->get_results(
+	$total    = (int) $wpdb->get_var( "SELECT COUNT(*) FROM {$table} a {$where}" );
+	$pages    = max( 1, (int) ceil( $total / TSVD_ANFRAGEN_PER_PAGE ) );
+	$paged    = min( $pages, max( 1, absint( $paged ) ) );
+	$offset   = ( $paged - 1 ) * TSVD_ANFRAGEN_PER_PAGE;
+	$rows     = $wpdb->get_results(
 		$wpdb->prepare( "SELECT a.*, {$calc} AS calc_status, {$waiting} AS waiting_since, {$activity} AS last_activity FROM {$table} a {$where} ORDER BY last_activity DESC, a.id DESC LIMIT %d OFFSET %d", TSVD_ANFRAGEN_PER_PAGE, $offset ),
 		ARRAY_A
 	);
+	return compact( 'rows', 'total', 'pages', 'paged' );
+}
+
+function tsvd_anfragen_render_sidebar( $status, $search, $selected, $pos = 'right', $breed = 0 ) {
+	$list  = tsvd_anfragen_list_rows( $status, $search, $breed, isset( $_GET['paged'] ) ? $_GET['paged'] : 1 );
+	$rows  = $list['rows'];
+	$total = $list['total'];
+	$pages = $list['pages'];
+	$paged = $list['paged'];
 
 	$base_url      = tsvd_anfragen_list_base_url();
 	$status_labels = tsvd_anfragen_status_labels();
@@ -491,82 +497,58 @@ function tsvd_anfragen_check_action( $nonce_prefix ) {
 }
 
 function tsvd_anfragen_handle_trash() {
-	$id = tsvd_anfragen_check_action( 'tsvd_anfrage_trash_' );
-	global $wpdb;
-	$wpdb->update( tsvd_anfragen_table_name(), array( 'deleted_at' => current_time( 'mysql' ) ), array( 'id' => $id ), array( '%s' ), array( '%d' ) );
+	tsvd_anfragen_trash( tsvd_anfragen_check_action( 'tsvd_anfrage_trash_' ) );
 	wp_safe_redirect( add_query_arg( 'trashed', '1', tsvd_anfragen_list_base_url() ) );
+	exit;
+}
+
+function tsvd_anfragen_redirect_to_view( $id ) {
+	wp_safe_redirect( add_query_arg( 'view', $id, tsvd_anfragen_list_base_url() ) );
 	exit;
 }
 
 function tsvd_anfragen_handle_restore() {
 	$id = tsvd_anfragen_check_action( 'tsvd_anfrage_restore_' );
-	global $wpdb;
-	$wpdb->update( tsvd_anfragen_table_name(), array( 'deleted_at' => null ), array( 'id' => $id ), array( '%s' ), array( '%d' ) );
-	wp_safe_redirect( add_query_arg( 'view', $id, tsvd_anfragen_list_base_url() ) );
-	exit;
+	tsvd_anfragen_restore( $id );
+	tsvd_anfragen_redirect_to_view( $id );
 }
 
 function tsvd_anfragen_handle_delete() {
-	$id = tsvd_anfragen_check_action( 'tsvd_anfrage_delete_' );
-	global $wpdb;
-	$wpdb->delete( tsvd_anfragen_replies_table_name(), array( 'anfrage_id' => $id ), array( '%d' ) );
-	$wpdb->delete( tsvd_anfragen_table_name(), array( 'id' => $id ), array( '%d' ) );
-	wp_safe_redirect( add_query_arg( array( 'status' => 'trash', 'deleted' => '1' ), tsvd_anfragen_list_base_url() ) );
+	tsvd_anfragen_delete( tsvd_anfragen_check_action( 'tsvd_anfrage_delete_' ) );
+	$args = array( 'status' => 'trash', 'deleted' => '1' );
+	wp_safe_redirect( add_query_arg( $args, tsvd_anfragen_list_base_url() ) );
 	exit;
 }
 
 function tsvd_anfragen_handle_spam() {
-	$id = tsvd_anfragen_check_action( 'tsvd_anfrage_spam_' );
-	global $wpdb;
-	$wpdb->update( tsvd_anfragen_table_name(), array( 'status' => 'spam', 'updated_at' => current_time( 'mysql' ) ), array( 'id' => $id ), array( '%s', '%s' ), array( '%d' ) );
-	wp_safe_redirect( add_query_arg( array( 'status' => 'spam', 'spammed' => '1' ), tsvd_anfragen_list_base_url() ) );
+	tsvd_anfragen_mark_spam( tsvd_anfragen_check_action( 'tsvd_anfrage_spam_' ) );
+	$args = array( 'status' => 'spam', 'spammed' => '1' );
+	wp_safe_redirect( add_query_arg( $args, tsvd_anfragen_list_base_url() ) );
 	exit;
 }
 
 function tsvd_anfragen_handle_unspam() {
 	$id = tsvd_anfragen_check_action( 'tsvd_anfrage_unspam_' );
-	global $wpdb;
-	$wpdb->update( tsvd_anfragen_table_name(), array( 'status' => 'open', 'updated_at' => current_time( 'mysql' ) ), array( 'id' => $id ), array( '%s', '%s' ), array( '%d' ) );
-	wp_safe_redirect( add_query_arg( 'view', $id, tsvd_anfragen_list_base_url() ) );
-	exit;
+	tsvd_anfragen_unmark_spam( $id );
+	tsvd_anfragen_redirect_to_view( $id );
 }
 
 function tsvd_anfragen_handle_assign() {
-	$id  = tsvd_anfragen_check_action( 'tsvd_anfrage_assign_' );
-	$uid = isset( $_POST['assigned_user_id'] ) ? absint( $_POST['assigned_user_id'] ) : 0;
-	if ( $uid && ! user_can( $uid, 'manage_tsvd_anfragen' ) ) {
-		$uid = 0;
-	}
-	global $wpdb;
-	$wpdb->update( tsvd_anfragen_table_name(), array( 'assigned_user_id' => $uid ?: null ), array( 'id' => $id ), array( '%d' ), array( '%d' ) );
-	wp_safe_redirect( add_query_arg( 'view', $id, tsvd_anfragen_list_base_url() ) );
-	exit;
+	$id = tsvd_anfragen_check_action( 'tsvd_anfrage_assign_' );
+	tsvd_anfragen_assign( $id, isset( $_POST['assigned_user_id'] ) ? $_POST['assigned_user_id'] : 0 );
+	tsvd_anfragen_redirect_to_view( $id );
 }
 
 function tsvd_anfragen_handle_block() {
 	$id = tsvd_anfragen_check_action( 'tsvd_anfrage_block_' );
-	global $wpdb;
-	$table = tsvd_anfragen_table_name();
-	$email = $wpdb->get_var( $wpdb->prepare( "SELECT applicant_email FROM {$table} WHERE id = %d", $id ) );
-	if ( $email ) {
-		tsvd_anfragen_blacklist_add( $email );
-		$wpdb->update( $table, array( 'status' => 'blocked', 'updated_at' => current_time( 'mysql' ) ), array( 'id' => $id ), array( '%s', '%s' ), array( '%d' ) );
-	}
-	wp_safe_redirect( add_query_arg( 'view', $id, tsvd_anfragen_list_base_url() ) );
-	exit;
+	tsvd_anfragen_block( $id );
+	tsvd_anfragen_redirect_to_view( $id );
 }
 
 function tsvd_anfragen_handle_unblock() {
 	$id = tsvd_anfragen_check_action( 'tsvd_anfrage_unblock_' );
-	global $wpdb;
-	$table = tsvd_anfragen_table_name();
-	$email = $wpdb->get_var( $wpdb->prepare( "SELECT applicant_email FROM {$table} WHERE id = %d", $id ) );
-	if ( $email ) {
-		tsvd_anfragen_blacklist_remove( $email );
-		$wpdb->update( $table, array( 'status' => 'open', 'updated_at' => current_time( 'mysql' ) ), array( 'id' => $id ), array( '%s', '%s' ), array( '%d' ) );
-	}
-	wp_safe_redirect( add_query_arg( 'view', $id, tsvd_anfragen_list_base_url() ) );
-	exit;
+	tsvd_anfragen_unblock( $id );
+	tsvd_anfragen_redirect_to_view( $id );
 }
 
 function tsvd_anfragen_eligible_assignees() {

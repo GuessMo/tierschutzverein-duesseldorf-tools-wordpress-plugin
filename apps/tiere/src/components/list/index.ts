@@ -1,0 +1,1 @@
+export { AnimalsScreen } from "./AnimalsScreen";

@@ -23,8 +23,7 @@ function tsvd_owner_request_approval( $animal_id, $action ) {
 }
 
 function tsvd_owner_render_pending_approval( $anfrage ) {
-	$animal_id = (int) $anfrage['animal_id'];
-	if ( 'halter' !== $anfrage['kind'] || 'active' !== tsvd_owner_pending_action( $animal_id ) ) {
+	if ( ! tsvd_owner_has_pending_approval( $anfrage ) ) {
 		return;
 	}
 	echo '<div class="tsvd-panel tsvd-panel--note"><p>' . esc_html__( 'Der Halter möchte die Anzeige wieder online stellen.', 'tsv-tools' ) . '</p>';
@@ -37,6 +36,17 @@ function tsvd_owner_handle_approve() {
 	if ( ! current_user_can( 'manage_tsvd_anfragen' ) || ! check_admin_referer( 'tsvd_owner_approve_' . $id ) ) {
 		wp_die( esc_html__( 'Keine Berechtigung.', 'tsv-tools' ) );
 	}
+	tsvd_owner_approve( $id );
+	wp_safe_redirect( wp_get_referer() ?: admin_url() );
+	exit;
+}
+
+function tsvd_owner_has_pending_approval( $anfrage ) {
+	$animal_id = (int) $anfrage['animal_id'];
+	return 'halter' === $anfrage['kind'] && 'active' === tsvd_owner_pending_action( $animal_id );
+}
+
+function tsvd_owner_approve( $id ) {
 	$anfrage   = tsvd_halter_get_anfrage( $id );
 	$animal_id = $anfrage ? (int) $anfrage['animal_id'] : 0;
 	if ( $animal_id && 'active' === tsvd_owner_pending_action( $animal_id ) ) {
@@ -44,7 +54,7 @@ function tsvd_owner_handle_approve() {
 		update_post_meta( $animal_id, 'animal_adoption_status', 'for_adoption' );
 		tsvd_halter_log( $id, 'out', __( 'Anzeige wieder freigegeben.', 'tsv-tools' ), 'halter', get_current_user_id() );
 		tsvd_halter_mail( $animal_id, sprintf( __( '%s ist wieder online', 'tsv-tools' ), tsvd_halter_animal_name( $animal_id ) ), sprintf( __( "Deine Anzeige ist wieder online:\n%1\$s\n\nViele Grüße\n%2\$s", 'tsv-tools' ), get_permalink( $animal_id ), get_bloginfo( 'name' ) ) );
+		return true;
 	}
-	wp_safe_redirect( wp_get_referer() ?: admin_url() );
-	exit;
+	return false;
 }

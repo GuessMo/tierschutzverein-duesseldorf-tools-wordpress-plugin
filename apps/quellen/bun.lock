@@ -8,7 +8,7 @@
         "@fontsource-variable/noto-sans": "5.3.0",
         "@tabler/icons-react": "3.49.0",
         "@tailwindcss/vite": "^4.3.2",
-        "@web-app-kit/frontend": "file:./vendor/web-app-kit/packages/frontend",
+        "@web-app-kit/frontend": "file:../vendor/web-app-kit/packages/frontend",
         "class-variance-authority": "^0.7.1",
         "clsx": "^2.1.1",
         "radix-ui": "^1.6.2",
@@ -23,7 +23,7 @@
         "@types/react": "19.2.17",
         "@types/react-dom": "19.2.3",
         "@vitejs/plugin-react": "6.0.3",
-        "@web-app-kit/eslint-plugin": "file:./vendor/web-app-kit/packages/eslint-plugin",
+        "@web-app-kit/eslint-plugin": "file:../vendor/web-app-kit/packages/eslint-plugin",
         "eslint": "9.39.5",
         "typescript": "7.0.2",
         "vite": "8.1.4",
@@ -487,9 +487,9 @@
 
     "@vitejs/plugin-react": ["@vitejs/plugin-react@6.0.3", "", { "dependencies": { "@rolldown/pluginutils": "^1.0.1" }, "peerDependencies": { "@rolldown/plugin-babel": "^0.1.7 || ^0.2.0", "babel-plugin-react-compiler": "^1.0.0", "vite": "^8.0.0" }, "optionalPeers": ["@rolldown/plugin-babel", "babel-plugin-react-compiler"] }, "sha512-vmFvco5/QuC2f9Oj+wTk0+9XeDFkHxSamwZKYc7MxYwKICfvUvlMhqKI0VuICPltGqh1neqBKDvO4kes1ya8vg=="],
 
-    "@web-app-kit/eslint-plugin": ["@web-app-kit/eslint-plugin@file:vendor/web-app-kit/packages/eslint-plugin", { "dependencies": { "@babel/core": "8.0.7", "@babel/eslint-parser": "8.0.7", "eslint-plugin-jsx-a11y": "6.10.2" }, "devDependencies": { "eslint": "9.39.5" }, "peerDependencies": { "eslint": "^9.24.0" } }],
+    "@web-app-kit/eslint-plugin": ["@web-app-kit/eslint-plugin@file:../vendor/web-app-kit/packages/eslint-plugin", { "dependencies": { "@babel/core": "8.0.7", "@babel/eslint-parser": "8.0.7", "eslint-plugin-jsx-a11y": "6.10.2" }, "devDependencies": { "eslint": "9.39.5" }, "peerDependencies": { "eslint": "^9.24.0" } }],
 
-    "@web-app-kit/frontend": ["@web-app-kit/frontend@file:vendor/web-app-kit/packages/frontend", { "devDependencies": { "@fontsource-variable/noto-sans": "5.3.0", "@tabler/icons-react": "3.49.0", "@testing-library/react": "16.3.3", "@testing-library/user-event": "14.6.7", "@types/jsdom": "30.0.0", "@types/react": "19.2.17", "@types/react-dom": "19.2.3", "class-variance-authority": "0.7.1", "clsx": "2.1.1", "cmdk": "1.1.1", "jsdom": "30.1.2", "radix-ui": "1.6.2", "react": "19.2.7", "react-dom": "19.2.7", "sonner": "2.0.8", "tailwind-merge": "3.6.0", "tsx": "4.23.1", "typescript": "^5.6.0" }, "peerDependencies": { "@fontsource-variable/noto-sans": "^5.3.0", "@tabler/icons-react": "^3.49.0", "class-variance-authority": "^0.7.1", "clsx": "^2.1.1", "cmdk": "^1.1.1", "radix-ui": "^1.6.2", "react": "^19.0.0", "sonner": "^2.0.8", "tailwind-merge": "^3.6.0" }, "optionalPeers": ["@fontsource-variable/noto-sans", "@tabler/icons-react", "class-variance-authority", "clsx", "cmdk", "radix-ui", "sonner", "tailwind-merge"] }],
+    "@web-app-kit/frontend": ["@web-app-kit/frontend@file:../vendor/web-app-kit/packages/frontend", { "devDependencies": { "@fontsource-variable/noto-sans": "5.3.0", "@tabler/icons-react": "3.49.0", "@testing-library/react": "16.3.3", "@testing-library/user-event": "14.6.7", "@types/jsdom": "30.0.0", "@types/react": "19.2.17", "@types/react-dom": "19.2.3", "class-variance-authority": "0.7.1", "clsx": "2.1.1", "cmdk": "1.1.1", "jsdom": "30.1.2", "radix-ui": "1.6.2", "react": "19.2.7", "react-dom": "19.2.7", "sonner": "2.0.8", "tailwind-merge": "3.6.0", "tsx": "4.23.1", "typescript": "^5.6.0" }, "peerDependencies": { "@fontsource-variable/noto-sans": "^5.3.0", "@tabler/icons-react": "^3.49.0", "class-variance-authority": "^0.7.1", "clsx": "^2.1.1", "cmdk": "^1.1.1", "radix-ui": "^1.6.2", "react": "^19.0.0", "sonner": "^2.0.8", "tailwind-merge": "^3.6.0" }, "optionalPeers": ["@fontsource-variable/noto-sans", "@tabler/icons-react", "class-variance-authority", "clsx", "cmdk", "radix-ui", "sonner", "tailwind-merge"] }],
 
     "acorn": ["acorn@8.19.0", "", { "bin": { "acorn": "bin/acorn" } }, "sha512-oJlA3XiRm7Cyk6qFD2Jn8ak9B7jSy0qy00ADO3+8dpT0LSjFihQYv4C02LFCSYJV3Q37xYwwRy5m+IpIiUzqWw=="],
 

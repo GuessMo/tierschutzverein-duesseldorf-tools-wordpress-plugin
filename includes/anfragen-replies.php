@@ -159,13 +159,9 @@ add_action( 'wp_ajax_tsvd_anfrage_reply_sendnow', 'tsvd_ajax_anfrage_reply_sendn
 function tsvd_ajax_anfrage_reply_sendnow() {
 	$anfrage = tsvd_anfragen_reply_ajax_guard();
 	$rid     = isset( $_POST['reply'] ) ? absint( $_POST['reply'] ) : 0;
-	global $wpdb;
-	$rt = tsvd_anfragen_replies_table_name();
-	$ok = $wpdb->get_var( $wpdb->prepare( "SELECT id FROM {$rt} WHERE id = %d AND anfrage_id = %d AND direction = 'out' AND sent_at IS NULL", $rid, $anfrage ) );
-	if ( ! $ok ) {
-		wp_send_json_error( array( 'message' => __( 'Nachricht nicht gefunden oder bereits gesendet.', 'tsvd' ) ) );
+	$result  = tsvd_anfragen_send_now( $rid, $anfrage );
+	if ( is_wp_error( $result ) ) {
+		wp_send_json_error( array( 'message' => $result->get_error_message() ) );
 	}
-	wp_clear_scheduled_hook( 'tsvd_anfragen_dispatch', array( (int) $rid ) );
-	tsvd_anfragen_dispatch_reply( (int) $rid );
 	wp_send_json_success();
 }

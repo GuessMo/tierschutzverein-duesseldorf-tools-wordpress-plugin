@@ -189,7 +189,7 @@ function tsvd_anfragen_render_replies( $wpdb, $replies_table, $anfrage ) {
 	echo '<h2>' . esc_html__( 'Konversation', 'tsvd' );
 	tsvd_anfragen_help_btn( __( 'Der vollständige Verlauf dieser Anfrage: ganz oben die Formularangaben der Person, darunter alle Nachrichten. Blau = Nachrichten vom Verein, weiß = Nachrichten der Person, gestrichelt = interne Notizen. Notizen und geplante Nachrichten kannst Du über die Symbole an der Nachricht bearbeiten oder löschen.', 'tsvd' ) );
 	echo '</h2>';
-	$replies = $wpdb->get_results( $wpdb->prepare( "SELECT * FROM {$replies_table} WHERE anfrage_id = %d ORDER BY COALESCE(sent_at, scheduled_at) ASC, id ASC", $id ), ARRAY_A );
+	$replies = tsvd_anfragen_replies_for( $id );
 	$nonce   = wp_create_nonce( 'tsvd_anfrage_reply_' . $id );
 
 	tsvd_anfragen_render_participants( $replies );
@@ -204,18 +204,7 @@ function tsvd_anfragen_render_replies( $wpdb, $replies_table, $anfrage ) {
 }
 
 function tsvd_anfragen_render_participants( $replies ) {
-	$names = array();
-	foreach ( $replies as $reply ) {
-		if ( 'in' === $reply['direction'] ) {
-			continue;
-		}
-		$uid = (int) $reply['user_id'];
-		$key = $uid ? 'u' . $uid : 'system';
-		if ( isset( $names[ $key ] ) ) {
-			continue;
-		}
-		$names[ $key ] = $uid ? tsvd_anfragen_user_label( $uid ) : __( 'System', 'tsvd' );
-	}
+	$names = tsvd_anfragen_participant_names( $replies );
 	if ( empty( $names ) ) {
 		return;
 	}
@@ -251,7 +240,7 @@ function tsvd_anfragen_render_angaben_bubble( $anfrage ) {
 function tsvd_anfragen_render_reply_bubble( $reply, $applicant_name ) {
 	$dir     = $reply['direction'];
 	$rid     = (int) $reply['id'];
-	$pending = ( 'out' === $dir && empty( $reply['sent_at'] ) && ! empty( $reply['scheduled_at'] ) );
+	$pending = tsvd_anfragen_reply_is_pending( $reply );
 	$author  = tsvd_anfragen_reply_author( $reply, $applicant_name );
 	$stamp   = tsvd_anfragen_format_local( $reply['sent_at'] );
 	$css     = 'tsvd-chat__msg tsvd-chat__msg--' . sanitize_html_class( $dir ) . ( $pending ? ' is-pending' : '' );
@@ -269,8 +258,7 @@ function tsvd_anfragen_render_reply_bubble( $reply, $applicant_name ) {
 	echo '</span>' . tsvd_anfragen_reply_tools( $reply, $pending ) . '</div>';
 	echo '<div class="tsvd-chat__body">' . esc_html( $reply['body'] ) . '</div>';
 	if ( $pending ) {
-		$remaining = strtotime( $reply['scheduled_at'] . ' UTC' ) - time();
-		echo '<div class="tsvd-chat__timer" data-remaining="' . max( 0, (int) $remaining ) . '">';
+		echo '<div class="tsvd-chat__timer" data-remaining="' . tsvd_anfragen_reply_remaining( $reply ) . '">';
 		echo '<span class="dashicons dashicons-clock"></span> <span class="tsvd-chat__timer-text"></span>';
 		echo '</div>';
 	}
@@ -456,22 +444,13 @@ function tsvd_ajax_anfrage_reply() {
 		wp_send_json_error( array( 'message' => __( 'Sicherheitsfehler.', 'tsvd' ) ) );
 	}
 
-	$body = isset( $_POST['body'] ) ? sanitize_textarea_field( wp_unslash( $_POST['body'] ) ) : '';
-	$mode = isset( $_POST['mode'] ) && in_array( $_POST['mode'], array( 'note', 'halter' ), true ) ? $_POST['mode'] : 'reply';
-
-	if ( 'note' === $mode ) {
-		$result  = tsvd_anfragen_add_note( $id, $body, get_current_user_id() );
-		$success = __( 'Notiz gespeichert.', 'tsvd' );
-	} else {
-		$result  = tsvd_anfragen_schedule_reply( $id, $body, get_current_user_id(), 'halter' === $mode ? 'halter' : 'applicant' );
-		$success = tsvd_anfragen_send_delay() > 0 ? __( 'Antwort geplant.', 'tsvd' ) : __( 'Antwort gesendet.', 'tsvd' );
-	}
-
+	$body   = isset( $_POST['body'] ) ? sanitize_textarea_field( wp_unslash( $_POST['body'] ) ) : '';
+	$mode   = isset( $_POST['mode'] ) ? sanitize_key( $_POST['mode'] ) : 'reply';
+	$result = tsvd_anfragen_submit_message( $id, $mode, $body );
 	if ( is_wp_error( $result ) ) {
 		wp_send_json_error( array( 'message' => $result->get_error_message() ) );
 	}
-
-	wp_send_json_success( array( 'message' => $success ) );
+	wp_send_json_success( array( 'message' => $result ) );
 }
 
 function tsvd_anfragen_add_note( $id, $body, $user_id = 0 ) {
