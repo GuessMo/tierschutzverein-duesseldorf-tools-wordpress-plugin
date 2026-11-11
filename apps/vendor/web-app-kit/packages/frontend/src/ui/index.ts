@@ -127,6 +127,10 @@ export type {
 export { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "./tooltip.js";
 export { ThemeToggle } from "./theme-toggle.js";
 export type { ThemeToggleLabels, ThemeToggleProps } from "./theme-toggle.types.js";
+export { AccountMenu } from "./account-menu.js";
+export type { AccountMenuProps } from "./account-menu.types.js";
+export { AppLauncher } from "./app-launcher.js";
+export type { AppLauncherItem, AppLauncherProps } from "./app-launcher.types.js";
 export { AppShell } from "./app-shell.js";
 export { APP_SHELL_CONTENT_ID } from "./app-shell.constants.js";
 export type { AppShellLinkProps, AppShellProps } from "./app-shell.types.js";

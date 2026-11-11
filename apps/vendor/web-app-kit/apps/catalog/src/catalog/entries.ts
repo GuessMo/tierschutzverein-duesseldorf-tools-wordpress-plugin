@@ -1,5 +1,7 @@
 import type { CatalogEntry } from "./catalog.types";
+import { accountMenuEntry } from "./components/account-menu";
 import { alertDialogEntry } from "./components/alert-dialog";
+import { appLauncherEntry } from "./components/app-launcher";
 import { appShellEntry } from "./components/app-shell";
 import { appVersionEntry } from "./components/app-version";
 import { badgeEntry } from "./components/badge";
@@ -59,6 +61,8 @@ export const CATALOG_ENTRIES: CatalogEntry[] = [
   separatorEntry,
   tabsEntry,
   dropdownMenuEntry,
+  appLauncherEntry,
+  accountMenuEntry,
   contextMenuEntry,
   commandEntry,
   dialogEntry,
