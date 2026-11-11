@@ -83,6 +83,6 @@ function tsvd_tool_portal_enqueue_menu_script() {
 	wp_localize_script(
 		'tsvd-tool-portal-menu',
 		'tsvdToolPortalMenu',
-		array( 'base' => home_url( '/' . TSVD_TOOL_PORTAL_BASE . '/' ) )
+		array( 'urls' => array_map( 'tsvd_tool_portal_url', array_keys( tsvd_tool_portal_tools() ) ) )
 	);
 }
