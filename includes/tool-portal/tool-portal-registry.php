@@ -35,6 +35,13 @@ function tsvd_tool_portal_tools() {
 			'symbol' => 'school',
 			'cap'    => 'read',
 		),
+		'layout'   => array(
+			'title'  => __( 'Layout', 'tsvd' ),
+			'path'   => 'layout',
+			'icon'   => 'dashicons-layout',
+			'symbol' => 'layout',
+			'cap'    => 'edit_posts',
+		),
 	) + tsvd_tool_portal_skylark_tool();
 }
 

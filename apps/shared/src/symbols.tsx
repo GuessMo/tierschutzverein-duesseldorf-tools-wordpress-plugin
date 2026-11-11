@@ -2,6 +2,7 @@ import type { ReactNode } from "react";
 import {
   IconApps,
   IconBooks,
+  IconLayoutGrid,
   IconChartBar,
   IconMessages,
   IconPaw,
@@ -17,6 +18,7 @@ const SYMBOLS: Record<string, Icon> = {
   books: IconBooks,
   chart: IconChartBar,
   school: IconSchool,
+  layout: IconLayoutGrid,
 };
 
 export function symbolIcon(name: string, color: string): ReactNode {

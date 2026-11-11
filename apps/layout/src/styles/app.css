@@ -1,0 +1,9 @@
+html,
+body,
+#root {
+  height: 100%;
+}
+
+.swatch-transparent {
+  background: repeating-conic-gradient(var(--border) 0 25%, var(--background) 0 50%) 50% / 0.5rem 0.5rem;
+}

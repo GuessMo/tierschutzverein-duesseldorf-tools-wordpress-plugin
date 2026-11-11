@@ -1,0 +1,57 @@
+.artboard :is(.artboard-section, .artboard-cell, .artboard-element) {
+  cursor: pointer;
+  outline-offset: -0.0625rem;
+}
+
+.artboard .artboard-element:hover {
+  outline: 0.0625rem solid var(--selection-color);
+}
+
+.artboard .artboard-cell:hover:not(:has(.artboard-element:hover)) {
+  outline: 0.0625rem dashed var(--selection-color);
+}
+
+.artboard .artboard-cell[data-empty] {
+  min-height: 8cqw;
+  border-radius: 0.8cqw;
+  background-image: repeating-linear-gradient(
+    -45deg,
+    oklch(60% 0.2 303 / 0.08) 0 0.6cqw,
+    transparent 0.6cqw 1.2cqw
+  );
+}
+
+.artboard [data-selected] {
+  outline: 0.125rem solid var(--selection-color);
+  outline-offset: -0.125rem;
+}
+
+.artboard-section[data-selected] {
+  outline-width: 0.1875rem;
+}
+
+.artboard .artboard-element[data-contrast-issue] {
+  outline: 0.125rem dashed var(--issue-color);
+  outline-offset: 0.125rem;
+}
+
+.artboard [data-overflow] {
+  outline: 0.1875rem dashed var(--issue-color);
+  outline-offset: -0.1875rem;
+}
+
+.artboard:is(.is-exporting, .is-static) :is(.artboard-section, .artboard-cell, .artboard-element) {
+  outline: none;
+}
+
+.artboard:is(.is-exporting, .is-static) .artboard-cell[data-empty] {
+  background-image: none;
+}
+
+.artboard.is-exporting .el-image--empty svg {
+  visibility: hidden;
+}
+
+.artboard:is(.is-exporting, .is-static) .artboard__trim {
+  display: none;
+}

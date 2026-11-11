@@ -1,0 +1,42 @@
+.print-sheets {
+  display: none;
+}
+
+@media print {
+  html[data-printing] body {
+    background: #ffffff;
+  }
+
+  html[data-printing] #root {
+    display: none;
+  }
+
+  html[data-printing] .print-sheets {
+    display: block;
+  }
+
+  .print-sheet {
+    position: relative;
+    overflow: hidden;
+    break-after: page;
+    background: #ffffff;
+  }
+
+  .print-sheet:last-child {
+    break-after: auto;
+  }
+
+  .print-sheet__board {
+    position: absolute;
+  }
+
+  .print-sheet .artboard {
+    box-shadow: none;
+  }
+
+  .crop-mark {
+    position: absolute;
+    border-top: 0.25pt solid #000000;
+    border-left: 0.25pt solid #000000;
+  }
+}

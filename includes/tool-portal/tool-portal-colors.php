@@ -8,6 +8,7 @@ const TSVD_TOOL_PORTAL_HUES = array(
 	'start'    => 172,
 	'tiere'    => 45,
 	'quellen'  => 85,
+	'layout'   => 130,
 	'skylark'  => 215,
 	'academy'  => 255,
 	'anfragen' => 300,
