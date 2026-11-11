@@ -35,6 +35,21 @@ function tsvd_tool_portal_tools() {
 			'symbol' => 'school',
 			'cap'    => 'read',
 		),
+	) + tsvd_tool_portal_skylark_tool();
+}
+
+function tsvd_tool_portal_skylark_tool() {
+	if ( ! function_exists( 'skylark_register_data_route' ) ) {
+		return array();
+	}
+	return array(
+		'skylark' => array(
+			'title'  => __( 'Skylark', 'tsvd' ),
+			'path'   => 'skylark',
+			'icon'   => 'dashicons-chart-area',
+			'symbol' => 'chart',
+			'cap'    => 'manage_options',
+		),
 	);
 }
 

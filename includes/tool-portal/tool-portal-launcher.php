@@ -12,12 +12,6 @@ function tsvd_tool_portal_admin_links() {
 			'symbol' => 'world',
 			'cap'    => 'edit_posts',
 		),
-		'skylark' => array(
-			'title'  => __( 'Skylark', 'tsvd' ),
-			'page'   => 'skylark-analytics',
-			'symbol' => 'chart',
-			'cap'    => 'manage_options',
-		),
 	);
 }
 

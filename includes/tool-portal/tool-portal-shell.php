@@ -33,6 +33,7 @@ function tsvd_tool_portal_bootstrap_json( $slug ) {
 	$user = wp_get_current_user();
 	$data = array(
 		'restUrl'      => esc_url_raw( rest_url( 'tsvd-tools/v1/' ) ),
+		'restRoot'     => esc_url_raw( rest_url() ),
 		'nonce'        => wp_create_nonce( 'wp_rest' ),
 		'adminUrl'     => admin_url(),
 		'userName'     => $user->display_name,
