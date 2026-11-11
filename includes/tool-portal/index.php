@@ -10,3 +10,5 @@ require_once __DIR__ . '/tool-portal-menu.php';
 require_once __DIR__ . '/tool-portal-manifest.php';
 require_once __DIR__ . '/tool-portal-shell.php';
 require_once __DIR__ . '/tool-portal-route.php';
+require_once __DIR__ . '/tool-portal-launcher.php';
+require_once __DIR__ . '/tool-portal-login.php';

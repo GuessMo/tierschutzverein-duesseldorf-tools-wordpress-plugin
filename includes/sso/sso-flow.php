@@ -103,7 +103,8 @@ function tsvd_sso_callback() {
 	}
 
 	wp_set_auth_cookie( $user_id, true );
-	wp_safe_redirect( empty( $data['redirect'] ) ? admin_url() : $data['redirect'] );
+	$target = empty( $data['redirect'] ) ? admin_url() : $data['redirect'];
+	wp_safe_redirect( apply_filters( 'login_redirect', $target, $data['redirect'], get_user_by( 'id', $user_id ) ) );
 	exit;
 }
 

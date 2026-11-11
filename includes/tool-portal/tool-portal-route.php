@@ -17,8 +17,12 @@ function tsvd_tool_portal_request_path() {
 }
 
 function tsvd_tool_portal_requested_slug() {
+	$path = tsvd_tool_portal_request_path();
+	if ( TSVD_TOOL_PORTAL_BASE === $path ) {
+		return TSVD_TOOL_PORTAL_START;
+	}
 	$pattern = '#^' . TSVD_TOOL_PORTAL_BASE . '/([a-z0-9-]+)$#';
-	if ( ! preg_match( $pattern, tsvd_tool_portal_request_path(), $matches ) ) {
+	if ( ! preg_match( $pattern, $path, $matches ) ) {
 		return null;
 	}
 	return tsvd_tool_portal_tool( $matches[1] ) ? $matches[1] : null;

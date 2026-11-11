@@ -16,7 +16,7 @@ function tsvd_tool_portal_render_shell( $slug, $assets ) {
 }
 
 function tsvd_tool_portal_print_head( $slug, $assets ) {
-	$tool = tsvd_tool_portal_tool( $slug );
+	$tool = tsvd_tool_portal_app( $slug );
 	echo '<meta charset="utf-8">';
 	echo '<meta name="viewport" content="width=device-width, initial-scale=1">';
 	echo '<meta name="robots" content="noindex, nofollow">';
@@ -32,11 +32,15 @@ function tsvd_tool_portal_print_head( $slug, $assets ) {
 function tsvd_tool_portal_bootstrap_json( $slug ) {
 	$user = wp_get_current_user();
 	$data = array(
-		'restUrl'  => esc_url_raw( rest_url( 'tsvd-tools/v1/' ) ),
-		'nonce'    => wp_create_nonce( 'wp_rest' ),
-		'adminUrl' => admin_url(),
-		'userName' => $user->display_name,
-		'toolUrl'  => tsvd_tool_portal_url( $slug ),
+		'restUrl'      => esc_url_raw( rest_url( 'tsvd-tools/v1/' ) ),
+		'nonce'        => wp_create_nonce( 'wp_rest' ),
+		'adminUrl'     => admin_url(),
+		'userName'     => $user->display_name,
+		'userInitials' => tsvd_tool_portal_initials( $user->display_name ),
+		'toolUrl'      => tsvd_tool_portal_url( $slug ),
+		'startUrl'     => tsvd_tool_portal_start_url(),
+		'logoutUrl'    => wp_logout_url( wp_login_url() ),
+		'tools'        => tsvd_tool_portal_launcher_items(),
 	);
 	return (string) wp_json_encode( $data, JSON_HEX_TAG | JSON_HEX_AMP | JSON_UNESCAPED_SLASHES );
 }
