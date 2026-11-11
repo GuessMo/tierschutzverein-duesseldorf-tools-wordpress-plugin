@@ -27,10 +27,13 @@ export function MessageActions({ conversationId, message, ask, onChanged }: Mess
         initial={message.body}
         onCancel={() => setIsEditing(false)}
         onSave={(body) =>
-          runAction(() => messagesApi.update(conversationId, message.id, body), async () => {
-            setIsEditing(false);
-            await onChanged();
-          })
+          runAction(
+            () => messagesApi.update(conversationId, message.id, body),
+            async () => {
+              setIsEditing(false);
+              await onChanged();
+            },
+          )
         }
       />
     );
@@ -44,7 +47,12 @@ export function MessageActions({ conversationId, message, ask, onChanged }: Mess
           Jetzt senden
         </Button>
       )}
-      <Button size="icon-xs" variant="ghost" aria-label="Nachricht bearbeiten" onClick={() => setIsEditing(true)}>
+      <Button
+        size="icon-xs"
+        variant="ghost"
+        aria-label="Nachricht bearbeiten"
+        onClick={() => setIsEditing(true)}
+      >
         <IconPencil aria-hidden />
       </Button>
       <Button size="icon-xs" variant="ghost" aria-label="Nachricht löschen" onClick={remove}>

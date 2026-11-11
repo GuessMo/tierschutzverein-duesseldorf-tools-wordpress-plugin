@@ -19,16 +19,24 @@ import { CandidateRow } from "./CandidateRow";
 function CandidateList({ onChanged }: CandidatesDialogProps) {
   const candidates = useResource(candidatesApi.list);
   const decide = (id: number, decision: "approve" | "reject") =>
-    void runAction(() => candidatesApi.decide(id, decision), async () => {
-      await candidates.reload();
-      await onChanged();
-    });
+    void runAction(
+      () => candidatesApi.decide(id, decision),
+      async () => {
+        await candidates.reload();
+        await onChanged();
+      },
+    );
   if (candidates.error) {
     return <ErrorMessage message={candidates.error} onRetry={() => void candidates.reload()} />;
   }
   if (!candidates.data) return <LoadingRows label="Kandidaten werden geladen" count={3} />;
   if (candidates.data.length === 0) {
-    return <StateMessage title="Nichts zu prüfen" description="Alle eingegangenen Mails sind zugeordnet." />;
+    return (
+      <StateMessage
+        title="Nichts zu prüfen"
+        description="Alle eingegangenen Mails sind zugeordnet."
+      />
+    );
   }
   return (
     <ul className="flex max-h-[60vh] flex-col gap-2 overflow-y-auto">

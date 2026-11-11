@@ -22,16 +22,28 @@ export function ConversationHeader(props: ConversationHeaderProps) {
           </div>
           <div className="flex flex-wrap gap-x-4 gap-y-1">
             {conversation.email && (
-              <ContactLine label="E-Mail" value={conversation.email} href={`mailto:${conversation.email}`} />
+              <ContactLine
+                label="E-Mail"
+                value={conversation.email}
+                href={`mailto:${conversation.email}`}
+              />
             )}
             {conversation.phone && (
-              <ContactLine label="Telefon" value={conversation.phone} href={`tel:${conversation.phone}`} />
+              <ContactLine
+                label="Telefon"
+                value={conversation.phone}
+                href={`tel:${conversation.phone}`}
+              />
             )}
           </div>
           <span className="text-xs text-muted-foreground">{conversation.createdLabel}</span>
         </div>
         <div className="flex items-center gap-2">
-          <AssigneeSelect value={conversation.assignedUserId} assignees={assignees} onChange={onAssign} />
+          <AssigneeSelect
+            value={conversation.assignedUserId}
+            assignees={assignees}
+            onChange={onAssign}
+          />
           <ActionsMenu conversation={conversation} onAction={onAction} />
         </div>
       </div>

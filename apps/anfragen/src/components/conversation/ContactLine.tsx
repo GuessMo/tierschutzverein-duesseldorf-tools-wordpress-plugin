@@ -4,7 +4,15 @@ import { Button, toast } from "@web-app-kit/frontend/ui";
 
 const RESET_MS = 1600;
 
-export function ContactLine({ label, value, href }: { label: string; value: string; href: string }) {
+export function ContactLine({
+  label,
+  value,
+  href,
+}: {
+  label: string;
+  value: string;
+  href: string;
+}) {
   const [isCopied, setIsCopied] = useState(false);
   const copy = async () => {
     try {

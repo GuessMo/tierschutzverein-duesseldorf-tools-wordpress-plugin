@@ -19,7 +19,9 @@ function menuItems(conversation: Conversation): { action: MenuAction; label: str
   const isSpam = conversation.calcStatus === "spam";
   const isBlocked = conversation.calcStatus === "blocked";
   return [
-    isSpam ? { action: "unspam", label: "Kein Spam" } : { action: "spam", label: "Als Spam markieren" },
+    isSpam
+      ? { action: "unspam", label: "Kein Spam" }
+      : { action: "spam", label: "Als Spam markieren" },
     isBlocked
       ? { action: "unblock", label: "Blockierung aufheben" }
       : { action: "block", label: "Absender blockieren" },
