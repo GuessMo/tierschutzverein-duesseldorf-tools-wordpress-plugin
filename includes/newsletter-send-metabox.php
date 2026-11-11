@@ -80,21 +80,8 @@ function tsvd_newsletter_handle_send_action() {
 	}
 	check_admin_referer( 'tsvd_newsletter_send_' . $post_id );
 
-	$mode    = ( isset( $_POST['tsvd_send_mode'] ) && 'all' === $_POST['tsvd_send_mode'] ) ? 'all' : 'test';
-	$subject = get_the_title( $post_id );
-	$body    = tsvd_newsletter_render_email( $post_id );
-
-	if ( 'all' === $mode ) {
-		$emails = wp_list_pluck( tsvd_newsletter_subscribers(), 'user_email' );
-		$result = tsvd_newsletter_send_html( $emails, $subject, $body );
-		if ( $result['sent'] > 0 ) {
-			update_post_meta( $post_id, TSVD_NEWSLETTER_SENT_META, time() );
-			tsvd_newsletter_mark_items_sent( $post_id, tsvd_newsletter_collect_sent_items( $post_id ) );
-		}
-	} else {
-		$me     = wp_get_current_user();
-		$result = tsvd_newsletter_send_html( array( $me->user_email ), '[Test] ' . $subject, $body );
-	}
+	$mode   = ( isset( $_POST['tsvd_send_mode'] ) && 'all' === $_POST['tsvd_send_mode'] ) ? 'all' : 'test';
+	$result = tsvd_newsletter_send_issue( $post_id, $mode );
 
 	$redirect = add_query_arg(
 		array(

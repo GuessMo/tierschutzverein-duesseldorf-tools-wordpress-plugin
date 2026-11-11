@@ -3,6 +3,7 @@ import {
   IconApps,
   IconBooks,
   IconLayoutGrid,
+  IconMail,
   IconChartBar,
   IconMessages,
   IconPaw,
@@ -19,6 +20,7 @@ const SYMBOLS: Record<string, Icon> = {
   chart: IconChartBar,
   school: IconSchool,
   layout: IconLayoutGrid,
+  mail: IconMail,
 };
 
 export function symbolIcon(name: string, color: string): ReactNode {

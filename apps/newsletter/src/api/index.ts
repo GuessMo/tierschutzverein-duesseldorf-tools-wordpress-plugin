@@ -1,0 +1,1 @@
+export { newsletterApi } from "./newsletter";

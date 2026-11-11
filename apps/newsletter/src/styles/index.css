@@ -1,0 +1,8 @@
+@import "tailwindcss";
+@import "tw-animate-css";
+@import "shadcn/tailwind.css";
+@import "@fontsource-variable/noto-sans";
+@import "@web-app-kit/frontend/theme.css";
+@source "../../node_modules/@web-app-kit/frontend/src";
+@source "../../node_modules/@tsvd/tool-controls/src";
+@import "./app.css";

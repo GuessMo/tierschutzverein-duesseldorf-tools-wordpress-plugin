@@ -6,6 +6,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 const TSVD_TOOL_PORTAL_HUES = array(
 	'start'    => 172,
+	'newsletter' => 15,
 	'tiere'    => 45,
 	'quellen'  => 85,
 	'layout'   => 130,

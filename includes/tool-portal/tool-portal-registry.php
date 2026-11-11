@@ -35,6 +35,13 @@ function tsvd_tool_portal_tools() {
 			'symbol' => 'school',
 			'cap'    => 'read',
 		),
+		'newsletter' => array(
+			'title'  => __( 'Newsletter', 'tsvd' ),
+			'path'   => 'newsletter',
+			'icon'   => 'dashicons-email-alt',
+			'symbol' => 'mail',
+			'cap'    => 'manage_options',
+		),
 		'layout'   => array(
 			'title'  => __( 'Layout', 'tsvd' ),
 			'path'   => 'layout',
