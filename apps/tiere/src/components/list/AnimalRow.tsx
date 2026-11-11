@@ -30,7 +30,7 @@ export function AnimalRow({ animal, options }: AnimalRowProps) {
           </div>
         </div>
       </TableCell>
-      <TableCell className="hidden text-muted-foreground md:table-cell">
+      <TableCell className="hidden whitespace-normal text-muted-foreground md:table-cell">
         {speciesLine(animal.species, animal.breed)}
       </TableCell>
       <TableCell>

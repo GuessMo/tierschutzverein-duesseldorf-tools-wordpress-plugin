@@ -5,7 +5,7 @@ import type { UploadButtonProps } from "./media.types";
 
 const ACCEPT = "image/jpeg,image/png,image/webp,image/gif";
 
-export function UploadButton(props: UploadButtonProps) {
+export function UploadButton({ id, label, multiple, disabled, onFiles }: UploadButtonProps) {
   const input = useRef<HTMLInputElement>(null);
   return (
     <>
