@@ -3,7 +3,7 @@ name: web-app-kit-new-tool
 description: Legt ein neues internes Web-Tool auf Basis von web-app-kit an, von leerem Ordner bis zum laufenden Container - Repo-Layout backend/ + frontend/, Kit als Git-Submodule vendor/web-app-kit auf Release-Tag, Fastify-Backend mit Kit-Helfern (Fehlerklassen, Static Site, Version-Route, Shutdown), Vite/React/Tailwind-v4-Frontend mit App-Rahmen, Theme, i18n und ESLint-Plugin, Dockerfile, docker-compose, AGENTS.md und verlinkte Kit-Skills. Verwenden bei "neues Tool/neue Web-App mit dem Kit bauen", "Tool aufsetzen/scaffolden", "Projekt auf web-app-kit-Basis starten", "Dockerfile/Compose für ein Kit-Tool", "ist mein Tool vollständig eingerichtet" oder "wohin deployen". Nicht für Seiten und Komponenten in einem bestehenden Tool (web-app-kit-ui) und nicht für das Anheben der Kit-Version (web-app-kit-update).
 license: MIT
 metadata:
-  version: "1.0.0"
+  version: "1.2.1"
   abgleich: "2026-11-04 skills.sh+agent-skill.co+aiskill.market+agentskills.io"
 ---
 
@@ -38,8 +38,8 @@ Bei Aufruf mit `how-to` diese Ansicht ausgeben.
   oder nein, legt alle Dateien an, baut das Image und zeigt die laufende App unter
   `http://localhost:<Port>`.
 - **Ergebnis/Verifikation:** `npm run lint` und `npm run build` im Frontend, `npm test` im
-  Backend grün; `docker build` erfolgreich; `GET /api/version` liefert die Version, die Seite
-  zeigt Kopfzeile mit Sprach- und Theme-Umschalter und die Version im Footer.
+  Backend grün; `docker build` erfolgreich; `GET /api/version` liefert App- und Kit-Version,
+  die Seite zeigt Kopfzeile mit Sprach- und Theme-Umschalter und beide Versionen im Footer.
 
 ## Grundregeln (gelten in jedem Schritt)
 
@@ -123,7 +123,8 @@ freischalten, nichts per Flag unterdrücken.
 
 Alle Dateien nach `references/frontend.md`: `.npmrc`, `package.json`, `tsconfig.json`,
 `vite.config.ts`, `eslint.config.js`, `index.html`, `src/index.css`, `src/vite-env.d.ts`,
-`src/main.tsx`, i18n, App-Rahmen (`ToolLayout.tsx`), `App.tsx`, `src/api/client.ts`. Danach:
+`src/main.tsx`, i18n, App-Rahmen (`ToolLayout.tsx`), `App.tsx`, `src/api/client.ts`, Favicon
+(`public/favicon.svg`, Abschnitt „Favicon" in `references/frontend.md`). Danach:
 
 ```bash
 cd frontend && npm install && npm run lint && npm run build && cd ..
@@ -187,16 +188,19 @@ Befehle im Repo-Wurzelordner des Tools ausführen.
 11. Theme ohne Aufblitzen: `themeInitScript` in `frontend/vite.config.ts` mit demselben
     `storageKey` und `defaultTheme` wie `ThemeProvider` in `main.tsx`.
 12. Rahmen: `AppShell` mit `skipLinkLabel`, `ThemeToggle`, `LanguageToggle` und
-    `footer={<AppVersion …/>}`: `grep -rn "AppVersion" frontend/src`.
-13. Keine lokalen UI-Kopien: `test ! -d frontend/src/components/ui && echo ok`.
+    `footer={<AppVersion … kitLabel={…} />}`: `grep -rn "kitLabel" frontend/src`.
+13. Keine lokalen UI-Kopien: `test ! -d frontend/src/components/ui && echo ok` (zusätzlich meldet
+    `web-app-kit/no-foreign-ui` im Lint Dateien unter `components/ui/` und fremde UI-Pakete).
 14. Keine festen Texte: `grep -rnE 'aria-label="|title="|placeholder="' frontend/src` findet
     keine Literale; JSX-Texte stichprobenartig lesen, alle über `t("…")`.
 15. Fehleranzeige: `grep -rnE "error\.message|UserFacingError\(t\(" frontend/src` findet nichts;
     der Fehler-State hält das Fehlerobjekt oder einen i18n-Schlüssel, übersetzt wird beim
     Rendern über `localizeError(error, t)` (`references/frontend.md`).
-16. Kit-Pakete im Dockerfile: zu jeder `file:`-Abhängigkeit eine Zeile
+16. Favicon: `frontend/public/favicon.svg` vorhanden und `grep -n 'rel="icon"' frontend/index.html`
+    zeigt `type="image/svg+xml" href="/favicon.svg"`.
+17. Kit-Pakete im Dockerfile: zu jeder `file:`-Abhängigkeit eine Zeile
     `COPY vendor/web-app-kit/packages/<paket>` in `Dockerfile` und im passenden `Dockerfile.dev`.
-17. Image baut (nach dem ersten Commit). Vor dem ersten Release-Tag ist die Version der
+18. Image baut (nach dem ersten Commit). Vor dem ersten Release-Tag ist die Version der
     Commit-Hash, ohne Commit `dev`:
 
     ```bash
@@ -205,10 +209,11 @@ Befehle im Repo-Wurzelordner des Tools ausführen.
       -t <tool>:local .
     ```
 
-18. Image läuft: `docker run`, dann `curl /api/version` (Version) und `curl /` (200), Befehle in
+19. Image läuft: `docker run`, dann `curl /api/version` (`version` und `kitVersion`) und
+    `curl /` (200), Befehle in
     `references/docker.md`.
-19. `AGENTS.md` vorhanden und verweist auf die drei Kit-Skills; `CLAUDE.md` enthält `@AGENTS.md`.
-20. UI-Prüfung: Skill `web-app-kit-ui`, Command `check`.
+20. `AGENTS.md` vorhanden und verweist auf die drei Kit-Skills; `CLAUDE.md` enthält `@AGENTS.md`.
+21. UI-Prüfung: Skill `web-app-kit-ui`, Command `check`.
 
 ## Deploy
 
@@ -227,4 +232,5 @@ fragen.
 | `references/agents-template.md` | Vorlage für `AGENTS.md` des Tools |
 | `references/deploy.md` | Deploy-Anforderungen, vom Team gepflegtes Deploy-Ziel |
 
-*Zuletzt aktualisiert: 2026-11-04*
+*Zuletzt aktualisiert: 2026-11-05 (Container nach Kit-Update: Verweis auf web-app-kit-update;
+zuvor Kit-Version in Footer und `/api/version`, Favicon-Vorlage, Lint-Regel no-foreign-ui)*

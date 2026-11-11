@@ -106,6 +106,34 @@ check_changelog() {
   [ -n "$entry" ] || fail "CHANGELOG.md hat keinen Eintrag '## [$VERSION]'."
   grep -qE '^App-Aktion: (keine|optional|Pflicht)' <<< "$entry" \
     || fail "CHANGELOG-Eintrag $VERSION ohne gültige Zeile 'App-Aktion: keine|optional|Pflicht'."
+  check_entry_blocks "$entry"
+}
+
+check_entry_blocks() {
+  local block
+  [ "${VERSION%%.*}" -ge 1 ] || return 0
+  for block in "### Neu" "### Umbau"; do
+    grep -qxF "$block" <<< "$1" && continue
+    fail "CHANGELOG-Eintrag $VERSION ohne Block '$block' (Pflicht ab 1.0.0).
+  Vorlage: README, Abschnitt Versionierung und Update."
+  done
+  check_mandatory_rebuild "$1"
+}
+
+rebuild_items() {
+  awk '
+    /^### |^App-Aktion:/ { inside = ($0 == "### Umbau"); next }
+    inside && NF { print }
+  ' <<< "$1"
+}
+
+check_mandatory_rebuild() {
+  grep -qE '^App-Aktion: Pflicht' <<< "$1" || return 0
+  local items
+  items="$(rebuild_items "$1")"
+  [ -n "$items" ] && grep -qvE -e '^[[:space:]]*- keiner\.?[[:space:]]*$' <<< "$items" && return 0
+  fail "CHANGELOG-Eintrag $VERSION hat 'App-Aktion: Pflicht', aber keinen Umbau-Schritt.
+  Unter '### Umbau' je Punkt einen konkreten Schritt in der App nennen, nicht nur '- keiner'."
 }
 
 package_version() {

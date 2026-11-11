@@ -36,7 +36,12 @@ test("keyboard focus matches :focus-visible and carries the focus ring classes",
   const card = renderButtonCard(() => undefined);
   await user.tab();
   assert.equal(card.matches(":focus-visible"), true);
-  for (const token of ["focus-visible:ring-3", "focus-visible:outline-hidden", "cursor-pointer"]) {
+  const tokens = [
+    "focus-visible:ring-2",
+    "focus-visible:ring-ring",
+    "focus-visible:outline-hidden",
+  ];
+  for (const token of [...tokens, "cursor-pointer"]) {
     assert.ok(card.classList.contains(token), token);
   }
   assert.equal(card.dataset.interactive, "true");

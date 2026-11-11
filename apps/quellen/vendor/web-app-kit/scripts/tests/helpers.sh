@@ -52,7 +52,8 @@ write_package() {
 }
 
 write_changelog_entry() {
-  printf '## [%s] — 2026-10-09\n\n- %s\n\n%s\n\n' "$1" "$3" "$2" >> CHANGELOG.md
+  printf '## [%s] — 2026-10-09\n\n### Neu\n\n- %s\n\n### Umbau\n\n- keiner\n\n%s\n\n' \
+    "$1" "$3" "$2" >> CHANGELOG.md
 }
 
 write_kit_release() {

@@ -13,7 +13,7 @@ Bestand der gepinnten Version zeigt
 | `AppShell` | `brand`, `skipLinkLabel`, `children` | `navigation` verlangt `navigationLabel`, `detail` verlangt `detailLabel`; `homeHref` macht `brand` zum Link; `renderLink` für Router-Links (alle Props außer `href` unverändert weitergeben); `actions` links nach dem Titel, `controls` rechts (Sprache, Theme); `footer` für `AppVersion` |
 | `SidePanel` | `side` (`left`/`right`) | `width` `sm` 16rem (Default), `md` 20rem, `lg` 24rem; `title` macht das Panel zur benannten Gruppe mit `<h2>`; `onOpenChange` verlangt `closeLabel`; `returnFocusRef` auf das auslösende Element; `open={false}` rendert nichts |
 | `PageContainer` | – | `size` `md` (Formulare, Lesetext), `lg` (Listen, Default), `full` (Arbeitsflächen) |
-| `AppVersion` | `label`, `version` | nur im `footer` der `AppShell` |
+| `AppVersion` | `label`, `version` | nur im `footer` der `AppShell`; `kitLabel` (Pflicht in Kit-Tools) zeigt dahinter die Kit-Version, z. B. „Version v1.2.0 · Kit 0.14.0“ |
 | `ThemeToggle` | `labels` (`system`, `light`, `dark`), `describe` | Zyklus System → Hell → Dunkel; `describe` formuliert die Aktion für `aria-label`/`title` |
 | `LanguageToggle` | `languages`, `value`, `onChange`, `describe` | `describe` muss den sichtbaren Sprachcode enthalten (WCAG 2.5.3) |
 
@@ -39,7 +39,13 @@ Aufbau einer Seite mit Liste und Detail:
     </SidePanel>
   }
   detailLabel={t("items.detail")}
-  footer={<AppVersion label={t("layout.version")} version={version} />}
+  footer={
+    <AppVersion
+      label={t("layout.version")}
+      version={version}
+      kitLabel={t("layout.kitVersion")}
+    />
+  }
 >
   <PageContainer size="lg">…</PageContainer>
 </AppShell>
@@ -52,11 +58,15 @@ begrenzt. Detail-Panel deshalb erst nach einer Auswahl öffnen. Nur `<main>` scr
 
 | Baustein | Varianten | Regeln |
 | --- | --- | --- |
-| `Button` | `variant`: `default`, `outline`, `secondary`, `ghost`, `destructive`, `link`; `size`: `default`, `xs`, `sm`, `lg`, `icon`, `icon-xs`, `icon-sm`, `icon-lg` | eine `default`-Aktion pro Ansicht; `xs`/`icon-xs` sind 24px hoch (WCAG-Minimum), sonst Default-Größen; Icon-only-Button braucht `aria-label` aus i18n; Laden: `disabled` + sichtbarer Text, kein eigenes `isPending` |
-| `Badge` | wie Button-Farbvarianten | als Link: `Badge asChild` mit `<a>` |
+| `Button` | `variant`: `default`, `outline`, `secondary`, `tertiary`, `ghost`, `destructive`, `link`; `size`: `default`, `xs`, `sm`, `lg`, `icon`, `icon-xs`, `icon-sm`, `icon-lg` | eine `default`-Aktion pro Ansicht, `secondary` für die zweite, `tertiary` für neutrale oder untergeordnete Aktionen; `xs`/`icon-xs` sind 24px hoch (WCAG-Minimum), sonst Default-Größen; Icon-only-Button braucht `aria-label` aus i18n; Laden: `disabled` + sichtbarer Text, kein eigenes `isPending` |
+| `Badge` | wie Button-Farbvarianten, dazu `info` und `warning` (getönte Fläche, Text in `--info` bzw. `--warning`) | als Link: `Badge asChild` mit `<a>`; Status nie nur über Farbe, der Text trägt die Bedeutung; keine eigenen Klassen wie `bg-[var(--info)]` |
+| `MetaRow` | `label` optional | umbrechende Reihe kleiner Meta-Angaben (Badges für Status, Version, Kategorie); mit `label` fett vorangestellt und als `role="group"` benannt; Text kommt per Props/Kinder aus i18n; ersetzt lokale Meta-Zeilen (`flex flex-wrap gap-2`) |
 | `Card`, `CardHeader`, `CardTitle`, `CardDescription`, `CardAction`, `CardContent`, `CardFooter` | `interactive` (nur mit `asChild`) | keine verschachtelten Karten |
 | `Table`, `TableHeader`, `TableBody`, `TableRow`, `TableHead`, `TableCell`, `TableCaption`, `TableFooter` | – | ausgewählte Zeile: `data-state="selected"`; `TableCaption` oder `aria-label` benennt die Tabelle |
 | `Tooltip`, `TooltipTrigger`, `TooltipContent`, `TooltipProvider` | – | nur Zusatzinfo; nie die einzige Beschriftung eines Bedienelements |
+| `Progress` | `value`, `max` (Default 100); `value={null}` = unbestimmt | Pflicht `aria-label` oder `aria-labelledby` (Typ erzwingt eins von beiden); Indikator `--primary` auf Spur `--muted`; Bewegung entfällt bei reduzierter Bewegung |
+| `Skeleton` | Form per `className` (`h-*`, `w-*`, `size-*`, `rounded-*`) | dekorativ (`aria-hidden`); Ladezustand am Container per `aria-busy` oder sichtbarem Text melden; Fläche `--accent`, pulsiert nicht bei reduzierter Bewegung |
+| `Toaster`, `toast` | `toast()`, `toast.success`, `.info`, `.warning`, `.error`, `.loading`; `action`, `description` | `Toaster` einmal pro App innerhalb von `ThemeProvider`, Pflicht `closeLabel` und `regionLabel` aus i18n; Peer-Dependency `sonner` installieren; `toast` nur aus `@web-app-kit/frontend/ui` importieren; nur Rückmeldung nach einer Aktion, Fehler, die eine Entscheidung brauchen, im Dialog |
 
 ## Interaktive Karten und eigene Klick-Flächen
 
@@ -200,12 +210,51 @@ Schlüssel in `de.ts`/`en.ts`: `items.heading`, `items.loading`, `items.empty`, 
 - Destruktive Bestätigung: `Button variant="destructive"` mit konkretem Text („Projekt
   löschen"), nicht „OK".
 
+### Bestätigung vor folgenreicher Aktion: `AlertDialog`
+
+```tsx
+<AlertDialog>
+  <AlertDialogTrigger asChild>
+    <Button variant="destructive">{t("project.delete")}</Button>
+  </AlertDialogTrigger>
+  <AlertDialogContent size="sm">
+    <AlertDialogHeader>
+      <AlertDialogMedia>
+        <IconTrash aria-hidden />
+      </AlertDialogMedia>
+      <AlertDialogTitle>{t("project.deleteTitle")}</AlertDialogTitle>
+      <AlertDialogDescription>{t("project.deleteDescription")}</AlertDialogDescription>
+    </AlertDialogHeader>
+    <AlertDialogFooter>
+      <AlertDialogCancel>{t("common.keep")}</AlertDialogCancel>
+      <AlertDialogAction variant="destructive" onClick={remove}>
+        {t("common.delete")}
+      </AlertDialogAction>
+    </AlertDialogFooter>
+  </AlertDialogContent>
+</AlertDialog>
+```
+
+- `AlertDialogCancel` und `AlertDialogAction` verlangen ihren Text als `children` (kein
+  eingebautes „Cancel"/„Continue"). `AlertDialogTitle` und `AlertDialogDescription` immer.
+- Kein Schließen per Klick daneben; Escape bricht ab, der Fokus startet auf
+  `AlertDialogCancel` und kehrt zum Auslöser zurück (Radix, nicht überschreiben).
+- `size`: `default` oder `sm` (Buttons nebeneinander); Action-`variant` wie `Button`.
+- Für Formulare oder Inhalte mit eigener Bedienung `Dialog`, nicht `AlertDialog`.
+
 ## Menüs und Auswahl
 
 | Baustein | Regeln |
 | --- | --- |
 | `DropdownMenu*` (`Trigger`, `Content`, `Item`, `CheckboxItem`, `RadioGroup`, `RadioItem`, `Label`, `Separator`, `Sub*`, `Shortcut`) | Trigger per `asChild` auf `Button`; ein eigenes `<button>` als Trigger braucht eigene Zustände |
 | `Select`, `SelectTrigger`, `SelectValue`, `SelectContent`, `SelectGroup`, `SelectItem`, `SelectLabel`, `SelectSeparator` | Items immer in `SelectGroup`; Standard `position="item-aligned"`, Popover-Verhalten per `position="popper"`; sichtbares `Label` mit `htmlFor` auf die `id` des Triggers |
+| `Tabs`, `TabsList`, `TabsTrigger`, `TabsContent` | gleichrangige Ansichten auf einer Seite; `TabsList` per `aria-label` oder `aria-labelledby` benennen; `variant` `default` (aktiver Tab mit Primärrahmen und Innenring) oder `line` (Unterstrich); `orientation` `horizontal`/`vertical`; ein Tab-Stopp, Pfeiltasten wechseln, deaktivierte Tabs werden übersprungen; nicht als Navigation zwischen Seiten |
+| `ContextMenu*` (`Trigger`, `Content`, `Item`, `CheckboxItem`, `RadioGroup`, `RadioItem`, `Label`, `Separator`, `Shortcut`, `Group`, `Portal`, `Sub`, `SubTrigger`, `SubContent`) | Trigger fokussierbar machen (`tabIndex={0}` oder `asChild` auf ein fokussierbares Element), dann öffnen Rechtsklick, Shift+F10 und die Kontextmenü-Taste; Escape schließt, Fokus kehrt zum Trigger zurück; jede Aktion zusätzlich ohne Rechtsklick anbieten (Werkzeugleiste oder `DropdownMenu`) |
+| `Command`, `CommandInput`, `CommandList`, `CommandEmpty`, `CommandGroup`, `CommandItem`, `CommandSeparator`, `CommandShortcut`, `CommandDialog` | Import aus `@web-app-kit/frontend/command`, nicht aus `/ui`; durchsuchbare Liste auf `cmdk` (Peer-Dependency installieren); `Command` per `label` benennen (wird Name des Suchfelds); `CommandDialog` verlangt `title` und `description`, `closeLabel` zeigt den Schließen-Knopf; markierter Eintrag wie Menüs |
+| `MultiCombobox` | Import aus `@web-app-kit/frontend/command`; Mehrfachauswahl aus vielen Optionen (ab etwa 10, sonst Checkboxen); Pflicht `options`, `value`, `onValueChange`, `placeholder`, `searchPlaceholder`, `emptyText`, `selectedLabel`, `removeLabel`; sichtbares `Label` mit `htmlFor` auf `id`; Werte ohne Option erscheinen als Chip mit Rohwert; Peer-Dependency `cmdk` |
+
+Markierte Einträge in `DropdownMenu`, `ContextMenu` und `Select` zeigen die zarte Fläche plus
+einen inneren 2-px-Ring in `--ring` (≥ 3:1). Nicht per `className` überschreiben.
 
 ## Werkzeugleisten und Popups
 
@@ -301,6 +350,10 @@ Schlüssel in `de.ts`/`en.ts`: `editor.tools`, `editor.toolSelect`, `editor.tool
 | Baustein | Regeln |
 | --- | --- |
 | `Label` + `Input` / `Textarea` / `Select` | jedes Feld hat ein sichtbares `Label` mit `htmlFor` = `id` des Feldes; Placeholder ist kein Label |
+| `Checkbox` | `checked`/`defaultChecked` (`true`, `false`, `"indeterminate"`), `onCheckedChange` liefert `true`, `false` oder `"indeterminate"` (`state === true` prüfen); Beschriftung per `Label htmlFor` oder `aria-label` aus i18n; an/teilweise in `--primary`, Fokus als Outline mit Abstand |
+| `Switch` | Einstellung, die sofort wirkt (`checked`/`defaultChecked`, `onCheckedChange`); für Auswahl mit Absenden `Checkbox`; `size` `default`/`sm`; Beschriftung per `Label htmlFor` oder `aria-label` aus i18n; an in `--primary`, aus mit Spur `--input` (≥ 3:1 zu Seite und Card), Fokus als Outline mit Abstand |
+| `InputGroup`, `InputGroupAddon`, `InputGroupInput`, `InputGroupTextarea`, `InputGroupButton`, `InputGroupText` | Feld mit Zusätzen (Icon, Text, Knopf); `align` am Addon: `inline-start` (Default), `inline-end`, `block-start`, `block-end`; `aria-invalid` und `disabled` an das Feld, die Gruppe übernimmt Rahmen und Abblendung; Icon-Knopf braucht `aria-label` aus i18n |
+| `Separator` | `orientation` `horizontal`/`vertical`; dekorativ per Default (`role="none"`), `decorative={false}` nur, wenn die Trennung Bedeutung trägt |
 
 State: `nameErrorKey: TranslationKey | null` (eigene Prüfung), `submitError: unknown`
 (Antwort des Backends), beide ohne fertigen Text. Ablauf von `handleSubmit`: Skill
@@ -349,13 +402,15 @@ Kit-Komponenten bringen alle Zustände mit. Für eigene interaktive Elemente:
 | ausgewählt / geöffnet | `aria-pressed`/`aria-expanded`/`aria-current` + `border-primary inset-ring-1 inset-ring-primary bg-primary-subtle` |
 | Primärfläche | `bg-primary hover:bg-primary-hover active:bg-primary-active` |
 | Link | `text-primary hover:text-primary-hover hover:underline` |
-| Fokus | `focus-visible:ring-3 focus-visible:ring-ring/50 focus-visible:outline-hidden` |
+| Fokus | `focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-hidden` (voll deckend; ein Halo `ring-ring/50` nur zusammen mit `focus-visible:border-ring` an einem Element mit Rahmen) |
 | deaktiviert | `disabled:cursor-not-allowed disabled:opacity-50` |
 
 Verboten: `hover:bg-muted`, `hover:bg-accent` (in Hell auf weißen Flächen kaum sichtbar),
 eigene `color-mix`-Hover, Fokus per `:focus` statt `:focus-visible`, entfernter Fokusring.
 
-## ESLint-Regel `web-app-kit/interactive-states`
+## ESLint-Regeln
+
+### `web-app-kit/interactive-states`
 
 Prüft `button`, `a href`, alles mit `onClick`/`onKeyDown` und interaktive `role`s. Erfüllt,
 wenn `className` je eine `hover:`-, `active:`- und `focus-visible:`-Klasse enthält (unbedingt,
@@ -366,5 +421,21 @@ nicht. Meldet zusätzlich `hover:bg-muted`/`hover:bg-accent`. Dazu laufen
 `jsx-a11y/no-static-element-interactions`, `click-events-have-key-events`,
 `interactive-supports-focus`, `no-noninteractive-element-interactions`: Klicks gehören auf
 `<button>`/`<a>`, nicht auf `div`.
+
+### `web-app-kit/no-foreign-ui`
+
+Meldet Importe aus `radix-ui`, `@radix-ui/*`, `shadcn` (außer `shadcn/tailwind.css`), aus
+Icon-Paketen außer `@tabler/icons-react` (z. B. `lucide-react`, `react-icons`, `@heroicons/*`)
+und aus lokalen Kopien (`@/components/ui/*`, `../components/ui/*`); dazu jede Datei unter
+`components/ui/`. Eigene Elemente aus Kit-Bausteinen in anderen Ordnern
+(`src/components/app/`) sind erlaubt. Begründete Ausnahmen über die Option `allow`
+(Import-Quelle oder Dateipfad relativ zum ESLint-Arbeitsordner):
+
+```js
+export default [
+  ...webAppKit.configs.recommended,
+  { rules: { "web-app-kit/no-foreign-ui": ["error", { allow: ["recharts"] }] } },
+];
+```
 
 Bei einer Meldung den Code korrigieren, nicht die Regel abschalten.

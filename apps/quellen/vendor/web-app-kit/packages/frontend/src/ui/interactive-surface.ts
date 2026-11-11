@@ -10,7 +10,7 @@ export const INTERACTIVE_SURFACE_CLASSES = [
   "cursor-pointer text-left outline-none focus-visible:outline-hidden",
   "transition-[box-shadow,translate]",
   "not-disabled:hover:bg-primary-subtle not-disabled:active:translate-y-px",
-  "focus-visible:ring-3 focus-visible:ring-ring/50",
+  "focus-visible:ring-2 focus-visible:ring-ring",
   "disabled:cursor-not-allowed disabled:opacity-50",
   "aria-disabled:pointer-events-none aria-disabled:opacity-50",
   ...SELECTED_SURFACE_CLASSES,

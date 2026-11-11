@@ -56,6 +56,18 @@ export class UnauthorizedError extends AppError {
   }
 }
 
+export class TooManyRequestsError extends AppError {
+  statusCode = 429;
+
+  constructor(
+    message: string,
+    readonly retryAfterSeconds?: number,
+  ) {
+    super(message);
+    this.name = "TooManyRequestsError";
+  }
+}
+
 export class ConfigurationError extends Error {
   constructor(message: string) {
     super(message);

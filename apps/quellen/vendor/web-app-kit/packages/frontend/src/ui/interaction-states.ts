@@ -11,3 +11,13 @@ export const PRIMARY_SUBTLE_STATE_CLASSES = [
   "aria-pressed:text-primary-subtle-foreground",
   "aria-pressed:**:text-primary-subtle-foreground",
 ];
+
+export const FILLED_FOCUS_CLASSES = [
+  "focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-solid",
+  "focus-visible:outline-ring",
+];
+
+export const TOGGLE_ON_FOCUS_CLASSES = [
+  "data-[state=on]:focus-visible:outline-2 data-[state=on]:focus-visible:outline-offset-2",
+  "data-[state=on]:focus-visible:outline-solid data-[state=on]:focus-visible:outline-ring",
+];

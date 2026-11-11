@@ -13,6 +13,7 @@ frontend/
 ├── vite.config.ts
 ├── eslint.config.js
 ├── index.html
+├── public/favicon.svg
 └── src/
     ├── main.tsx
     ├── App.tsx
@@ -141,7 +142,8 @@ import webAppKit from "@web-app-kit/eslint-plugin";
 export default [...webAppKit.configs.recommended];
 ```
 
-Aktiviert `web-app-kit/interactive-states` und vier `jsx-a11y`-Regeln als Fehler. Neues Tool:
+Aktiviert `web-app-kit/interactive-states`, `web-app-kit/no-foreign-ui` und vier
+`jsx-a11y`-Regeln als Fehler. Neues Tool:
 von Anfang an ohne Verstöße, keine `eslint-suppressions.json`.
 
 ## `index.html`
@@ -152,7 +154,7 @@ von Anfang an ohne Verstöße, keine `eslint-suppressions.json`.
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <link rel="icon" href="data:," />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <title><Tool-Name></title>
   </head>
   <body>
@@ -162,8 +164,20 @@ von Anfang an ohne Verstöße, keine `eslint-suppressions.json`.
 </html>
 ```
 
-`<link rel="icon" href="data:," />` ist ein Platzhalter und verhindert die 404-Anfrage nach
-`/favicon.ico`, bis das Tool ein eigenes Icon hat.
+## Favicon
+
+Im Wurzelordner des Tools erzeugen, Kürzel bzw. Icon beim Nutzer erfragen:
+
+```bash
+node vendor/web-app-kit/scripts/create-favicon.mjs --text <1-2 Zeichen>
+node vendor/web-app-kit/scripts/create-favicon.mjs \
+  --icon frontend/node_modules/@tabler/icons/icons/outline/<icon-name>.svg
+```
+
+Schreibt `frontend/public/favicon.svg`: Kachel in `--primary`, Zeichen in
+`--primary-foreground`, `oklch`-Werte aus `brand.css` des Kits fest eingesetzt, Hell/Dunkel per
+`prefers-color-scheme` im SVG. Die Datei wird committet; nach einem Kit-Update mit geänderter
+Primärfarbe neu erzeugen. Details: README des Kits, Abschnitt „Favicon".
 
 ## `src/index.css`
 
@@ -240,6 +254,7 @@ export const de = {
   "layout.skipToContent": "Zum Inhalt springen",
   "layout.version": "Version",
   "layout.versionUnknown": "lokal",
+  "layout.kitVersion": "Kit",
   "theme.system": "System",
   "theme.light": "Hell",
   "theme.dark": "Dunkel",
@@ -283,6 +298,7 @@ export const en: Record<TranslationKey, string> = {
   "layout.skipToContent": "Skip to content",
   "layout.version": "Version",
   "layout.versionUnknown": "local",
+  "layout.kitVersion": "Kit",
   "theme.system": "System",
   "theme.light": "Light",
   "theme.dark": "Dark",
@@ -464,7 +480,13 @@ export function ToolLayout({ children }: { children: ReactNode }) {
           <LocalizedThemeToggle />
         </>
       }
-      footer={<AppVersion label={t("layout.version")} version={version} />}
+      footer={
+        <AppVersion
+          label={t("layout.version")}
+          version={version}
+          kitLabel={t("layout.kitVersion")}
+        />
+      }
     >
       {children}
     </AppShell>

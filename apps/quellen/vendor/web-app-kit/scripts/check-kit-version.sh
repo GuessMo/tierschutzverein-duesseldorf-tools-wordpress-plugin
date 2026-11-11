@@ -1,6 +1,8 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
+source "$(dirname "${BASH_SOURCE[0]}")/lib/update-checks.sh"
+
 KIT_SUBMODULE="${WEB_APP_KIT_SUBMODULE:-vendor/web-app-kit}"
 MANDATORY_PATTERN='^App-Aktion: Pflicht'
 
@@ -82,6 +84,7 @@ print_entries() {
   fi
   echo "CHANGELOG $1 -> $2:"
   sed -E "s/$MANDATORY_PATTERN/!! &/" <<< "$entries"
+  run_update_checks "$entries"
   grep -qE "$MANDATORY_PATTERN" <<< "$entries" || return 0
   echo
   echo "!! Mindestens ein Eintrag verlangt App-Aktion: Pflicht (Umbau-Liste oben abarbeiten)."
@@ -94,6 +97,7 @@ print_update_steps() {
   echo
   echo "Nachziehen:"
   echo "  git -C $kit fetch --tags && git -C $kit checkout $NEWEST_TAG"
+  echo "  Skript erneut ausführen: zeigt die Umbau-Punkte mit Prüfergebnissen des neuen Tags"
   echo "  Kopie und Lockfile erneuern (Kit-README, Abschnitt Nutzung), App bauen und testen"
   echo "  git -C $app add $KIT_SUBMODULE && git -C $app commit"
 }

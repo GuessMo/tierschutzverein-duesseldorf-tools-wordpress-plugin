@@ -9,7 +9,9 @@ React+Vite-Muster.
 
 **`packages/backend`** (`@web-app-kit/backend`) — für Fastify+Prisma-Backends:
 - `AppError` + Subklassen (`NotFoundError`, `BadRequestError`, `ValidationError`,
-  `UpstreamError`, `ConflictError`, `UnauthorizedError`) — Fehler mit echtem Statuscode und Klartext-Message statt generischem
+  `UpstreamError`, `ConflictError`, `UnauthorizedError`,
+  `TooManyRequestsError`) — Fehler mit echtem Statuscode und Klartext-Message
+  statt generischem
   "Internal server error" für alles ≥500.
 - `registerErrorHandler(app)` — verdrahtet das oben stehende Muster als Fastify
   `setErrorHandler`.
@@ -131,6 +133,78 @@ einen Symlink anzulegen. Folgen:
   vorheriges `rm -rf` ließ dieser Befehl bei unveränderter Versionsnummer die alte Kopie
   liegen, deshalb beide Schritte. Die `file:`-Angabe in `package.json` bleibt unverändert.
 
+## Versionierung und Update
+
+### CHANGELOG-Format ab 1.0.0
+
+Jeder Eintrag ab 1.0.0 sagt, was neu ist und was eine App umbauen muss. Pflicht sind die Blöcke
+`### Neu` und `### Umbau` sowie die Zeile `App-Aktion: keine | optional | Pflicht …`;
+`scripts/tag-release.sh` verweigert das Tag sonst, ebenso bei `App-Aktion: Pflicht` ohne konkreten
+Umbau-Schritt. Einträge vor 1.0.0 bleiben im alten Format und werden weiter angezeigt.
+
+| Teil | Inhalt |
+| --- | --- |
+| `### Neu` | je Punkt: was es gibt und wofür (Komponente, Funktion, Fix) |
+| `### Umbau` | je Punkt ein konkreter Schritt in der App; bei `App-Aktion: keine` genügt `- keiner` |
+| `Prüfen: \`<befehl>\`` | optional, eingerückt unter einem Umbau-Punkt: findet betroffene Stellen in der App |
+| `App-Aktion:` | `keine`, `optional` oder `Pflicht` mit Kurzbegründung |
+
+Vorlage:
+
+```markdown
+## [1.2.0] — 2026-12-01
+
+### Neu
+
+- `Switch` in `@web-app-kit/frontend/ui`: Ein/Aus-Schalter für Einstellungen.
+
+### Umbau
+
+- Lokale `components/ui/switch.tsx` löschen, Importe auf `@web-app-kit/frontend/ui` umstellen.
+  Prüfen: `grep -rl "components/ui/switch" frontend/src`
+
+App-Aktion: optional (lokale Switch-Kopien ersetzen)
+```
+
+Prüfbefehle laufen relativ zum Wurzelordner der App und ohne Shell: nur `grep`, `rg`, `find`,
+`ls` oder `test`, Anführungszeichen wie in der Shell, keine Pipes, Umleitungen, Variablen oder
+Globs (`; | & < > $` und Backtick sind verboten), keine ausführenden Optionen (`find -exec`,
+`-delete`, `-fprint…`, `rg --pre`). Ausgabe des Befehls = betroffene Dateien, ohne Ausgabe =
+nicht betroffen; bei `test` zählt der Exit-Code (0 = betroffen). Der Befehl muss also gerade die
+Stellen finden, die noch umzubauen sind, z. B. `grep -rl`, `find … -name`, `test -f`.
+
+### Update in der App
+
+```bash
+bash vendor/web-app-kit/scripts/check-kit-version.sh
+```
+
+Bei veraltetem Pin (Exit 1) zeigt das Script die Einträge zwischen Pin und neuestem Tag
+(neueste oben) und führt danach jeden `Prüfen:`-Befehl im App-Verzeichnis aus:
+
+```text
+Prüfbefehle aus den Umbau-Listen (ausgeführt in /pfad/zur/app):
+  [1.2.0] grep -rl "components/ui/switch" frontend/src
+    betroffen: frontend/src/settings.tsx
+  [1.1.0] test -f frontend/src/legacy-theme.css
+    nicht betroffen
+  [1.1.0] grep -rl x frontend | wc -l
+    nicht ausgeführt: erlaubt sind nur grep, rg, find, ls, test ohne Shell-Zeichen
+    (; | & < > $ `) und ohne ausführende Optionen. Befehl von Hand prüfen.
+```
+
+Ein Fehler des Befehls (z. B. fehlender Ordner) erscheint als „Prüfung fehlgeschlagen: …“. Die
+Exit-Codes hängen nicht von den Prüfergebnissen ab. Das Script stammt aus dem ausgecheckten
+Submodule: nach `git -C vendor/web-app-kit checkout <neuer-tag>` erneut ausführen, dann zeigt es
+die Umbau-Listen mit dem Script des neuen Tags (der committete Pin ist bis zum Commit noch der
+alte). Jeden Umbau-Punkt einzeln umsetzen und den Prüfbefehl danach erneut laufen lassen; erst
+bei „nicht betroffen“ ist der Punkt erledigt. Ablauf mit allen Schritten (Lockfile, Vite-Cache,
+Container, Skills, Pin-Hook): Skill `web-app-kit-update`.
+
+Nach erneuertem Lockfile bündelt Vite die Abhängigkeiten beim nächsten Start neu
+(Cache `node_modules/.vite`). Ein laufender Dev-Server merkt das nicht: neu starten, bei
+unveränderter Kit-Version mit `npx vite --force`.
+
 ## UI-Basis (`@web-app-kit/frontend/ui`, ab 0.3.0)
 
 Geteilte shadcn-Primitives (Stil `radix-nova`, `baseColor neutral`, Tabler-Icons), `cn` und
@@ -142,8 +216,10 @@ Enthalten: `Badge`, `Button`, `Card*`, `Dialog*`, `DropdownMenu*`, `Input`, `Lab
 `Table*`, `Textarea`, `Tooltip*`, `cn`, `ThemeToggle` (+ `badgeVariants`, `buttonVariants`),
 ab 0.3.1 `Card interactive`, `asChild` an `Card`/`CardHeader`/`CardTitle`/`CardDescription`,
 `INTERACTIVE_SURFACE_CLASSES`, `STRETCHED_CARD_CLASSES`, `STRETCHED_LINK_CLASSES`,
-`Toggle`, `ToggleGroup*`, `Popover*` (+ `toggleVariants`, Abschnitt 8).
-Bestandsaufnahme und Herleitung: `docs/ui-inventory.md`.
+`Toggle`, `ToggleGroup*`, `Popover*` (+ `toggleVariants`, Abschnitt 8), `ContextMenu*`,
+`Checkbox`, `Separator` (Abschnitt 9), `AlertDialog*`, `Tabs*`, `Switch`, `Progress`,
+`Skeleton`, `Toaster`, `toast` (+ `tabsListVariants`, Abschnitt 10), `MetaRow` und die
+`Badge`-Varianten `info` und `warning` (Farbrollen `--info`, `--warning`).
 
 ### 1. Abhängigkeiten der App
 
@@ -153,6 +229,13 @@ npm install @tabler/icons-react@3.49.0
 
 Weitere Peer-Dependencies haben alle Web-Tools bereits: `react` ^19.0.0, `radix-ui` ^1.6.2,
 `class-variance-authority` ^0.7.1, `clsx` ^2.1.1, `tailwind-merge` ^3.6.0.
+
+`sonner` ist Pflicht, auch ohne `Toaster`: der Einstieg `@web-app-kit/frontend/ui` importiert es,
+sonst scheitern `tsc -b` und der Build (`npm install --save-exact sonner@2.0.8`).
+
+`cmdk` braucht nur, wer `Command` oder `MultiCombobox` nutzt: beide liegen im eigenen Einstieg
+`@web-app-kit/frontend/command`, damit `/ui` ohne `cmdk` baut
+(`npm install --save-exact cmdk@1.1.1`).
 
 ### 2. CSS
 
@@ -234,9 +317,12 @@ die Aktion beschreibt (z. B. „Darstellung: System – klicken zum Wechseln"); 
   das Modell (`PRIMARY_SUBTLE_STATE_CLASSES` in `ui/interaction-states.ts`). `TableRow` und
   der Skip-Link nutzen weiterhin `--surface-hover`/`--surface-selected` (Utilities
   `bg-surface-hover`, `bg-surface-selected`, `bg-surface-selected-hover`, `overlay-hover`).
-  `secondary` hovert mit 8 % `--foreground` auf `--secondary`, Dunkel-`destructive` mit `/26`.
-  Menü- und Select-Items: Fokus/Hover `focus:bg-primary-subtle`, ausgewählt per Check-Icon in
-  `text-primary`. Link-Badges (`Badge asChild` mit `<a>`)
+  `secondary` hovert mit `--secondary-hover` und wird gedrückt `--secondary-active` (ab 0.12.0;
+  Default: 8 % bzw. 14 % `--foreground` auf `--secondary`). `tertiary` (ab 0.12.0) ist die
+  neutrale Fläche `--tertiary` mit `--tertiary-hover`, gedrückt `--tertiary-active` und
+  `--tertiary-active-foreground`. Dunkel-`destructive` hovert mit `/26`.
+  Menü- und Select-Items: Fokus/Hover `focus:bg-primary-subtle` plus innerer 2-px-Ring in
+  `--ring`, ausgewählt per Check-Icon in `text-primary`. Link-Badges (`Badge asChild` mit `<a>`)
   quittieren den Klick wie Buttons mit `translate-y-px` (`[a]:active:translate-y-px`); Hover
   kommt je Variante über `[a]:hover:…` bzw. bei `link` über die Unterstreichung, der Fokusring
   über `focus-visible:ring-[3px]`.
@@ -271,7 +357,8 @@ die Aktion beschreibt (z. B. „Darstellung: System – klicken zum Wechseln"); 
   `<button type="button">` als Kind. Der Typ verlangt `asChild` zusammen mit `interactive`,
   damit Rolle und Tastaturbedienung vom nativen Element kommen (Tab, Enter bzw.
   Enter/Leertaste). Die Karte bekommt `INTERACTIVE_SURFACE_CLASSES`: `cursor-pointer`,
-  Fokusring `focus-visible:ring-3 ring-ring/50` (gemessen 3.67–3.93:1 gegen die Seite),
+  Fokusring `focus-visible:ring-2 ring-ring` (voll deckend, ab 0.11.0; vorher
+  `ring-3 ring-ring/50` mit nur 2.36–2.48:1 bei kräftiger Primärfarbe),
   `focus-visible:outline-hidden` (im Forced-Colors-Modus bleibt ein 2-px-Fokusrahmen sichtbar,
   gemessen per `emulateMedia({ forcedColors: "active" })`), `disabled:` wie Buttons und
   `aria-disabled:pointer-events-none aria-disabled:opacity-50` für deaktivierte Link-Karten
@@ -333,12 +420,15 @@ die Aktion beschreibt (z. B. „Darstellung: System – klicken zum Wechseln"); 
   nutzbar). Hover ersetzt die Hintergrundfarbe der Fläche durch `--primary-subtle`. Klassen bei
   `asChild` an `Card` übergeben, nicht an das Kind: Slot hängt die Kind-Klassen ungeprüft an,
   `cn`/`tailwind-merge` löst Konflikte nur für die an `Card` übergebenen Klassen.
-- **Tastaturfokus in Menü- und Select-Items:** zusätzlich zur `--primary-subtle`-Fläche ein
-  innerer 2-px-Ring in `--ring` (`focus-visible:ring-2 ring-inset`), ≥ 3:1 gegen Item- und
-  Popover-Fläche in Hell und Dunkel. Radix fokussiert Items auch beim Zeiger-Hover per
-  Skript; Chromium wertet das als `:focus-visible`, der Ring erscheint dort also auch bei Hover.
-  `DropdownMenuSubTrigger` trägt die Gruppe `group/dropdown-menu-item`, damit
-  `DropdownMenuShortcut` darin `primary-subtle-foreground` übernimmt.
+- **Markierter Eintrag in Menüs und Select (ab 0.11.0):** `--primary-subtle` hebt sich nur
+  1.17–1.54:1 vom Popover ab. Der markierte Eintrag (`data-highlighted`, per Tastatur und per
+  Zeiger) trägt deshalb zusätzlich einen inneren 2-px-Ring in `--ring`
+  (`MENU_HIGHLIGHT_CLASSES` in `ui/menu-classes.ts`: `data-highlighted:inset-ring-2
+  inset-ring-ring`), gilt für `DropdownMenu*`, `ContextMenu*` und `SelectItem`. Gemessen
+  (deep pink sample): 4.38:1 Hell / 4.76:1 Dunkel gegen die Item-Fläche, 5.14 / 5.89 gegen das
+  Popover; `destructive` 4.32 / 3.83. `DropdownMenuSubTrigger` trägt die Gruppe
+  `group/dropdown-menu-item`, damit `DropdownMenuShortcut` darin
+  `primary-subtle-foreground` übernimmt (analog `group/context-menu-item`).
 - **Select:** Standard ist `position="item-aligned"` mit `IconSelector` im Trigger.
   Popover-Verhalten über `position="popper"` an der Aufrufstelle.
 
@@ -346,6 +436,14 @@ die Aktion beschreibt (z. B. „Darstellung: System – klicken zum Wechseln"); 
 
 `theme.css` erfüllt in Hell und Dunkel 4.5:1 für Text und 3:1 für Eingabe-Rahmen und
 Fokusring (gemessen per Playwright, System-Modus und per ThemeToggle gesetzte Klasse).
+
+Fokusindikator ≥ 3:1 (ab 0.11.0): Ein Halo `ring-ring/50` allein erreicht mit kräftiger
+Primärfarbe nur 2.2–2.6:1. Elemente ohne eigenen 1-px-Rahmen in `--ring` zeigen den Fokus
+deshalb voll deckend: `INTERACTIVE_SURFACE_CLASSES` (`ring-2 ring-ring`), `STRETCHED_LINK_CLASSES`
+(innerer Ring), Skip-Link (`ring-3 ring-ring`), `Checkbox` (Outline 2 px mit 2 px Abstand) und
+die Basis-Outline aller Elemente (`outline-ring` statt `outline-ring/50` in `theme.css`).
+`src/active-state.test.ts` prüft `--ring` gegen `--background`, `--card`, `--popover`,
+`--sidebar` und `--primary-subtle` (≥ 3:1, Hell und Dunkel, inkl. deep pink sample).
 Angehoben gegenüber 0.2.x: `--destructive`, `--input`, `--ring`/`--sidebar-ring`,
 `--muted-foreground`, `--accent` (nur Hell). Neu: `--brand`/`--brand-foreground`
 (Utilities `bg-brand`, `text-brand`, `text-brand-foreground`), Default neutral wie
@@ -492,6 +590,114 @@ import {
 `onValueChange={(next) => next && setTool(next)}` verhindert, dass ein erneuter Klick auf das
 aktive Werkzeug die Auswahl leert (Radix liefert dann `""`).
 
+### 9. Kontextmenü, Checkbox, Separator (ab 0.11.0)
+
+shadcn-Form auf den Radix-Primitives aus `radix-ui` (bereits Peer-Dependency), keine neue
+Abhängigkeit. Keine eingebauten Texte, Beschriftungen kommen aus der App.
+
+- **`ContextMenu`:** `ContextMenu`, `ContextMenuTrigger`, `ContextMenuContent`,
+  `ContextMenuItem` (`variant` `default`/`destructive`, `inset`), `ContextMenuCheckboxItem`,
+  `ContextMenuRadioGroup`, `ContextMenuRadioItem`, `ContextMenuLabel`, `ContextMenuSeparator`,
+  `ContextMenuShortcut`, `ContextMenuGroup`, `ContextMenuPortal`, `ContextMenuSub`,
+  `ContextMenuSubTrigger`, `ContextMenuSubContent`. Fläche, Items und Zustände wie
+  `DropdownMenu` (gemeinsame Klassen in `ui/menu-classes.ts`). Öffnen per Rechtsklick und per
+  Tastatur: `ContextMenuTrigger` öffnet bei Shift+F10 und der Kontextmenü-Taste an seiner
+  linken unteren Ecke (eigene Tastaturbehandlung, unabhängig vom Browser), der erste
+  Eintrag erhält den Fokus, Escape schließt und gibt den Fokus an den Trigger zurück. Der
+  Trigger muss dafür fokussierbar sein (`tabIndex={0}` oder `asChild` auf ein fokussierbares
+  Element) und braucht einen sichtbaren Fokus (Basis-Outline in `--ring`). Ein eigenes
+  `onKeyDown` mit `event.preventDefault()` schaltet das Öffnen per Tastatur ab. Jede Aktion des
+  Kontextmenüs muss auch ohne Rechtsklick erreichbar sein (Werkzeugleiste, `DropdownMenu`).
+- **`Checkbox`:** `checked`/`defaultChecked` (`true`, `false`, `"indeterminate"`),
+  `onCheckedChange`. Radix setzt `role="checkbox"`, `aria-checked` (`mixed` bei
+  `indeterminate`) und `data-state`. Aus: Rahmen `--input` (3.34:1 Hell / 4.29:1 Dunkel mit
+  deep pink sample), Hover `bg-primary-subtle` mit Rahmen `--primary`, gedrückt zusätzlich
+  1-px-Innenring. An und `indeterminate` (Strich-Icon): Fläche `--primary`, Icon
+  `--primary-foreground`, Hover `--primary-hover`, gedrückt `--primary-active`. Fokus:
+  Outline 2 px in `--ring` mit 2 px Abstand, damit er auch auf der Primärfläche sichtbar
+  bleibt (deep pink sample: 4.71–6.05:1 gegen die Seite, 4.97–5.14:1 auf Cards). Deaktiviert
+  `cursor-not-allowed opacity-50`. Die Box ist 16 px groß, die Klickfläche per `::after`
+  40 × 32 px. Beschriftung per `Label htmlFor` oder `aria-label` aus i18n.
+- **`Separator`:** `orientation` `horizontal` (Default) oder `vertical`, `decorative`
+  Default `true` (`role="none"`, für Screenreader unsichtbar). `decorative={false}` setzt
+  `role="separator"` und bei `vertical` `aria-orientation="vertical"`. Linie 1 px in
+  `--border`, vertikal per `self-stretch` so hoch wie der Flex-Container.
+
+```tsx
+<ContextMenu>
+  <ContextMenuTrigger asChild>
+    <div tabIndex={0} aria-label={t("canvas.label")} className="rounded-lg border">…</div>
+  </ContextMenuTrigger>
+  <ContextMenuContent>
+    <ContextMenuItem onSelect={copy}>
+      {t("common.copy")}
+      <ContextMenuShortcut>⌘C</ContextMenuShortcut>
+    </ContextMenuItem>
+    <ContextMenuCheckboxItem checked={isGridVisible} onCheckedChange={setGridVisible}>
+      {t("editor.grid")}
+    </ContextMenuCheckboxItem>
+    <ContextMenuSeparator />
+    <ContextMenuItem variant="destructive" onSelect={remove}>{t("common.delete")}</ContextMenuItem>
+  </ContextMenuContent>
+</ContextMenu>
+
+<div className="flex items-center gap-2">
+  <Checkbox
+    id="snap"
+    checked={isSnapping}
+    onCheckedChange={(state) => setSnapping(state === true)}
+  />
+  <Label htmlFor="snap">{t("editor.snap")}</Label>
+  <Separator orientation="vertical" />
+</div>
+```
+
+### 10. AlertDialog, Tabs, Switch, Progress, Skeleton, Toast (ab 1.0.0)
+
+shadcn-Form (Stil `radix-nova`) auf den Radix-Primitives aus `radix-ui`; `Toaster` umhüllt
+`sonner` (Pflicht-Abhängigkeit des ui-Einstiegs, Abschnitt 1). Keine eingebauten Texte.
+
+- **`AlertDialog`:** `AlertDialog`, `AlertDialogTrigger`, `AlertDialogContent` (`size`
+  `default`/`sm`), `AlertDialogHeader`, `AlertDialogMedia`, `AlertDialogTitle`,
+  `AlertDialogDescription`, `AlertDialogFooter`, `AlertDialogCancel`, `AlertDialogAction`
+  (`variant`/`size` wie `Button`, z. B. `destructive`), `AlertDialogOverlay`,
+  `AlertDialogPortal`. `AlertDialogCancel` und `AlertDialogAction` verlangen ihren Text als
+  `children`. Kein Schließen per Klick daneben; Escape bricht ab, der Fokus startet auf
+  Abbrechen und kehrt zum Auslöser zurück.
+- **`Tabs`:** `Tabs` (`orientation`), `TabsList` (`variant` `default`/`line`, per
+  `aria-label` benennen), `TabsTrigger`, `TabsContent`, dazu `tabsListVariants`. Aktiver Tab
+  bei `default` mit Fläche `--primary-subtle`, Rahmen `--primary` und Innenring, bei `line`
+  mit Unterstrich in `--foreground`; also nicht nur über Farbe. Ein Tab-Stopp, Pfeiltasten
+  wechseln und aktivieren, deaktivierte Tabs werden übersprungen.
+- **`Switch`:** `checked`/`defaultChecked`, `onCheckedChange`, `size` `default`/`sm`. Aus:
+  Spur `--input` (≥ 3:1 zu Seite und Card in Hell und Dunkel), Hover Rahmen `--primary`. An:
+  Spur `--primary`, Hover `--primary-hover`, gedrückt `--primary-active`. Fokus als Outline
+  2 px in `--ring` mit 2 px Abstand. Für Auswahl mit Absenden `Checkbox`.
+- **`Progress`:** `value`, `max` (Default 100), Pflicht `aria-label` oder `aria-labelledby`.
+  `role="progressbar"` mit `aria-valuemin`/`-max`/`-now`; `value={null}` ist unbestimmt (kein
+  `aria-valuenow`). Indikator `--primary`, ohne Bewegung bei reduzierter Bewegung.
+- **`Skeleton`:** dekorativ (`aria-hidden`), Fläche `--accent`, pulsiert nicht bei reduzierter
+  Bewegung. Den Ladezustand am Container melden (`aria-busy`, sichtbarer Text).
+- **`Toaster`, `toast`:** `Toaster` einmal pro App innerhalb von `ThemeProvider`, Pflicht
+  `closeLabel` und `regionLabel`; Hell/Dunkel folgt `resolvedTheme`. Meldungen per `toast()`,
+  `toast.success()` usw., immer aus `@web-app-kit/frontend/ui` importiert. Region mit
+  `aria-live="polite"`, Tabler-Icons, Schließen als Ghost-Icon-Button (24 px), Aktion als
+  `Button`, Fokus als Outline in `--ring`.
+
+```tsx
+<ThemeProvider>
+  <App />
+  <Toaster closeLabel={t("common.close")} regionLabel={t("common.notifications")} />
+</ThemeProvider>
+
+toast.success(t("items.saved"), { action: { label: t("common.undo"), onClick: undo } });
+
+<div className="flex items-center gap-2">
+  <Switch id="autosave" checked={isAutosave} onCheckedChange={setAutosave} />
+  <Label htmlFor="autosave">{t("settings.autosave")}</Label>
+</div>
+```
+
 ## App-Shell (`@web-app-kit/frontend/ui`, ab 0.4.0)
 
 Alle Web-Tools bekommen denselben Rahmen: Kopfzeile oben, optional Navigation links und
@@ -604,13 +810,20 @@ import {
 
 Jede App zeigt ihren ausgelieferten Stand unten in der Shell, damit sichtbar ist, ob eine
 Änderung live ist. Quelle ist `git describe --tags` zum Build-Zeitpunkt: auf einem Release-Tag
-`v1.4.0`, danach `v1.4.0-3-gabc1234` (3 Commits nach dem Tag, Commit `abc1234`).
+`v1.4.0`, danach `v1.4.0-3-gabc1234` (3 Commits nach dem Tag, Commit `abc1234`). Daneben
+steht die Kit-Version, mit der die App gebaut ist („Version v1.4.0 · Kit 0.14.0").
 
 ```tsx
 <AppShell
   brand={t("app.title")}
   skipLinkLabel={t("shell.skipLink")}
-  footer={<AppVersion label={t("shell.version")} version={import.meta.env.VITE_APP_VERSION} />}
+  footer={
+    <AppVersion
+      label={t("shell.version")}
+      version={import.meta.env.VITE_APP_VERSION}
+      kitLabel={t("shell.kitVersion")}
+    />
+  }
 >
 ```
 
@@ -618,14 +831,24 @@ Jede App zeigt ihren ausgelieferten Stand unten in der Shell, damit sichtbar ist
   `contentinfo`, `h-8`, `border-t`, `text-xs`, `text-muted-foreground`). Ohne `footer` keine
   Fußzeile.
 - **`AppVersion`** zeigt `label` und `version` (`tabular-nums`), Beschriftung aus der App.
+  Mit `kitLabel` folgt nach einem Trennpunkt (`aria-hidden`) die Kit-Version: `version` aus
+  `package.json` des Frontend-Pakets, zur Build-Zeit von Vite als Konstante eingesetzt. Ohne
+  `kitLabel` bleibt die Anzeige wie bisher. App-Version und Kit-Version in `text-foreground`,
+  Beschriftungen in `text-muted-foreground`.
 - **Backend:** `registerVersionRoute(app, { version: readAppVersion() })` liefert
-  `GET /api/version` → `{ "version": "v1.4.0-3-gabc1234" }` (`cache-control: no-store`,
-  `null` ohne Wert). `readAppVersion()` liest `APP_VERSION`. Pfad per `path` änderbar.
+  `GET /api/version` → `{ "version": "v1.4.0-3-gabc1234", "kitVersion": "0.14.0" }`
+  (`cache-control: no-store`, `version` ist `null` ohne Wert). `readAppVersion()` liest
+  `APP_VERSION`. `kitVersion` ist `version` aus `package.json` des Backend-Pakets, ohne
+  Konfiguration. Pfad per `path` änderbar.
+- **TypeScript:** Die Kit-Version kommt per JSON-Import aus `package.json` der Kit-Pakete.
+  Die `tsconfig.json` der App braucht dafür `"resolveJsonModule": true` (Frontend und Backend).
 - **Build:** Pipeline mit voller Tag-Historie (`clone: depth: full` bzw. `git fetch --tags`),
   dann `docker build --build-arg APP_VERSION="$(git describe --tags --always)" …`. Im
   Dockerfile `ARG APP_VERSION`, für den Frontend-Build `ENV VITE_APP_VERSION=$APP_VERSION`,
   für die Laufzeit `ENV APP_VERSION=$APP_VERSION`.
-- **Live-Prüfung:** Footer bzw. `/api/version` gleich `git describe --tags` auf `main`.
+- **Live-Prüfung:** Footer bzw. `/api/version` gleich `git describe --tags` auf `main`, die
+  Kit-Version gleich dem Tag des Submodules ohne `v`
+  (`git -C vendor/web-app-kit describe --tags`).
 
 ### Primärfarbe
 
@@ -661,6 +884,7 @@ Rollen für Interaktions-Zustände (ebenfalls in `brand.css`, Hell und Dunkel; U
 | `--primary`, `--primary-hover`, `--primary-active` als Text auf `--background`, `--card` | 4.5 |
 | `--primary`, `--primary-hover`, `--primary-active` gegen `--background` | 3 |
 | `--primary` gegen `--card`, `--popover`, `--primary-subtle` (Rahmen, Ring, Check-Icon) | 3 |
+| `--ring` gegen `--background`, `--card`, `--popover`, `--sidebar`, `--primary-subtle` | 3 |
 
 Zustandsmodell: Hover zart (`--primary-subtle`), gedrückt/geöffnet/ausgewählt Primärrahmen
 plus Innenring auf `--primary-subtle`, aktives `Toggle`/`ToggleGroupItem` voll (`--primary`,
@@ -671,7 +895,78 @@ nur zart vom Untergrund abgesetzt (gemessen Hover zu Ruhe 1.08–1.5:1); der Zus
 nur in der Farbe, sondern in `aria-pressed`/`aria-expanded`/`aria-current` und Rahmen.
 
 Weicht ein einzelnes Tool ab, setzt es die Variablen per `applyThemeOverrides` und prüft sie
-mit `contrastRatio(first, second)` (OKLCH oder `#rrggbb`) vor dem Einsatz.
+mit `contrastRatio(first, second)` vor dem Einsatz.
+
+Farbwerte in `brand.css` immer als `oklch(L C H)`. Erlaubt sind außerdem `var(…)` und
+`color-mix(in oklch, …)`; Hex, `rgb()` und `hsl()` lässt `src/brand.test.ts` für `brand.css`
+und `theme.css` scheitern. `contrastRatio` versteht `#rrggbb` nur noch für Messungen.
+
+### Grautöne: Farbstich und Einzelwerte
+
+Alle neutralen Tokens in `theme.css` (Flächen, Text, Rahmen, `--surface-*`, `--sidebar*`,
+`--brand*`, die neutralen `--secondary-*`/`--tertiary-*`-Defaults) rechnen sich aus zwei
+Seed-Variablen, nach dem Vorbild der getönten shadcn-Basisfarben (Stone, Zinc, Mauve, Olive,
+Mist, Taupe):
+
+| Variable | Default | Wirkung |
+| --- | --- | --- |
+| `--neutral-hue` | `0` | Farbton des Stichs (OKLCH-Hue in Grad) |
+| `--neutral-chroma` | `0` | Stärke des Stichs; `0` ergibt exakt die bisherigen Grautöne |
+
+Jeder Grauton behält seine Helligkeit, z. B. `--background: oklch(0.97 var(--neutral-chroma)
+var(--neutral-hue))`. `--destructive` und die Primär-Defaults (`--primary-*-default`) bleiben
+unverändert. Beispiel in `brand.css`:
+
+```css
+:root {
+    --neutral-hue: 250;
+    --neutral-chroma: 0.02;
+}
+```
+
+Der Seed unter `:root` gilt für Hell und Dunkel. Zusätzlich lässt sich jeder Grauton einzeln in
+`brand.css` setzen, dann immer in `:root` und `.dark` (ein Wert nur unter `:root` gälte sonst
+auch im Dunkelmodus):
+
+```css
+:root {
+    --background: oklch(0.95 0.015 80);
+}
+
+.dark {
+    --background: oklch(0.17 0.015 80);
+}
+```
+
+Mechanismus: `theme.css` importiert `brand.css` zuerst und legt die Grautöne danach unter
+`:where(:root)` und `:where(.dark)` ab. `:where()` hat die Spezifität 0, ein Wert aus
+`brand.css` (`:root`, `.dark`) gewinnt deshalb trotz späterer Position; fehlt er, greift der
+Wert aus `theme.css`. Dadurch sind ab dieser Version auch `--secondary` und
+`--secondary-foreground` aus `brand.css` wirksam.
+
+Obergrenze: `src/neutral-tint.test.ts` prüft Text auf allen Flächen (4.5:1), `--input` und
+`--ring` gegen die Flächen (3:1) für Standard, warm (60/0.012), kühl (250/0.02), Deep Pink
+(350/0.02), Einzelwerte sowie `--neutral-chroma: 0.09` für jeden Hue von 0 bis 359. Bis 0.094
+bestehen alle Paare, ab 0.095 fällt `--input` (Hell, Hue 17–30) unter 3:1. Für leicht getönte
+Grautöne genügen 0.005 bis 0.02: darüber liegen die hellen Flächen (L ≥ 0.97) außerhalb von
+sRGB, der Browser schneidet die Farbe ab und das Grau wird sichtbar farbig.
+
+Gemessene Minima (Hell / Dunkel):
+
+| Fall | `--foreground` | `--muted-foreground` | übrige Text-Paare | `--input` | `--ring` |
+| --- | --- | --- | --- | --- | --- |
+| Standard | 16.11 / 14.43 | 4.88 / 7.02 | 11.50 / 10.02 | 3.34 / 3.52 | 18.15 / 10.17 |
+| warm 60/0.012 | 16.09 / 14.39 | 4.89 / 7.02 | 11.49 / 10.00 | 3.34 / 3.52 | 18.11 / 10.19 |
+| kühl 250/0.02 | 16.13 / 14.35 | 4.88 / 7.02 | 11.51 / 9.96 | 3.33 / 3.52 | 18.13 / 10.15 |
+| Deep Pink 350/0.02 | 16.03 / 14.26 | 4.90 / 7.01 | 11.47 / 9.93 | 3.34 / 3.51 | 17.96 / 10.25 |
+
+„Übrige Text-Paare": `-foreground` auf `--card`, `--popover`, `--secondary` (auch Hover und
+gedrückt), `--accent`, `--sidebar*`, `--tertiary` (auch Hover und gedrückt),
+`--secondary-subtle`, `--brand`. Ein Wert, den `brand.css` für `--secondary*` oder
+`--tertiary*` setzt, hat Vorrang vor dem getönten Default.
+
+`--border` ist eine dekorative Trennlinie (Hell 0.922 auf 0.97) und nicht Teil der Prüfung;
+Eingabefelder grenzen sich über `--input` ab.
 
 ### Theme ohne Aufblitzen
 
@@ -721,11 +1016,48 @@ npm install @fontsource-variable/noto-sans@5.3.0
 
 Ohne den Import bleibt die System-Schrift aktiv (`ui-sans-serif, system-ui, sans-serif`).
 
+### Favicon
+
+Vorlage für ein SVG-Favicon je Tool: abgerundete Kachel in `--primary`, darauf ein Kürzel oder
+ein Tabler-Icon in `--primary-foreground`. Hell und Dunkel schaltet das SVG selbst per
+`@media (prefers-color-scheme: dark)` um (Farbschema des Browsers, nicht der `ThemeToggle`
+der Seite). Ein Favicon erbt keine CSS-Variablen der Seite, deshalb setzt
+`scripts/create-favicon.mjs` die `oklch`-Werte aus `packages/frontend/src/brand.css` (`:root`
+und `.dark`) fest in die Vorlage `scripts/templates/favicon.template.svg` ein. Andere Werte
+als `oklch(L C H)` (Hex, `var(…)`, `color-mix`) lehnt das Skript ab.
+
+Im Wurzelordner des Tools (Node `^22.18.0 || >=24.11.0`, keine Abhängigkeiten):
+
+```bash
+node vendor/web-app-kit/scripts/create-favicon.mjs --text W
+node vendor/web-app-kit/scripts/create-favicon.mjs \
+  --icon frontend/node_modules/@tabler/icons/icons/outline/layout-board.svg
+```
+
+- `--text`: ein oder zwei Zeichen (Schrift `system-ui`, fett; ein Favicon lädt keine
+  Web-Schriften).
+- `--icon`: eine Tabler-SVG-Datei (`viewBox="0 0 24 24"`, Outline oder Filled), z. B. aus
+  `@tabler/icons`, das `@tabler/icons-react` mitinstalliert.
+- `--out` (Default `frontend/public/favicon.svg`), `--brand` (Default `brand.css` des Kits).
+
+`frontend/index.html`:
+
+```html
+<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+```
+
+Nach einer Änderung der Primärfarbe im Kit das Favicon neu erzeugen und committen.
+
+Kontrast Zeichen zu Kachel = `--primary-foreground` auf `--primary`; `src/brand.test.ts`
+verlangt dafür 4.5:1 in Hell und Dunkel, über den 3:1 für Grafiken. Gemessen mit
+`contrastRatio`: neutrale Werte 17.16:1 (Hell) / 14.22:1 (Dunkel), Deep Pink
+(`oklch(0.5668 0.2294 0.76)` / `oklch(0.695 0.2229 355.31)`) 5.14:1 / 5.88:1.
+
 ## ESLint-Plugin (`@web-app-kit/eslint-plugin`)
 
 Prüft beim Linten, dass interaktive Elemente sichtbare Zustände haben (Abschnitt
-„Komponenten-Verhalten"). Plain-ESM ohne Build, ESLint 9 (Flat Config), Pflicht für jede
-Kit-App.
+„Komponenten-Verhalten") und dass ein Tool keine Kit-Bausteine nachbaut. Plain-ESM ohne Build,
+ESLint 9 (Flat Config), Pflicht für jede Kit-App.
 
 Regel `web-app-kit/interactive-states`:
 - Prüft intrinsische Elemente (kleingeschriebener Tag): `button`, `a` mit `href`, jedes Element
@@ -770,7 +1102,43 @@ Regel `web-app-kit/interactive-states`:
   `bg-surface-hover`.
 - Option `kitModules` (Default `["@web-app-kit/frontend", "@web-app-kit/frontend/ui"]`).
 
-`configs.recommended` aktiviert die Regel für `**/*.{ts,tsx}` mit `@babel/eslint-parser`
+Regel `web-app-kit/no-foreign-ui` (ab 1.0.0), verhindert eine zweite UI-Basis neben dem Kit:
+- Meldet Importe (auch `export … from`, `export * from` und `import("…")`) aus `radix-ui`,
+  `@radix-ui/*`, aus Icon-Paketen außer `@tabler/icons-react` (`lucide`, `lucide-react`,
+  `@lucide/*`, `react-icons`, `react-feather`, `@heroicons/*`, `@phosphor-icons/*`,
+  `phosphor-react`, `@fortawesome/*`, `@mui/icons-material`, `@iconify/*`, `@mdi/*`,
+  `@remixicon/*`, `@ant-design/icons`, `@primer/octicons-react`, `@tabler/icons`) und aus
+  `shadcn` außer `shadcn/tailwind.css`.
+- Meldet Importe lokaler shadcn-Kopien: Pfade mit dem Segment `components/ui`, die mit `.`,
+  `/`, `@/` oder `~/` beginnen (`@/components/ui/tabs`, `../components/ui/skeleton`).
+- Meldet jede Datei unter `components/ui/` (auch `src/components/ui/`) einmal am Dateianfang:
+  dort liegen kopierte Bausteine. `class-variance-authority`-Nachbauten sind am Import nicht
+  erkennbar, der Ordner ist das Merkmal.
+- Erlaubt sind eigene App-Elemente aus Kit-Bausteinen und Tokens in jedem anderen Ordner, z. B.
+  `src/components/app/`.
+- Option `allow` (Default `[]`) für begründete Ausnahmen, etwa eine Chart-Bibliothek: ein
+  Eintrag gilt für die exakte Import-Quelle oder einen Pfad darunter (`"recharts"` erlaubt
+  `recharts/x`, nicht `recharts-extra`) und ebenso für den Dateipfad relativ zum
+  ESLint-Arbeitsordner (`"src/components/ui/chart.tsx"`, Ordner `"src/components/ui/legacy/"`).
+  Jede Ausnahme in der `AGENTS.md` des Tools begründen.
+- Meldung: Kit-Baustein aus `@web-app-kit/frontend/ui` nutzen; fehlt er, im Kit ergänzen
+  (Skill `web-app-kit-component`).
+
+```js
+// eslint.config.js mit begründeter Ausnahme
+export default [
+  ...webAppKit.configs.recommended,
+  { rules: { "web-app-kit/no-foreign-ui": ["error", { allow: ["src/components/ui/chart.tsx"] }] } },
+];
+```
+
+Gilt für Tool-Code, nicht für den Kit: `configs.recommended` nimmt
+`**/packages/frontend/src/ui/**` (die Kit-Bausteine, die `radix-ui` legitim importieren) von
+dieser Regel aus; in Tools liegt der Kit unter `vendor/` bzw. `node_modules/` und wird ohnehin
+nicht gelintet. Gemessen mit `configs.recommended` auf `packages/frontend/src`: 0 Meldungen,
+ohne die Ausnahme 19.
+
+`configs.recommended` aktiviert beide Regeln für `**/*.{ts,tsx}` mit `@babel/eslint-parser`
 (ohne Babel-Konfigurationsdatei; Babel-Plugins `typescript` für `*.ts`, damit `<T>(x) => x`
 und `<number>wert` parsen, und `jsx` + `typescript` für `*.tsx`, jeweils mit `decorators` für
 Klassen- und Member-Decorators; Parameter-Decorators parst der Standard nicht) und dazu
@@ -820,7 +1188,7 @@ danach fehl. Behobene Stellen aus der Datei entfernen mit
 
 ## Agent-Skills
 
-Der Kit liefert drei agent-neutrale Skills (Format Agent Skills, `SKILL.md` + `references/`)
+Der Kit liefert vier agent-neutrale Skills (Format Agent Skills, `SKILL.md` + `references/`)
 unter `.agents/skills/`. Damit baut ein KI-Agent ein Tool ohne Vorwissen nach dem Kit-Muster:
 
 | Skill | Zweck | Commands |
@@ -828,6 +1196,7 @@ unter `.agents/skills/`. Damit baut ein KI-Agent ein Tool ohne Vorwissen nach de
 | `web-app-kit-new-tool` | neues Tool von Null bis zum laufenden Container, Vorlage für die `AGENTS.md` des Tools, Deploy-Anforderungen | `how-to`, `scaffold`, `checklist`, `deploy` |
 | `web-app-kit-ui` | UI nur aus Kit-Bausteinen, Zustände, WCAG 2.2 AA, Theme | `how-to`, `check`, `theme` |
 | `web-app-kit-update` | Kit-Pin im Tool anheben | `how-to`, `check`, `apply` |
+| `web-app-kit-component` | neuen Baustein im Kit-Repository ergänzen: shadcn-Vorlage, Kit-Rollen, Zustände, DOM-Test, Doku, Release | `how-to`, `add`, `check` |
 
 Ein Tool bekommt die Skills per Skript, ausgeführt im Wurzelordner des Tools:
 
@@ -847,6 +1216,48 @@ Die `AGENTS.md` des Tools verweist auf die Skills (Vorlage:
 `.agents/skills/web-app-kit-new-tool/references/deploy.md` enthält die allgemeinen
 Deploy-Anforderungen und eine Eintragsstelle für das Deploy-Ziel, die jedes Team in seinem
 Kit-Repository selbst pflegt.
+
+## Katalog
+
+`apps/catalog` zeigt alle Bausteine aus `@web-app-kit/frontend/ui` mit Beschreibung, Import,
+Varianten, Zuständen und Live-Vorschau in Hell und Dunkel, dazu Farbrollen samt Grautönen
+(Kontrast gerendert gemessen), Radien und eine Statusübersicht. Rahmen und Navigation sind
+neutral; die Vorschauen laufen in eigenen iframes und zeigen die Farben aus `brand.css`.
+
+```bash
+npm install
+npm run catalog:dev     # http://localhost:5199
+npm run catalog:build   # Ausgabe in apps/catalog/dist
+```
+
+Pflicht-Eintrag je Baustein: Jeder Export aus `packages/frontend/src/ui/index.ts` braucht einen
+Eintrag in `apps/catalog/src/catalog/components/<name>.tsx` (Name, Gruppe, Status,
+Beschreibung, Exporte, Varianten mit Vorschau-Komponente, Zustände), aufgenommen in
+`apps/catalog/src/catalog/entries.ts`. Hilfs-Exporte ohne eigene Oberfläche (`cn`,
+`*Variants`, `*_CLASSES`, `APP_SHELL_CONTENT_ID`) stehen mit Begründung in
+`apps/catalog/src/catalog/export-exceptions.ts`. `npm test` schlägt fehl, solange ein Export
+weder Eintrag noch Ausnahme hat, und ebenso bei Einträgen für Exporte, die es nicht mehr gibt.
+Vorschauen nutzen nur Kit-Bausteine und Tabler-Icons; Texte im Katalog sind Deutsch.
+
+## CI
+
+`bitbucket-pipelines.yml` prüft das Kit-Repository auf jedem Pull Request und auf `main`
+(Image `node:24`, kein Deploy):
+
+| Schritt | Prüft |
+| --- | --- |
+| `npm install` | Abhängigkeiten aller Workspaces (`package-lock.json` ist nicht eingecheckt) |
+| `npm run typecheck` | Typen aller Pakete und des Katalogs |
+| `npm test` | Tests aller Pakete, Katalog-Pflichteinträge |
+| `npm run test:scripts` | Scripts unter `scripts/` (`tag-release.sh`, `check-kit-version.sh`, …) |
+| `npm run catalog:build` | Katalog baut |
+| `npm run lint -w @web-app-kit/catalog` | Katalog gegen `@web-app-kit/eslint-plugin` |
+
+Lint-Gate in den Tools (verbindlich): Jedes Tool bindet `webAppKit.configs.recommended` in
+`frontend/eslint.config.js` ein (Abschnitt „ESLint-Plugin“), und der Frontend-Schritt der
+Tool-Pipeline ruft `npm run lint` ohne `--if-present` auf. Ein Treffer von
+`web-app-kit/interactive-states`, `web-app-kit/no-foreign-ui` oder den `jsx-a11y`-Regeln
+bricht den Build ab. Fehlt dem Frontend das Skript `lint`, schlägt der Schritt ebenfalls fehl.
 
 ## Konventionen
 

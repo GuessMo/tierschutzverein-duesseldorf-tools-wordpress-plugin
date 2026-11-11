@@ -7,6 +7,8 @@ import {
 } from "./parser-options.js";
 
 const IGNORED_DIRECTORIES = ["**/dist/**", "**/node_modules/**", "**/vendor/**"];
+const KIT_UI_SOURCES = ["**/packages/frontend/src/ui/**"];
+const TYPESCRIPT_FILES = ["**/*.{ts,tsx}"];
 
 const A11Y_RULES = {
   "jsx-a11y/no-static-element-interactions": "error",
@@ -30,9 +32,15 @@ export function createRecommendedConfig(plugin) {
     createLanguageBlock("web-app-kit/tsx", ["**/*.tsx"], TSX_PLUGINS),
     {
       name: "web-app-kit/recommended",
-      files: ["**/*.{ts,tsx}"],
+      files: TYPESCRIPT_FILES,
       plugins: { "web-app-kit": plugin, "jsx-a11y": jsxA11y },
       rules: { "web-app-kit/interactive-states": "error", ...A11Y_RULES },
+    },
+    {
+      name: "web-app-kit/no-foreign-ui",
+      files: TYPESCRIPT_FILES,
+      ignores: KIT_UI_SOURCES,
+      rules: { "web-app-kit/no-foreign-ui": "error" },
     },
   ];
 }

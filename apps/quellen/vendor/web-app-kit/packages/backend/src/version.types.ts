@@ -5,4 +5,5 @@ export interface VersionRouteOptions {
 
 export interface VersionPayload {
   version: string | null;
+  kitVersion: string;
 }

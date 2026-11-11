@@ -20,12 +20,31 @@
     --color-input: var(--input);
     --color-border: var(--border);
     --color-destructive: var(--destructive);
+    --color-info: var(--info);
+    --color-info-foreground: var(--info-foreground);
+    --color-warning: var(--warning);
+    --color-warning-foreground: var(--warning-foreground);
     --color-accent-foreground: var(--accent-foreground);
     --color-accent: var(--accent);
     --color-muted-foreground: var(--muted-foreground);
     --color-muted: var(--muted);
     --color-secondary-foreground: var(--secondary-foreground);
     --color-secondary: var(--secondary);
+    --color-secondary-hover: var(--secondary-hover, var(--secondary-hover-default));
+    --color-secondary-active: var(--secondary-active, var(--secondary-active-default));
+    --color-secondary-subtle: var(--secondary-subtle, var(--secondary-subtle-default));
+    --color-secondary-subtle-foreground: var(
+        --secondary-subtle-foreground,
+        var(--secondary-subtle-foreground-default)
+    );
+    --color-tertiary: var(--tertiary, var(--tertiary-default));
+    --color-tertiary-foreground: var(--tertiary-foreground, var(--tertiary-foreground-default));
+    --color-tertiary-hover: var(--tertiary-hover, var(--tertiary-hover-default));
+    --color-tertiary-active: var(--tertiary-active, var(--tertiary-active-default));
+    --color-tertiary-active-foreground: var(
+        --tertiary-active-foreground,
+        var(--tertiary-active-foreground-default)
+    );
     --color-primary-foreground: var(--primary-foreground);
     --color-primary: var(--primary);
     --color-primary-hover: var(--primary-hover, var(--primary-hover-default));
@@ -56,69 +75,119 @@
     --font-heading: var(--font-sans);
 }
 
-:root {
-    --background: oklch(0.97 0 0);
-    --foreground: oklch(0.145 0 0);
-    --card: oklch(1 0 0);
-    --card-foreground: oklch(0.145 0 0);
-    --popover: oklch(1 0 0);
-    --popover-foreground: oklch(0.145 0 0);
-    --secondary: oklch(0.97 0 0);
-    --secondary-foreground: oklch(0.205 0 0);
-    --muted: oklch(0.97 0 0);
-    --muted-foreground: oklch(0.5 0 0);
-    --accent: oklch(0.93 0 0);
-    --accent-foreground: oklch(0.205 0 0);
+:where(:root) {
+    --neutral-hue: 0;
+    --neutral-chroma: 0;
+    --background: oklch(0.97 var(--neutral-chroma) var(--neutral-hue));
+    --foreground: oklch(0.145 var(--neutral-chroma) var(--neutral-hue));
+    --card: oklch(1 var(--neutral-chroma) var(--neutral-hue));
+    --card-foreground: oklch(0.145 var(--neutral-chroma) var(--neutral-hue));
+    --popover: oklch(1 var(--neutral-chroma) var(--neutral-hue));
+    --popover-foreground: oklch(0.145 var(--neutral-chroma) var(--neutral-hue));
+    --secondary: oklch(0.97 var(--neutral-chroma) var(--neutral-hue));
+    --secondary-foreground: oklch(0.205 var(--neutral-chroma) var(--neutral-hue));
+    --muted: oklch(0.97 var(--neutral-chroma) var(--neutral-hue));
+    --muted-foreground: oklch(0.5 var(--neutral-chroma) var(--neutral-hue));
+    --accent: oklch(0.93 var(--neutral-chroma) var(--neutral-hue));
+    --accent-foreground: oklch(0.205 var(--neutral-chroma) var(--neutral-hue));
     --destructive: oklch(0.48 0.18 27.325);
-    --border: oklch(0.922 0 0);
-    --input: oklch(0.62 0 0);
+    --info: oklch(0.45 0.14 250);
+    --info-foreground: oklch(0.985 0 0);
+    --warning: oklch(0.47 0.1 70);
+    --warning-foreground: oklch(0.985 0 0);
+    --border: oklch(0.922 var(--neutral-chroma) var(--neutral-hue));
+    --input: oklch(0.62 var(--neutral-chroma) var(--neutral-hue));
     --radius: 0.625rem;
-    --brand: oklch(0.205 0 0);
-    --brand-foreground: oklch(0.985 0 0);
-    --surface-hover: oklch(0.145 0 0 / 8%);
-    --surface-selected: oklch(0.145 0 0 / 14%);
-    --surface-selected-hover: oklch(0.145 0 0 / 20%);
+    --brand: oklch(0.205 var(--neutral-chroma) var(--neutral-hue));
+    --brand-foreground: oklch(0.985 var(--neutral-chroma) var(--neutral-hue));
+    --surface-hover: oklch(0.145 var(--neutral-chroma) var(--neutral-hue) / 8%);
+    --surface-selected: oklch(0.145 var(--neutral-chroma) var(--neutral-hue) / 14%);
+    --surface-selected-hover: oklch(0.145 var(--neutral-chroma) var(--neutral-hue) / 20%);
     --primary-hover-default: oklch(0.32 0 0);
     --primary-active-default: oklch(0.4 0 0);
     --primary-subtle-default: oklch(0.92 0 0);
     --primary-subtle-foreground-default: oklch(0.145 0 0);
-    --sidebar: oklch(0.97 0 0);
-    --sidebar-foreground: oklch(0.145 0 0);
-    --sidebar-accent: oklch(0.97 0 0);
-    --sidebar-accent-foreground: oklch(0.205 0 0);
-    --sidebar-border: oklch(0.922 0 0);
+    --secondary-hover-default: color-mix(in oklch, var(--secondary), var(--foreground) 8%);
+    --secondary-active-default: color-mix(in oklch, var(--secondary), var(--foreground) 14%);
+    --secondary-subtle-default: oklch(0.97 var(--neutral-chroma) var(--neutral-hue));
+    --secondary-subtle-foreground-default: oklch(0.145 var(--neutral-chroma) var(--neutral-hue));
+    --tertiary-default: oklch(0.97 var(--neutral-chroma) var(--neutral-hue));
+    --tertiary-foreground-default: oklch(0.205 var(--neutral-chroma) var(--neutral-hue));
+    --tertiary-hover-default: color-mix(
+        in oklch,
+        var(--tertiary, var(--tertiary-default)),
+        var(--foreground) 8%
+    );
+    --tertiary-active-default: color-mix(
+        in oklch,
+        var(--tertiary, var(--tertiary-default)),
+        var(--foreground) 14%
+    );
+    --tertiary-active-foreground-default: var(
+        --tertiary-foreground,
+        var(--tertiary-foreground-default)
+    );
+    --sidebar: oklch(0.97 var(--neutral-chroma) var(--neutral-hue));
+    --sidebar-foreground: oklch(0.145 var(--neutral-chroma) var(--neutral-hue));
+    --sidebar-accent: oklch(0.97 var(--neutral-chroma) var(--neutral-hue));
+    --sidebar-accent-foreground: oklch(0.205 var(--neutral-chroma) var(--neutral-hue));
+    --sidebar-border: oklch(0.922 var(--neutral-chroma) var(--neutral-hue));
 }
 
-.dark {
-    --background: oklch(0.19 0 0);
-    --foreground: oklch(0.985 0 0);
-    --card: oklch(0.27 0 0);
-    --card-foreground: oklch(0.985 0 0);
-    --popover: oklch(0.205 0 0);
-    --popover-foreground: oklch(0.985 0 0);
-    --secondary: oklch(0.269 0 0);
-    --secondary-foreground: oklch(0.985 0 0);
-    --muted: oklch(0.269 0 0);
-    --muted-foreground: oklch(0.76 0 0);
-    --accent: oklch(0.269 0 0);
-    --accent-foreground: oklch(0.985 0 0);
+:where(.dark) {
+    --background: oklch(0.19 var(--neutral-chroma) var(--neutral-hue));
+    --foreground: oklch(0.985 var(--neutral-chroma) var(--neutral-hue));
+    --card: oklch(0.27 var(--neutral-chroma) var(--neutral-hue));
+    --card-foreground: oklch(0.985 var(--neutral-chroma) var(--neutral-hue));
+    --popover: oklch(0.205 var(--neutral-chroma) var(--neutral-hue));
+    --popover-foreground: oklch(0.985 var(--neutral-chroma) var(--neutral-hue));
+    --secondary: oklch(0.269 var(--neutral-chroma) var(--neutral-hue));
+    --secondary-foreground: oklch(0.985 var(--neutral-chroma) var(--neutral-hue));
+    --muted: oklch(0.269 var(--neutral-chroma) var(--neutral-hue));
+    --muted-foreground: oklch(0.76 var(--neutral-chroma) var(--neutral-hue));
+    --accent: oklch(0.269 var(--neutral-chroma) var(--neutral-hue));
+    --accent-foreground: oklch(0.985 var(--neutral-chroma) var(--neutral-hue));
     --destructive: oklch(0.82 0.1 22.216);
-    --border: oklch(1 0 0 / 10%);
-    --input: oklch(0.58 0 0);
-    --brand: oklch(0.922 0 0);
-    --brand-foreground: oklch(0.205 0 0);
-    --surface-hover: oklch(0.985 0 0 / 8%);
-    --surface-selected: oklch(0.985 0 0 / 14%);
-    --surface-selected-hover: oklch(0.985 0 0 / 20%);
+    --info: oklch(0.82 0.09 240);
+    --info-foreground: oklch(0.2 0.03 250);
+    --warning: oklch(0.85 0.12 80);
+    --warning-foreground: oklch(0.2 0.03 70);
+    --border: oklch(1 var(--neutral-chroma) var(--neutral-hue) / 10%);
+    --input: oklch(0.58 var(--neutral-chroma) var(--neutral-hue));
+    --brand: oklch(0.922 var(--neutral-chroma) var(--neutral-hue));
+    --brand-foreground: oklch(0.205 var(--neutral-chroma) var(--neutral-hue));
+    --surface-hover: oklch(0.985 var(--neutral-chroma) var(--neutral-hue) / 8%);
+    --surface-selected: oklch(0.985 var(--neutral-chroma) var(--neutral-hue) / 14%);
+    --surface-selected-hover: oklch(0.985 var(--neutral-chroma) var(--neutral-hue) / 20%);
     --primary-hover-default: oklch(0.85 0 0);
     --primary-active-default: oklch(0.78 0 0);
     --primary-subtle-default: oklch(0.33 0 0);
     --primary-subtle-foreground-default: oklch(0.985 0 0);
-    --sidebar: oklch(0.19 0 0);
-    --sidebar-foreground: oklch(0.985 0 0);
-    --sidebar-accent: oklch(0.269 0 0);
-    --sidebar-accent-foreground: oklch(0.985 0 0);
-    --sidebar-border: oklch(1 0 0 / 10%);
+    --secondary-hover-default: color-mix(in oklch, var(--secondary), var(--foreground) 8%);
+    --secondary-active-default: color-mix(in oklch, var(--secondary), var(--foreground) 14%);
+    --secondary-subtle-default: oklch(0.269 var(--neutral-chroma) var(--neutral-hue));
+    --secondary-subtle-foreground-default: oklch(0.985 var(--neutral-chroma) var(--neutral-hue));
+    --tertiary-default: oklch(0.269 var(--neutral-chroma) var(--neutral-hue));
+    --tertiary-foreground-default: oklch(0.985 var(--neutral-chroma) var(--neutral-hue));
+    --tertiary-hover-default: color-mix(
+        in oklch,
+        var(--tertiary, var(--tertiary-default)),
+        var(--foreground) 8%
+    );
+    --tertiary-active-default: color-mix(
+        in oklch,
+        var(--tertiary, var(--tertiary-default)),
+        var(--foreground) 14%
+    );
+    --tertiary-active-foreground-default: var(
+        --tertiary-foreground,
+        var(--tertiary-foreground-default)
+    );
+    --sidebar: oklch(0.19 var(--neutral-chroma) var(--neutral-hue));
+    --sidebar-foreground: oklch(0.985 var(--neutral-chroma) var(--neutral-hue));
+    --sidebar-accent: oklch(0.269 var(--neutral-chroma) var(--neutral-hue));
+    --sidebar-accent-foreground: oklch(0.985 var(--neutral-chroma) var(--neutral-hue));
+    --sidebar-border: oklch(1 var(--neutral-chroma) var(--neutral-hue) / 10%);
 }
 
 @utility overlay-hover {
@@ -127,7 +196,7 @@
 
 @layer base {
   * {
-    @apply border-border outline-ring/50;
+    @apply border-border outline-ring;
     }
   body {
     @apply bg-background text-foreground;

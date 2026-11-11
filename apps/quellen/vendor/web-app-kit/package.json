@@ -3,11 +3,13 @@
   "version": "0.0.0",
   "private": true,
   "type": "module",
-  "workspaces": ["packages/*"],
+  "workspaces": ["packages/*", "apps/*"],
   "scripts": {
     "typecheck": "npm run typecheck --workspaces --if-present",
     "test": "npm test --workspaces --if-present",
-    "test:scripts": "bash scripts/tests/run.sh"
+    "test:scripts": "bash scripts/tests/run.sh",
+    "catalog:dev": "npm run dev --workspace @web-app-kit/catalog",
+    "catalog:build": "npm run build --workspace @web-app-kit/catalog"
   },
   "devDependencies": {
     "fastify": "5.10.0"

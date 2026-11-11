@@ -3,7 +3,7 @@ import { cva, type VariantProps } from "class-variance-authority";
 import { Slot } from "radix-ui";
 
 import { cn } from "./cn.js";
-import { PRIMARY_SUBTLE_STATE_CLASSES } from "./interaction-states.js";
+import { FILLED_FOCUS_CLASSES, PRIMARY_SUBTLE_STATE_CLASSES } from "./interaction-states.js";
 
 const buttonVariants = cva(
   [
@@ -25,12 +25,19 @@ const buttonVariants = cva(
         default: [
           "bg-primary text-primary-foreground not-disabled:hover:bg-primary-hover",
           "not-disabled:active:bg-primary-active",
+          FILLED_FOCUS_CLASSES,
         ],
         outline: ["border-input bg-transparent", PRIMARY_SUBTLE_STATE_CLASSES],
         secondary: [
           "bg-secondary text-secondary-foreground",
-          "not-disabled:hover:bg-[color-mix(in_oklch,var(--secondary),var(--foreground)_8%)]",
+          "not-disabled:hover:bg-secondary-hover not-disabled:active:bg-secondary-active",
           "aria-expanded:bg-secondary aria-expanded:text-secondary-foreground",
+        ],
+        tertiary: [
+          "bg-tertiary text-tertiary-foreground not-disabled:hover:bg-tertiary-hover",
+          "not-disabled:active:bg-tertiary-active",
+          "not-disabled:active:text-tertiary-active-foreground",
+          "aria-expanded:bg-tertiary aria-expanded:text-tertiary-foreground",
         ],
         ghost: PRIMARY_SUBTLE_STATE_CLASSES,
         destructive: [

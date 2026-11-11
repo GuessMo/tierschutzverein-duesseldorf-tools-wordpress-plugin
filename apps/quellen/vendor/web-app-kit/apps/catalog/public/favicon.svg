@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32">
+  <style>
+    .tile { fill: oklch(0.205 0 0); }
+    .glyph { color: oklch(0.985 0 0); }
+    @media (prefers-color-scheme: dark) {
+      .tile { fill: oklch(0.922 0 0); }
+      .glyph { color: oklch(0.205 0 0); }
+    }
+  </style>
+  <rect class="tile" width="32" height="32" rx="7" />
+  <g class="glyph"><text x="16" y="16" text-anchor="middle" dominant-baseline="central" font-family="system-ui, -apple-system, 'Segoe UI', sans-serif" font-weight="700" font-size="20" fill="currentColor">K</text></g>
+</svg>

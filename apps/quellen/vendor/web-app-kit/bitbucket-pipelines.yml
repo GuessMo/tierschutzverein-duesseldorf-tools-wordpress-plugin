@@ -1,0 +1,25 @@
+image: node:24
+
+definitions:
+  caches:
+    npm: ~/.npm
+  steps:
+    - step: &ci
+        name: Typecheck, test, script tests, catalog build and lint
+        caches:
+          - npm
+        script:
+          - npm install
+          - npm run typecheck
+          - npm test
+          - npm run test:scripts
+          - npm run catalog:build
+          - npm run lint -w @web-app-kit/catalog
+
+pipelines:
+  pull-requests:
+    "**":
+      - step: *ci
+  branches:
+    main:
+      - step: *ci

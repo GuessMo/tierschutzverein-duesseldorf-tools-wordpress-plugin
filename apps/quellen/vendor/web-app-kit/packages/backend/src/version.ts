@@ -1,4 +1,5 @@
 import type { FastifyInstance } from "fastify";
+import { KIT_VERSION } from "./kitVersion.js";
 import type { VersionPayload, VersionRouteOptions } from "./version.types.js";
 
 const DEFAULT_VERSION_PATH = "/api/version";
@@ -13,7 +14,10 @@ export function registerVersionRoute(
   app: FastifyInstance,
   { version, path = DEFAULT_VERSION_PATH }: VersionRouteOptions,
 ): void {
-  const payload: VersionPayload = { version: version ?? null };
+  const payload: VersionPayload = {
+    version: version ?? null,
+    kitVersion: KIT_VERSION,
+  };
   app.get(path, async (_request, reply) => {
     reply.header("cache-control", "no-store");
     return payload;

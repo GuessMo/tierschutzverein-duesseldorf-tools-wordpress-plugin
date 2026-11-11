@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32">
+  <style>
+    .tile { fill: {{PRIMARY_LIGHT}}; }
+    .glyph { color: {{FOREGROUND_LIGHT}}; }
+    @media (prefers-color-scheme: dark) {
+      .tile { fill: {{PRIMARY_DARK}}; }
+      .glyph { color: {{FOREGROUND_DARK}}; }
+    }
+  </style>
+  <rect class="tile" width="32" height="32" rx="7" />
+  <g class="glyph">{{GLYPH}}</g>
+</svg>

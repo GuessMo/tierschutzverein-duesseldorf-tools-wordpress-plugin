@@ -2,6 +2,7 @@ import * as React from "react";
 import { Select as SelectPrimitive } from "radix-ui";
 import { IconCheck, IconChevronDown, IconChevronUp } from "@tabler/icons-react";
 import { cn } from "./cn.js";
+import { MENU_HIGHLIGHT_CLASSES } from "./menu-classes.js";
 
 function SelectLabel({ className, ...props }: React.ComponentProps<typeof SelectPrimitive.Label>) {
   return (
@@ -14,7 +15,7 @@ function SelectLabel({ className, ...props }: React.ComponentProps<typeof Select
 }
 
 const SELECT_ITEM_CLASSES = [
-  "focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-inset",
+  ...MENU_HIGHLIGHT_CLASSES,
   "relative flex w-full cursor-default items-center gap-1.5 rounded-md py-1",
   "pr-8 pl-1.5 text-sm outline-hidden select-none focus:bg-primary-subtle",
   "focus:text-primary-subtle-foreground",

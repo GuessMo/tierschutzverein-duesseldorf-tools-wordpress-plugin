@@ -76,7 +76,7 @@ function AppShellBody({
       <main
         id={APP_SHELL_CONTENT_ID}
         tabIndex={-1}
-        className="min-h-0 min-w-0 flex-1 overflow-auto outline-none"
+        className="relative min-h-0 min-w-0 flex-1 overflow-auto outline-none"
       >
         {children}
       </main>

@@ -2,30 +2,18 @@ import * as React from "react";
 import { DropdownMenu as DropdownMenuPrimitive } from "radix-ui";
 import { IconCheck } from "@tabler/icons-react";
 import { cn } from "./cn.js";
+import {
+  MENU_CHECK_INDICATOR_CLASSES,
+  MENU_ITEM_CLASSES,
+  MENU_SELECTABLE_ITEM_CLASSES,
+} from "./menu-classes.js";
 
-const DROPDOWN_MENU_ITEM_CLASSES = [
-  "focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-inset",
-  "group/dropdown-menu-item relative flex cursor-default items-center",
-  "gap-1.5 rounded-md px-1.5 py-1 text-sm outline-hidden select-none",
-  "focus:bg-primary-subtle focus:text-primary-subtle-foreground",
-  "not-data-[variant=destructive]:focus:**:text-primary-subtle-foreground",
-  "data-inset:pl-7 data-[variant=destructive]:text-destructive",
-  "data-[variant=destructive]:focus:bg-destructive/10",
-  "data-[variant=destructive]:focus:text-destructive",
-  "dark:data-[variant=destructive]:focus:bg-destructive/20",
-  "data-disabled:pointer-events-none data-disabled:opacity-50",
-  "[&_svg]:pointer-events-none [&_svg]:shrink-0",
-  "[&_svg:not([class*='size-'])]:size-4",
-  "data-[variant=destructive]:*:[svg]:text-destructive",
-];
+const DROPDOWN_MENU_ITEM_CLASSES = ["group/dropdown-menu-item", ...MENU_ITEM_CLASSES];
 
 function ItemCheckIndicator({ slot }: { slot: string }) {
   return (
     <span
-      className={cn([
-        "pointer-events-none absolute right-2 flex items-center justify-center",
-        "text-primary",
-      ])}
+      className={cn(MENU_CHECK_INDICATOR_CLASSES)}
       data-slot={slot}
     >
       <DropdownMenuPrimitive.ItemIndicator>
@@ -55,16 +43,6 @@ function DropdownMenuItem({
   );
 }
 
-const SELECTABLE_ITEM_CLASSES = [
-  "focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-inset",
-  "relative flex cursor-default items-center gap-1.5 rounded-md py-1 pr-8",
-  "pl-1.5 text-sm outline-hidden select-none focus:bg-primary-subtle",
-  "focus:text-primary-subtle-foreground",
-  "data-inset:pl-7 data-disabled:pointer-events-none",
-  "data-disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:shrink-0",
-  "[&_svg:not([class*='size-'])]:size-4",
-];
-
 function DropdownMenuCheckboxItem({
   className,
   children,
@@ -78,7 +56,7 @@ function DropdownMenuCheckboxItem({
     <DropdownMenuPrimitive.CheckboxItem
       data-slot="dropdown-menu-checkbox-item"
       data-inset={inset}
-      className={cn(SELECTABLE_ITEM_CLASSES, className)}
+      className={cn(MENU_SELECTABLE_ITEM_CLASSES, className)}
       checked={checked}
       {...props}
     >
@@ -106,7 +84,7 @@ function DropdownMenuRadioItem({
     <DropdownMenuPrimitive.RadioItem
       data-slot="dropdown-menu-radio-item"
       data-inset={inset}
-      className={cn(SELECTABLE_ITEM_CLASSES, className)}
+      className={cn(MENU_SELECTABLE_ITEM_CLASSES, className)}
       {...props}
     >
       <ItemCheckIndicator slot="dropdown-menu-radio-item-indicator" />

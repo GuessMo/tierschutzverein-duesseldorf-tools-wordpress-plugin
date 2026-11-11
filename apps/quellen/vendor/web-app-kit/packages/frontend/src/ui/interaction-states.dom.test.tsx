@@ -38,6 +38,41 @@ test("default Button steps through primary hover and active roles", () => {
   assert.equal(classes.some((token) => token.includes("bg-primary/")), false);
 });
 
+test("secondary and tertiary Buttons step through their hover and active roles", () => {
+  assertClasses(
+    ui.buttonVariants({ variant: "secondary" }).split(" "),
+    ["not-disabled:hover:bg-secondary-hover", "not-disabled:active:bg-secondary-active"],
+    "secondary",
+  );
+  assertClasses(
+    ui.buttonVariants({ variant: "tertiary" }).split(" "),
+    [
+      "bg-tertiary",
+      "text-tertiary-foreground",
+      "not-disabled:hover:bg-tertiary-hover",
+      "not-disabled:active:bg-tertiary-active",
+      "not-disabled:active:text-tertiary-active-foreground",
+    ],
+    "tertiary",
+  );
+});
+
+const OFFSET_FOCUS_CLASSES = [
+  "focus-visible:outline-2",
+  "focus-visible:outline-offset-2",
+  "focus-visible:outline-solid",
+  "focus-visible:outline-ring",
+];
+
+test("filled Button and Badge draw the focus outline offset from the primary fill", () => {
+  render(<ui.Button>Save</ui.Button>);
+  const button = classesOf(screen.getByRole("button", { name: "Save" }));
+  assertClasses(button, OFFSET_FOCUS_CLASSES, "button default");
+  assert.equal(button.includes("focus-visible:outline-hidden"), false);
+  render(<ui.Badge>New</ui.Badge>);
+  assertClasses(classesOf(screen.getByText("New")), OFFSET_FOCUS_CLASSES, "badge default");
+});
+
 test("ghost and outline Buttons hover subtle and mark pressed with border and ring", () => {
   for (const variant of ["ghost", "outline"] as const) {
     render(
@@ -81,7 +116,12 @@ test("menu items focus on the subtle primary surface with a primary check", () =
   );
   const item = screen.getByRole("menuitem", { name: "Open" });
   const checkbox = screen.getByRole("menuitemcheckbox", { name: "Grid" });
-  const expected = ["focus:bg-primary-subtle", "focus:text-primary-subtle-foreground"];
+  const expected = [
+    "focus:bg-primary-subtle",
+    "focus:text-primary-subtle-foreground",
+    "data-highlighted:inset-ring-2",
+    "data-highlighted:inset-ring-ring",
+  ];
   assertClasses(classesOf(item), expected, "item");
   assertClasses(classesOf(checkbox), expected, "checkbox item");
   const indicator = checkbox.querySelector("[data-slot$=indicator]");

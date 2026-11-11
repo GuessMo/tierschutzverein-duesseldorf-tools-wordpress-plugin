@@ -1,9 +1,9 @@
 ---
 name: web-app-kit-ui
-description: Baut und prüft Oberflächen in Web-Tools, die web-app-kit nutzen - nur Kit-Komponenten aus @web-app-kit/frontend/ui, Tabler-Icons, Beschriftungen per Props und i18n, Pflicht-Zustände hover/gedrückt/focus-visible/deaktiviert, WCAG 2.2 AA in Hell und Dunkel, Seitenaufbau mit App-Rahmen, PageContainer und SidePanel, Dialoge, Formulare, ESLint-Regel interactive-states, Primärfarbe aus brand.css, Abweichungen per applyThemeOverrides mit Kontrastnachweis. Verwenden bei "Seite/Ansicht/Formular/Dialog/Liste im Tool bauen", "Komponente fürs Kit-Tool", "UI prüfen", "Barrierefreiheit/Kontrast im Tool prüfen", "Farbe/Theme/Primärfarbe ändern", "Lint-Fehler interactive-states". Nicht für das Anlegen eines neuen Tools (web-app-kit-new-tool), nicht für Kit-Updates (web-app-kit-update), nicht für die Entwicklung neuer Bausteine im Kit-Repository selbst und nicht für Oberflächen ohne web-app-kit.
+description: Baut und prüft Oberflächen in Web-Tools, die web-app-kit nutzen - nur Kit-Komponenten aus @web-app-kit/frontend/ui, Tabler-Icons, Beschriftungen per Props und i18n, Pflicht-Zustände hover/gedrückt/focus-visible/deaktiviert, WCAG 2.2 AA in Hell und Dunkel, Seitenaufbau mit App-Rahmen, PageContainer und SidePanel, Dialoge, Formulare, ESLint-Regel interactive-states, Primärfarbe aus brand.css, Abweichungen per applyThemeOverrides mit Kontrastnachweis. Verwenden bei "Seite/Ansicht/Formular/Dialog/Liste im Tool bauen", "Komponente fürs Kit-Tool", "UI prüfen", "Barrierefreiheit/Kontrast im Tool prüfen", "Farbe/Theme/Primärfarbe ändern", "Lint-Fehler interactive-states". Nicht für das Anlegen eines neuen Tools (web-app-kit-new-tool), nicht für Kit-Updates (web-app-kit-update), nicht für die Entwicklung neuer Bausteine im Kit-Repository selbst (web-app-kit-component) und nicht für Oberflächen ohne web-app-kit.
 license: MIT
 metadata:
-  version: "1.0.0"
+  version: "1.3.2"
   abgleich: "2026-11-04 skills.sh+agent-skill.co+aiskill.market+agentskills.io"
 ---
 
@@ -73,7 +73,7 @@ Bei Aufruf mit `how-to` diese Ansicht ausgeben.
 | Navigation links | `navigation` + `navigationLabel` | `SidePanel side="left"` mit Links; aktive Seite `aria-current="page"` |
 | Inhalt | `children` | `PageContainer size="md"` (Formular), `"lg"` (Liste), `"full"` (Arbeitsfläche) |
 | Detail rechts | `detail` + `detailLabel` | `SidePanel side="right"` mit `title`, `onOpenChange`, `closeLabel`, `returnFocusRef` |
-| Fußzeile | `footer` | `AppVersion` |
+| Fußzeile | `footer` | `AppVersion` mit `kitLabel` (App- und Kit-Version) |
 
 Pro Ansicht genau eine primäre Aktion (`Button` Default-Variante), alles andere `outline`,
 `ghost` oder `secondary`. Leere Listen bekommen einen Leerzustand mit Text und, wenn sinnvoll,
@@ -105,8 +105,8 @@ Details, Props und Code: `references/components.md`.
 
 ## Fehlender Baustein
 
-Braucht die Oberfläche etwas, das `@web-app-kit/frontend/ui` nicht exportiert (z. B. Tabs,
-Checkbox, Switch, Toast):
+Braucht die Oberfläche etwas, das `@web-app-kit/frontend/ui` nicht exportiert (z. B.
+Combobox, Datumsauswahl, Slider):
 
 1. Bestand prüfen: `cat vendor/web-app-kit/packages/frontend/src/ui/index.ts`; prüfen, ob eine
    neuere Kit-Version ihn hat (`bash vendor/web-app-kit/scripts/check-kit-version.sh`, dann
@@ -115,9 +115,24 @@ Checkbox, Switch, Toast):
    für ein Menü mit Aktionen, `ToggleGroup` für eine Werkzeugauswahl).
 3. Sonst stoppen und dem Nutzer melden: Name des Bausteins, Einsatzzweck, gewünschte Varianten.
    Der Baustein wird im web-app-kit-Repository ergänzt (shadcn-Basis, Tabler-Icons, Labels per
-   Props, Zustände, AA-Nachweis), dann per Kit-Update übernommen.
+   Props, Zustände, AA-Nachweis; Ergänzung im Kit-Repo mit Skill `web-app-kit-component`),
+   dann per Kit-Update übernommen.
 4. Nicht lokal nachbauen, nicht kopieren, keine andere Bibliothek einbinden, auch nicht
    „vorübergehend".
+
+## Lint-Regeln
+
+`configs.recommended` des Plugins `@web-app-kit/eslint-plugin` prüft zwei Kit-Regeln als Fehler
+(Details `references/components.md`, Abschnitt „ESLint-Regeln"):
+
+| Regel | Meldet | Behebung |
+| --- | --- | --- |
+| `interactive-states` | interaktive Elemente ohne hover/gedrückt/focus-visible, `hover:bg-muted`/`hover:bg-accent` | Kit-Baustein oder Zustandsklassen |
+| `no-foreign-ui` | Importe aus `radix-ui`, `@radix-ui/*`, `shadcn` (außer `shadcn/tailwind.css`), Icon-Paketen außer `@tabler/icons-react`, `@/components/ui/*`; jede Datei unter `components/ui/` | Kit-Baustein aus `@web-app-kit/frontend/ui`; fehlt er, Abschnitt „Fehlender Baustein" |
+
+Eigene Elemente des Tools aus Kit-Bausteinen liegen außerhalb von `components/ui/`, z. B. in
+`src/components/app/`. Eine Ausnahme (z. B. Chart-Bibliothek) nur über die Option `allow` mit
+Begründung in der `AGENTS.md` des Tools, nie per `eslint-disable`.
 
 ## Theme
 
@@ -128,6 +143,7 @@ ausdrücklicher Freigabe des Teams. Danach klären, was geändert werden soll, u
 
 | Wunsch | Weg |
 | --- | --- |
+| Grautöne mit Farbstich für alle Tools des Teams | `--neutral-hue`/`--neutral-chroma` in `brand.css` (ab Kit 0.13.0, Chroma 0.005–0.02, Obergrenze 0.09), einzelne Grautöne direkt in `:root` und `.dark`, Kit-Release |
 | Primärfarbe für alle Tools des Teams | `brand.css` im Kit-Repository des Teams ändern (`--primary` samt `--primary-hover`, `--primary-active`, `--primary-subtle`, `--primary-subtle-foreground`), Kontrast aller Paare messen, Kit-Release |
 | Ein Tool soll anders aussehen (nur mit Team-Freigabe, siehe `references/team-theme.md`) | `applyThemeOverrides({ "--primary": { light, dark }, … })` in `main.tsx`, alle Paare in beiden Modi messen |
 | Instanzen unterscheiden (z. B. Test und Produktion) | `applyAccentOverride(import.meta.env.VITE_ACCENT_OKLCH)`, sichtbar nur über `bg-brand`/`text-brand`/`border-brand` |
@@ -140,6 +156,8 @@ ausgewählt mit Primärrahmen plus Innenring auf `--primary-subtle`, aktives `To
 Kontrast-Minimum: Text 4.5:1, Bedienelemente und Fokusring 3:1, in Hell und Dunkel, gerendert
 gemessen. Ohne Messwerte keine Theme-Änderung abschließen.
 
+Farbwerte in `brand.css` immer als `oklch(L C H)`.
+
 ## Prüfliste
 
 Für `check` alle Punkte abarbeiten und als Tabelle (Punkt, Befehl/Methode, Ergebnis, Messwert)
@@ -147,12 +165,17 @@ ausgeben. Nicht Gemessenes als „nicht geprüft" melden, nie als ok.
 
 Automatisch (im Ordner `frontend/`):
 
-1. `npm run lint` ohne Fehler und ohne neue Einträge in `eslint-suppressions.json`.
+1. `npm run lint` ohne Fehler und ohne neue Einträge in `eslint-suppressions.json`. Das umfasst
+   `web-app-kit/interactive-states` und `web-app-kit/no-foreign-ui` (fremde UI-Pakete,
+   Icon-Pakete außer Tabler, lokale `components/ui/`-Kopien; Abschnitt „Lint-Regeln").
 2. `npm run build` grün.
 3. Fremde UI-Quellen: `grep -rnE "lucide-react|@radix-ui/|components/ui/|@mui/|@chakra-ui/" src`
-   ohne Treffer.
+   ohne Treffer. Jeder Eintrag in der Option `allow` von `no-foreign-ui` ist in der
+   `AGENTS.md` des Tools begründet.
 4. Rohfarben und Dark-Overrides: `grep -rnE "(bg|text|border)-(red|blue|green|gray|slate|zinc)-[0-9]|dark:(bg|text|border)-|#[0-9a-fA-F]{6}" src`
-   ohne Treffer (fachliche Tokens gehören in `index.css`).
+   ohne Treffer (fachliche Tokens gehören in `index.css`). Farbwerte in `brand.css` und
+   `index.css` immer als `oklch(L C H)`: `grep -nE "#[0-9a-fA-F]{3,8}\b|rgba?\(|hsla?\(" src/index.css`
+   ohne Treffer.
 5. Verbotene Muster: `grep -rnE "hover:bg-(muted|accent)|space-[xy]-" src` ohne Treffer.
 6. Feste Texte: `grep -rnE 'aria-label="|title="|placeholder="' src` ohne Literale; JSX-Text
    stichprobenartig lesen.
@@ -167,7 +190,10 @@ Im Browser (Tool lokal starten, beide Modi per `ThemeToggle`):
    zuerst, alles erreichbar, Fokus immer sichtbar und nicht verdeckt, Dialog und Panel per
    Escape bzw. Schließen-Button zu, Fokus kehrt zurück.
 10. Kontrast gemessen (Methode in `references/theme.md`): Text 4.5:1, Bedienelemente und Fokus
-    3:1, in Hell und Dunkel; Messwerte notieren.
+    3:1, in Hell und Dunkel; Messwerte notieren. Fokusindikator ≥ 3:1 gegen die Fläche des
+    Elements und die Umgebung, gerendert gemessen: ein Halo `ring-ring/50` allein erreicht mit
+    kräftiger Primärfarbe nur 2.2–2.6:1 und zählt nicht; markierte Menü- und Select-Einträge
+    zeigen den Ring zusätzlich zur zarten Fläche.
 11. Hover, gedrückt, Fokus, deaktiviert an jedem eigenen interaktiven Element sichtbar.
 12. Breite 320px: kein horizontales Scrollen der Seite, Kopfzeile schneidet ab statt umzubrechen,
     Panels stapeln sich.
@@ -180,8 +206,8 @@ Im Browser (Tool lokal starten, beide Modi per `ThemeToggle`):
 
 | Datei | Inhalt |
 | --- | --- |
-| `references/components.md` | Katalog aller Kit-Bausteine mit Pflicht-Props, Code für Seite, Liste, Dialog, Formular, Werkzeugleiste, interaktive Karten, Zustands-Klassen, ESLint-Regel |
+| `references/components.md` | Katalog aller Kit-Bausteine mit Pflicht-Props, Code für Seite, Liste, Dialog, Formular, Werkzeugleiste, interaktive Karten, Zustands-Klassen, ESLint-Regeln |
 | `references/team-theme.md` | Verbindlicher Theme-Standard des Teams (vom Team gepflegt) |
 | `references/theme.md` | `brand.css`, Kontrast-Paare, `applyThemeOverrides`, `applyAccentOverride`, fachliche Tokens |
 
-*Zuletzt aktualisiert: 2026-11-04*
+*Zuletzt aktualisiert: 2026-11-05 (Beispiele fehlender Bausteine aktualisiert; zuvor AppVersion mit Kit-Version)*

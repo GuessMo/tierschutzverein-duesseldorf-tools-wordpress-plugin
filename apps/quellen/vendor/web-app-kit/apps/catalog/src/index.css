@@ -1,0 +1,7 @@
+@import "tailwindcss";
+@import "tw-animate-css";
+@import "shadcn/tailwind.css";
+@import "@fontsource-variable/noto-sans";
+@import "@web-app-kit/frontend/theme.css";
+@import "./shell/chrome.css";
+@source "../../../packages/frontend/src/ui";

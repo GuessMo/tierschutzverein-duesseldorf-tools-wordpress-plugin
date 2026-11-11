@@ -55,6 +55,13 @@ test("skip link targets the focusable main region and has hover and pressed stat
   }
 });
 
+test("main region contains absolutely positioned content so the page does not grow", () => {
+  renderPlainShell();
+  const main = screen.getByRole("main");
+  assert.ok(main.classList.contains("relative"));
+  assert.ok(main.classList.contains("overflow-auto"));
+});
+
 test("navigation and detail landmarks are omitted when not provided", () => {
   renderPlainShell();
   assert.equal(screen.queryByRole("navigation"), null);
@@ -65,7 +72,7 @@ test("brand renders as an interactive home link only with homeHref", () => {
   renderPlainShell("/");
   const brand = screen.getByRole("link", { name: "Taste" });
   assert.equal(brand.getAttribute("href"), "/");
-  for (const token of ["not-disabled:hover:bg-primary-subtle", "focus-visible:ring-3", "-ml-2"]) {
+  for (const token of ["not-disabled:hover:bg-primary-subtle", "focus-visible:ring-2", "-ml-2"]) {
     assert.ok(brand.classList.contains(token), token);
   }
   cleanup();
@@ -122,7 +129,7 @@ test("renderLink renders the brand link with the shared href, classes and data-s
     assert.ok(received[0].className.split(" ").includes(token), token);
     assert.ok(brand.classList.contains(token), token);
   }
-  assert.ok(brand.classList.contains("focus-visible:ring-3"));
+  assert.ok(brand.classList.contains("focus-visible:ring-2"));
 });
 
 test("panels start collapsed on small screens and toggle via a labelled button", () => {
@@ -152,7 +159,8 @@ test("panel toggles are hidden from md, interactive, and cap the open panel heig
     for (const token of tokens) {
       assert.ok(toggle.classList.contains(token), `${name}: ${token}`);
     }
-    assert.ok(toggle.classList.contains("focus-visible:ring-3"));
+    assert.ok(toggle.classList.contains("focus-visible:ring-2"));
+    assert.ok(toggle.classList.contains("focus-visible:ring-ring"));
     const panel = toggle.closest("[data-slot=app-shell-panel]");
     assert.ok(panel?.classList.contains("max-md:max-h-[60dvh]"));
   }

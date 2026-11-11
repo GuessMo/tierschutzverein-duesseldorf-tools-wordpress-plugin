@@ -144,7 +144,7 @@ Reihenfolge einhalten:
 | Schritt | Warum |
 | --- | --- |
 | `registerErrorHandler` zuerst | Alle Fehler kommen als `{ "error": "<Meldung>" }` mit echtem Statuscode |
-| `registerVersionRoute` | `GET /api/version` → `{ "version": "v1.4.0-3-gabc1234" }`, dient auch als Health-Check |
+| `registerVersionRoute` | `GET /api/version` → `{ "version": "v1.4.0-3-gabc1234", "kitVersion": "0.14.0" }`, dient auch als Health-Check |
 | eigene Routen unter `/api` | `serverPaths` von `registerStaticSite` ist per Default `["/api"]` |
 | `registerStaticSite` nach den Routen | übernimmt den Not-Found-Handler, liefert `index.html` für SPA-Pfade; keinen eigenen `setNotFoundHandler` setzen |
 | `registerShutdown` | sauberes Beenden bei `SIGTERM`/`SIGINT`; mit Datenbank `onClose: () => prisma.$disconnect()` |
@@ -177,6 +177,7 @@ Fehlerklassen aus `@web-app-kit/backend`, nie `reply.code(…).send(…)` von Ha
 | `NotFoundError(resource, id)` | 404 | Datensatz fehlt |
 | `ConflictError` | 409 | Zustand passt nicht (Duplikat, veraltete Version) |
 | `ValidationError` | 422 | Eingabe fachlich ungültig |
+| `TooManyRequestsError` | 429 | Zu viele Versuche, optional `Retry-After` |
 | `UpstreamError` | 502 | Fremddienst antwortet fehlerhaft |
 | `ConfigurationError` | (Startabbruch) | Konfiguration fehlt, Start soll scheitern |
 
@@ -225,13 +226,14 @@ import assert from "node:assert/strict";
 import Fastify from "fastify";
 import { registerErrorHandler, registerVersionRoute } from "@web-app-kit/backend";
 
-test("GET /api/version returns the version", async () => {
+test("GET /api/version returns app and kit version", async () => {
   const app = Fastify();
   registerErrorHandler(app);
   registerVersionRoute(app, { version: "v1.0.0" });
   const response = await app.inject({ method: "GET", url: "/api/version" });
   assert.equal(response.statusCode, 200);
-  assert.deepEqual(response.json(), { version: "v1.0.0" });
+  assert.equal(response.json().version, "v1.0.0");
+  assert.match(response.json().kitVersion, /^\d+\.\d+\.\d+/);
 });
 ```
 

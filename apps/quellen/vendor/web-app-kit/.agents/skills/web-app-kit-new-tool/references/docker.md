@@ -155,9 +155,11 @@ volumes:
 
 Start: `docker compose up --build`. Frontend unter `http://localhost:<FRONTEND_PORT>`,
 Backend unter `http://localhost:<BACKEND_PORT>/api/version`. Benannte Volumes enthalten die
-`node_modules` der Container; nach Änderungen an `package.json` oder einem Kit-Update
-`docker compose build` erneut ausführen. Volumes nur bewusst löschen (`down -v` entfernt auch
-Datenbank-Daten).
+`node_modules` der Container und den Vite-Cache (`node_modules/.vite`). Docker befüllt ein
+Volume nur beim ersten Anlegen aus dem Image: nach Änderungen an `package.json` oder einem
+Kit-Update genügt `docker compose build` nicht, die Volumes behalten die alte Kopie. Prüfen und
+Volumes gezielt neu anlegen: Skill `web-app-kit-update`, `references/dev-containers.md`.
+Volumes nur bewusst löschen (`down -v` entfernt auch Datenbank-Daten).
 
 Ohne Docker geht es auch: in `backend/` und `frontend/` je `npm run dev`.
 

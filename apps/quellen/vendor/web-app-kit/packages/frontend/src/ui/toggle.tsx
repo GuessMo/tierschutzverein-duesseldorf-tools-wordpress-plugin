@@ -3,6 +3,7 @@ import { cva, type VariantProps } from "class-variance-authority";
 import { Toggle as TogglePrimitive } from "radix-ui";
 
 import { cn } from "./cn.js";
+import { TOGGLE_ON_FOCUS_CLASSES } from "./interaction-states.js";
 
 const toggleVariants = cva(
   [
@@ -20,6 +21,7 @@ const toggleVariants = cva(
     "data-[state=on]:not-disabled:hover:bg-primary-hover",
     "data-[state=on]:not-disabled:hover:text-primary-foreground",
     "data-[state=on]:not-disabled:active:bg-primary-active",
+    TOGGLE_ON_FOCUS_CLASSES,
     "disabled:cursor-not-allowed disabled:opacity-50",
     "aria-invalid:border-destructive aria-invalid:ring-3 aria-invalid:ring-destructive/20",
     "dark:aria-invalid:ring-destructive/40 [&_svg]:pointer-events-none [&_svg]:shrink-0",

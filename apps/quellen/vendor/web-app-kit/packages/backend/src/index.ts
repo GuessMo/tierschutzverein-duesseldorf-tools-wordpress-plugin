@@ -6,6 +6,7 @@ export {
   UpstreamError,
   ConflictError,
   UnauthorizedError,
+  TooManyRequestsError,
   ConfigurationError,
 } from "./errors.js";
 export { registerErrorHandler } from "./errorHandler.js";
